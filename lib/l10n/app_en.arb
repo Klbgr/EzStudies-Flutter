@@ -1,0 +1,24 @@
+{
+  "agenda": "Agenda",
+  "search": "Search",
+  "settings": "Settings",
+  "save": "Save",
+  "details": "Details",
+  "title": "Title",
+  "description": "Description",
+  "start": "Start",
+  "end": "End",
+  "source": "Source",
+  "edited": "Edited",
+  "yes": "Yes",
+  "no": "No",
+  "add": "Add",
+  "trash": "Trash",
+  "reset": "Reset",
+  "date": "Date",
+  "help": "Help",
+  "user": "User",
+  "internet": "Internet",
+  "welcome": "Welcome"
+
+}

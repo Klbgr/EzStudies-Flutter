@@ -1,0 +1,23 @@
+{
+  "agenda": "Agenda",
+  "search": "Rechercher",
+  "settings": "Paramètres",
+  "save": "Enregistrer",
+  "details": "Détails",
+  "title": "Titre",
+  "description": "Description",
+  "start": "Début",
+  "end": "Fin",
+  "source": "Source",
+  "edited": "Modifié",
+  "yes": "Oui",
+  "no": "Non",
+  "add": "Ajouter",
+  "trash": "Corbeille",
+  "reset": "Réinitialiser",
+  "date": "Date",
+  "help": "Aide",
+  "user": "Utilisateur",
+  "internet": "Internet",
+  "welcome": "Bienvenue"
+}
