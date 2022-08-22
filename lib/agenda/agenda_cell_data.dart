@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AgendaCellData {
   String id;
   String title;
@@ -30,5 +32,14 @@ class AgendaCellData {
       "edited": edited,
       "trashed": trashed,
     };
+  }
+
+  Color getColor() {
+    int value = 0;
+    for (int i = 0; i < title.length; i++) {
+      value += title.codeUnitAt(i);
+    }
+    value = (value % Colors.primaries.length).toInt();
+    return Colors.primaries[value].shade400;
   }
 }

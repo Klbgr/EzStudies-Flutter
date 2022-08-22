@@ -1,7 +1,6 @@
 import 'package:ezstudies/templates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
@@ -50,9 +49,7 @@ class _WelcomeState extends State<Welcome> {
         Center(
           child: TextButton(
             child: const Text('start'),
-            onPressed: () {
-
-            },
+            onPressed: () {},
           ),
         ),
       ],
@@ -62,10 +59,12 @@ class _WelcomeState extends State<Welcome> {
   }
 
   void next() {
-    pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    pageController.nextPage(
+        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   void previous() {
-    pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    pageController.previousPage(
+        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 }

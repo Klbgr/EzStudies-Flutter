@@ -1,29 +1,28 @@
+import 'package:ezstudies/agenda/time_input.dart';
 import 'package:ezstudies/database_helper.dart';
 import 'package:ezstudies/templates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 
-import '../timestamp_utils.dart';
 import 'agenda_cell_data.dart';
+import 'date_input.dart';
 
 class Details extends StatelessWidget {
-  const Details(this.data, {Key? key}) : super(key: key);
+  Details(this.data, {Key? key}) : super(key: key);
   final AgendaCellData data;
-  static late AgendaCellData newData;
+  late AgendaCellData newData;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
   @override
   Widget build(BuildContext context) {
-      newData = AgendaCellData(
-          id: data.id,
-          title: data.title,
-          description: data.description,
-          start: data.start,
-          end: data.end,
-          added: data.added,
-          edited: data.edited,
-          trashed: data.trashed);
+    newData = AgendaCellData(
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        start: data.start,
+        end: data.end,
+        added: data.added,
+        edited: data.edited,
+        trashed: data.trashed);
 
     String source = AppLocalizations.of(context)!.internet;
     if (newData.added == 1) {
@@ -67,7 +66,7 @@ class Details extends StatelessWidget {
               decoration: InputDecoration(
                   label: Text(AppLocalizations.of(context)!.description),
                   hintText:
-                  AppLocalizations.of(context)!.description.toLowerCase(),
+                      AppLocalizations.of(context)!.description.toLowerCase(),
                   icon: const Icon(Icons.description)),
               initialValue: newData.description,
               onChanged: (value) => newData.description = value)),
@@ -113,29 +112,32 @@ class Details extends StatelessWidget {
             DateTime dateTime = date.getDate();
             TimeOfDay startTime = TimeOfDay.fromDateTime(start.getDate());
             TimeOfDay endTime = TimeOfDay.fromDateTime(end.getDate());
-            newData.start = DateTime(dateTime.year, dateTime.month, dateTime.day, startTime.hour, startTime.minute, 0, 0, 0).millisecondsSinceEpoch;
-            newData.end = DateTime(dateTime.year, dateTime.month, dateTime.day, endTime.hour, endTime.minute, 0, 0, 0).millisecondsSinceEpoch;
+            newData.start = DateTime(dateTime.year, dateTime.month,
+                    dateTime.day, startTime.hour, startTime.minute, 0, 0, 0)
+                .millisecondsSinceEpoch;
+            newData.end = DateTime(dateTime.year, dateTime.month, dateTime.day,
+                    endTime.hour, endTime.minute, 0, 0, 0)
+                .millisecondsSinceEpoch;
             DatabaseHelper database = DatabaseHelper();
             database.open().then((_) {
               if (newData.added == 0) {
                 if (newData.edited == 0) {
                   newData.edited = 1;
-                  database
-                      .insertOrReplace(DatabaseHelper.backup, data)
-                      .then((value) => database
-                      .insertOrReplace(DatabaseHelper.agenda, newData)
-                      .then((value) => database
-                      .close()
-                      .then((value) => Navigator.pop(context))));
+                  database.insertOrReplace(DatabaseHelper.backup, data).then(
+                      (value) => database
+                          .insertOrReplace(DatabaseHelper.agenda, newData)
+                          .then((value) => database
+                              .close()
+                              .then((value) => Navigator.pop(context))));
                 } else {
                   database.insertOrReplace(DatabaseHelper.agenda, newData).then(
-                          (value) => database
+                      (value) => database
                           .close()
                           .then((value) => Navigator.pop(context)));
                 }
               } else {
                 database.insertOrReplace(DatabaseHelper.agenda, newData).then(
-                        (value) => database
+                    (value) => database
                         .close()
                         .then((value) => Navigator.pop(context)));
               }
@@ -167,12 +169,12 @@ class Details extends StatelessWidget {
                         database
                             .insertOrReplace(DatabaseHelper.agenda, backup)
                             .then((value) => database
-                            .delete(DatabaseHelper.backup, backup)
-                            .then((value) {
-                          database
-                              .close()
-                              .then((value) => Navigator.pop(context));
-                        }));
+                                    .delete(DatabaseHelper.backup, backup)
+                                    .then((value) {
+                                  database
+                                      .close()
+                                      .then((value) => Navigator.pop(context));
+                                }));
                       }
                     });
                   });
@@ -201,99 +203,5 @@ class Details extends StatelessWidget {
     );
 
     return Template(AppLocalizations.of(context)!.details, child, null, true);
-  }
-}
-
-class TimeInput extends StatefulWidget {
-  TimeInput(
-      {Key? key, required this.label, required this.icon, required this.date})
-      : super(key: key);
-  final String label;
-  final Icon icon;
-  DateTime date;
-
-  @override
-  State<TimeInput> createState() => _TimeInputState();
-
-  DateTime getDate() {
-    return date;
-  }
-}
-
-class _TimeInputState extends State<TimeInput> {
-  late String text = DateFormat("HH:mm", getLocale()).format(widget.date);
-  @override
-  Widget build(BuildContext context) {
-    initializeDateFormatting(getLocale(), null);
-    return TextFormField(
-      decoration: InputDecoration(
-          label: Text(widget.label),
-          hintText: widget.label.toLowerCase(),
-          icon: widget.icon),
-      controller: TextEditingController(text: text),
-      onTap: () {
-        showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.fromDateTime(widget.date))
-            .then((value) {
-          if (value != null) {
-            widget.date = DateTime(widget.date.year, widget.date.month,
-                widget.date.day, value.hour, value.minute, 0, 0, 0);
-            setState(() {
-              text = DateFormat("HH:mm", getLocale()).format(widget.date);
-            });
-          }
-        });
-      },
-    );
-  }
-}
-
-class DateInput extends StatefulWidget {
-  DateInput(
-      {Key? key, required this.label, required this.icon, required this.date})
-      : super(key: key);
-  final String label;
-  final Icon icon;
-  DateTime date;
-
-  @override
-  State<DateInput> createState() => _DateInputState();
-
-  DateTime getDate() {
-    return date;
-  }
-}
-
-class _DateInputState extends State<DateInput> {
-  late String text = DateFormat("EEEE, d MMMM y", getLocale()).format(widget.date);
-  @override
-  Widget build(BuildContext context) {
-    initializeDateFormatting(getLocale(), null);
-    return TextFormField(
-      decoration: InputDecoration(
-          label: Text(widget.label),
-          hintText: widget.label.toLowerCase(),
-          icon: widget.icon),
-      controller: TextEditingController(text: text),
-      onTap: () {
-        showDatePicker(
-                context: context,
-                initialDate: widget.date,
-                lastDate: DateTime(
-                    widget.date.year, widget.date.month + 1, widget.date.day),
-                firstDate: DateTime(
-                    widget.date.year, widget.date.month - 1, widget.date.day))
-            .then((value) {
-          if (value != null) {
-            widget.date = DateTime(value.year, value.month,
-                value.day, widget.date.hour, widget.date.minute, 0, 0, 0);
-            setState(() {
-              text = DateFormat("EEEE, d MMMM y", getLocale()).format(widget.date);
-            });
-          }
-        });
-      },
-    );
   }
 }

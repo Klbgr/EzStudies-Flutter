@@ -39,7 +39,20 @@ class DatabaseHelper {
   }
 
   Future<int> delete(String table, AgendaCellData data) async {
-    return await database.delete(table, where: 'id = ?', whereArgs: [data.id]);
+    return await database.delete(table, where: "id = ?", whereArgs: [data.id]);
+  }
+
+  Future<void> reset() async {
+    await database
+        .delete(agenda, where: "added = 1")
+        .then((value) async => await get(backup).then((value) async {
+              for (int i = 0; i < value.length; i++) {
+                await delete(backup, value[i]);
+                await insertOrReplace(agenda, value[i]);
+              }
+              await database.update(agenda, Map.of({"trashed": 0}),
+                  where: "trashed = 1");
+            }));
   }
 
   Future<void> close() async {
@@ -47,33 +60,35 @@ class DatabaseHelper {
   }
 
   Future<List<AgendaCellData>> getById(String table, String id) async {
-    final List<Map<String, dynamic>> maps = await database.query(table, where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps =
+        await database.query(table, where: 'id = ?', whereArgs: [id]);
     return List.generate(maps.length, (i) {
       return AgendaCellData(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        description: maps[i]['description'],
-        start: maps[i]['start'],
-        end: maps[i]['end'],
-        added: maps[i]['added'],
-        edited: maps[i]['edited'],
-        trashed: maps[i]['trashed'],
+        id: maps[i]["id"],
+        title: maps[i]["title"],
+        description: maps[i]["description"],
+        start: maps[i]["start"],
+        end: maps[i]["end"],
+        added: maps[i]["added"],
+        edited: maps[i]["edited"],
+        trashed: maps[i]["trashed"],
       );
     });
   }
 
   Future<List<AgendaCellData>> get(String table) async {
-    final List<Map<String, dynamic>> maps = await database.rawQuery("SELECT * FROM $table ORDER BY start");
+    final List<Map<String, dynamic>> maps =
+        await database.query(table, orderBy: "start");
     return List.generate(maps.length, (i) {
       return AgendaCellData(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        description: maps[i]['description'],
-        start: maps[i]['start'],
-        end: maps[i]['end'],
-        added: maps[i]['added'],
-        edited: maps[i]['edited'],
-        trashed: maps[i]['trashed'],
+        id: maps[i]["id"],
+        title: maps[i]["title"],
+        description: maps[i]["description"],
+        start: maps[i]["start"],
+        end: maps[i]["end"],
+        added: maps[i]["added"],
+        edited: maps[i]["edited"],
+        trashed: maps[i]["trashed"],
       );
     });
   }

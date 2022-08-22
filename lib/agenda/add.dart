@@ -1,14 +1,15 @@
+import 'package:ezstudies/agenda/time_input.dart';
 import 'package:ezstudies/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../templates.dart';
 import 'agenda_cell_data.dart';
-import 'details.dart';
+import 'date_input.dart';
 
 class Add extends StatelessWidget {
-  const Add({Key? key}) : super(key: key);
-  static AgendaCellData newData = AgendaCellData(
+  Add({Key? key}) : super(key: key);
+  AgendaCellData newData = AgendaCellData(
     id: "",
     title: "",
     description: "",
@@ -106,8 +107,16 @@ class Add extends StatelessWidget {
                           .insert(DatabaseHelper.agenda, newData)
                           .then((value) {
                         if (!value) {
-                          //error
-                          print("error");
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialogTemplate(
+                                      AppLocalizations.of(context)!.error,
+                                      "error", [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                            AppLocalizations.of(context)!.ok))
+                                  ]));
                           database.close();
                         } else {
                           database

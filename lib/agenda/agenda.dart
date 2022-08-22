@@ -35,30 +35,45 @@ class _AgendaState extends State<Agenda> {
         Text(AppLocalizations.of(context)!.trash, style: menuStyle),
         const Trash(),
         () => load());
-    OpenContainerTemplate reset = OpenContainerTemplate(
-        Text(AppLocalizations.of(context)!.reset, style: menuStyle),
-        Text(AppLocalizations.of(context)!.reset),
-        () => load());
-
-    OpenContainerTemplate help = OpenContainerTemplate(
-        Text(AppLocalizations.of(context)!.help, style: menuStyle),
-        Text(AppLocalizations.of(context)!.help),
-        () => load());
 
     Widget menu = MenuTemplate(<PopupMenuItem<String>>[
       PopupMenuItem<String>(value: "trash", child: trash),
-      PopupMenuItem<String>(value: "reset", child: reset),
-      PopupMenuItem<String>(value: "help", child: help)
+      PopupMenuItem<String>(
+          value: "reset", child: Text(AppLocalizations.of(context)!.reset)),
+      PopupMenuItem<String>(
+          value: "help", child: Text(AppLocalizations.of(context)!.help))
     ], (value) {
       switch (value) {
         case "trash":
           trash.getTrigger().call();
           break;
         case "reset":
-          reset.getTrigger().call();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                AppLocalizations.of(context)!.reset, "reset?", [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.cancel)),
+              TextButton(
+                  onPressed: () {
+                    reset();
+                    Navigator.pop(context);
+                  },
+                  child: Text(AppLocalizations.of(context)!.reset))
+            ]),
+          );
           break;
         case "help":
-          help.getTrigger().call();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                AppLocalizations.of(context)!.help, "help", [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok))
+            ]),
+          );
           break;
       }
     });
@@ -66,7 +81,12 @@ class _AgendaState extends State<Agenda> {
     OpenContainerTemplate add = OpenContainerTemplate(
         Row(
           children: [
-            Container(margin: const EdgeInsets.only(right: 10), child: const Icon(Icons.add, color: Colors.white,)),
+            Container(
+                margin: const EdgeInsets.only(right: 10),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                )),
             Text(
               AppLocalizations.of(context)!.add,
               style: const TextStyle(
@@ -76,34 +96,53 @@ class _AgendaState extends State<Agenda> {
             )
           ],
         ),
-        const Add(),
+        Add(),
         () => load());
+
+    Widget content = Center(
+        child: TextButton(
+            onPressed: () => refresh(),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                margin: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.refresh, size: 16),
+              ),
+              Text(AppLocalizations.of(context)!.refresh)
+            ])));
+    if (list.isNotEmpty) {
+      content = ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: list.length,
+        itemBuilder: (context, index) {
+          var data = list[index];
+          return Dismissible(
+            key: UniqueKey(),
+            onDismissed: (direction) {
+              remove(data);
+            },
+            background: Container(
+                color: Colors.red,
+                child: Container(
+                    margin: const EdgeInsets.only(left: 20, right: 20),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Icon(Icons.delete),
+                          Icon(Icons.delete)
+                        ]))),
+            child: _AgendaCell(
+                this,
+                data,
+                index == 0 || !isSameDay(data.start, list[index - 1].start),
+                index == 0 || !isSameMonth(data.start, list[index - 1].start)),
+          );
+        },
+      );
+    }
 
     Widget child = Stack(
       children: [
-        RefreshIndicator(
-            onRefresh: () => refresh(),
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                var data = list[index];
-                return Dismissible(
-                  key: UniqueKey(),
-                  onDismissed: (direction) {
-                    remove(data);
-                  },
-                  background: Container(color: Colors.red),
-                  child: _AgendaCell(
-                      this,
-                      data,
-                      index == 0 ||
-                          !isSameDay(data.start, list[index - 1].start),
-                      index == 0 ||
-                          !isSameMonth(data.start, list[index - 1].start)),
-                );
-              },
-            )),
+        RefreshIndicator(onRefresh: () => refresh(), child: content),
         Container(
           alignment: Alignment.bottomRight,
           margin: const EdgeInsets.only(right: 20, bottom: 20),
@@ -132,28 +171,6 @@ class _AgendaState extends State<Agenda> {
             }));
   }
 
-  /*
-  void add(String id, String title, String description, int start, int end) {
-    CellData data = CellData(
-      id: id,
-      title: title,
-      description: description,
-      start: start,
-      end: end,
-      added: 1,
-    );
-    DatabaseHelper database = DatabaseHelper();
-    database.open().then((value) => database
-        .insert(DatabaseHelper.agenda, data)
-        .then((value) => database.close()));
-    if (!list.any((element) => element.id == data.id)) {
-      setState(() => list.add(data));
-    } else {
-      //error
-    }
-  }
-   */
-
   void remove(AgendaCellData data) {
     data.trashed = 1;
     DatabaseHelper database = DatabaseHelper();
@@ -163,7 +180,16 @@ class _AgendaState extends State<Agenda> {
     setState(() => list.remove(data));
   }
 
-  Future<void> refresh() async {}
+  void reset() {
+    DatabaseHelper database = DatabaseHelper();
+    database.open().then((value) => database
+        .reset()
+        .then((value) => database.close().then((value) => load())));
+  }
+
+  Future<void> refresh() async {
+    load();
+  }
 }
 
 class _AgendaCell extends StatelessWidget {
@@ -183,14 +209,7 @@ class _AgendaCell extends StatelessWidget {
     String end = timestampToTime(data.end);
     String description = data.description;
     if (description != "") {
-      description = " ($description)";
-    }
-
-    String tag = "";
-    if (data.added == 1) {
-      tag = " (Added)";
-    } else if (data.edited == 1) {
-      tag = " (Edited)";
+      description = "($description)";
     }
 
     List<Text> date = <Text>[];
@@ -200,6 +219,20 @@ class _AgendaCell extends StatelessWidget {
         Text(timestampToDayOfMonth(data.start).toString(),
             style: const TextStyle(fontSize: 20))
       ];
+    }
+    List<Widget> children = [
+      Text(
+        data.title,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      )
+    ];
+
+    if (data.added == 0 && data.edited == 1) {
+      children.add(const Icon(Icons.edit, size: 16));
+    } else if (data.added == 1) {
+      children.add(const Icon(Icons.add, size: 16));
     }
 
     Widget child1 = Row(children: [
@@ -212,24 +245,19 @@ class _AgendaCell extends StatelessWidget {
           child: Container(
               margin: const EdgeInsets.only(left: 20),
               padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.all(Radius.circular(16))),
+              decoration: BoxDecoration(
+                  color: data.getColor(),
+                  borderRadius: const BorderRadius.all(Radius.circular(16))),
               child: Column(children: [
                 Container(
-                  margin: const EdgeInsets.only(bottom: 2.5),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    data.title + tag,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                    margin: const EdgeInsets.only(bottom: 2.5),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: children)),
                 Container(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "$start - $end$description",
+                    "$start - $end $description",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

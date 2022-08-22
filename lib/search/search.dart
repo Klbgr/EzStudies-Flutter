@@ -12,6 +12,7 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
-    return Template(AppLocalizations.of(context)!.search, const Text("soon"), null, false);
+    return Template(
+        AppLocalizations.of(context)!.search, const Text("soon"), null, false);
   }
 }

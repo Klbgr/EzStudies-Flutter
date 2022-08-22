@@ -29,7 +29,7 @@ class Template extends StatelessWidget {
             statusBarIconBrightness: Brightness.dark,
             statusBarBrightness: Brightness.light,
           ),
-          actions: (menu == null)? null: [menu!],
+          actions: (menu == null) ? null : [menu!],
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: iconButton,
@@ -71,13 +71,13 @@ class MenuTemplate extends StatelessWidget {
   }
 }
 
-
 class OpenContainerTemplate extends StatelessWidget {
-  const OpenContainerTemplate(this.child1, this.child2, this.onClosed, {Key? key}) : super(key: key);
+  OpenContainerTemplate(this.child1, this.child2, this.onClosed, {Key? key})
+      : super(key: key);
   final Widget child1;
   final Widget child2;
   final Function onClosed;
-  static Function trigger = () {};
+  Function trigger = () {};
 
   @override
   Widget build(BuildContext context) {
@@ -96,5 +96,19 @@ class OpenContainerTemplate extends StatelessWidget {
 
   Function getTrigger() {
     return trigger;
+  }
+}
+
+class AlertDialogTemplate extends StatelessWidget {
+  const AlertDialogTemplate(this.title, this.content, this.actions, {Key? key})
+      : super(key: key);
+  final String title;
+  final String content;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+        title: Text(title), content: Text(content), actions: actions);
   }
 }

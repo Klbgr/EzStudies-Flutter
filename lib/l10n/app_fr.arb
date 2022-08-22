@@ -19,5 +19,10 @@
   "help": "Aide",
   "user": "Utilisateur",
   "internet": "Internet",
-  "welcome": "Bienvenue"
+  "welcome": "Bienvenue",
+  "ok": "Ok",
+  "error": "Erreur",
+  "cancel": "Annuler",
+  "nothing_to_show": "Rien à afficher",
+  "refresh": "Rafraîchir"
 }

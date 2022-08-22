@@ -19,6 +19,11 @@
   "help": "Help",
   "user": "User",
   "internet": "Internet",
-  "welcome": "Welcome"
+  "welcome": "Welcome",
+  "ok": "Ok",
+  "error": "Error",
+  "cancel": "Cancel",
+  "nothing_to_show": "Nothing to show",
+  "refresh": "Refresh"
 
 }

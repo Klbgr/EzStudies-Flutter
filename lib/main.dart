@@ -11,12 +11,12 @@
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
-import 'package:ezstudies/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() {
+void main() async {
+  await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
   runApp(const EzStudies());
 }
 
@@ -65,11 +65,7 @@ class _MainState extends State<Main> {
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
-        onPageChanged: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
+        onPageChanged: (index) => setState(() => selectedIndex = index),
         children: widgets,
       ),
       bottomNavigationBar: BottomNavigationBar(

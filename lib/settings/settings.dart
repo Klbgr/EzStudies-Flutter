@@ -12,6 +12,7 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    return Template(AppLocalizations.of(context)!.settings, const Text("soon"), null, false);
+    return Template(AppLocalizations.of(context)!.settings, const Text("soon"),
+        null, false);
   }
 }
