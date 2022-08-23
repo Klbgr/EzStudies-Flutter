@@ -23,6 +23,7 @@ class DateInput extends StatefulWidget {
 class _DateInputState extends State<DateInput> {
   late String text =
       DateFormat("EEEE, d MMMM y", getLocale()).format(widget.date);
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting(getLocale(), null);

@@ -24,6 +24,8 @@
   "error": "Error",
   "cancel": "Cancel",
   "nothing_to_show": "Nothing to show",
-  "refresh": "Refresh"
-
+  "refresh": "Refresh",
+  "next": "Next",
+  "previous": "Previous",
+  "begin": "Begin"
 }

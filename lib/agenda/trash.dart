@@ -17,6 +17,7 @@ class Trash extends StatefulWidget {
 class _TrashState extends State<Trash> {
   bool initialized = false;
   List<AgendaCellData> list = [];
+
   @override
   Widget build(BuildContext context) {
     if (!initialized) {

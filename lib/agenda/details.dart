@@ -12,6 +12,7 @@ class Details extends StatelessWidget {
   final AgendaCellData data;
   late AgendaCellData newData;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
+
   @override
   Widget build(BuildContext context) {
     newData = AgendaCellData(
@@ -162,7 +163,16 @@ class Details extends StatelessWidget {
                         .getById(DatabaseHelper.backup, newData.id)
                         .then((value) {
                       if (value.isEmpty) {
-                        print("error");
+                        //TODO: error
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialogTemplate(
+                              AppLocalizations.of(context)!.error, "error", [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(AppLocalizations.of(context)!.ok))
+                          ]),
+                        );
                         database.close();
                       } else {
                         backup = value[0];

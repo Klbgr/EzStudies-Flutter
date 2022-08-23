@@ -24,5 +24,8 @@
   "error": "Erreur",
   "cancel": "Annuler",
   "nothing_to_show": "Rien à afficher",
-  "refresh": "Rafraîchir"
+  "refresh": "Rafraîchir",
+  "next": "Suivant",
+  "previous": "Précédent",
+  "begin": "Commencer"
 }

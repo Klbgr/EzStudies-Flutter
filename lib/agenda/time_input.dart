@@ -22,6 +22,7 @@ class TimeInput extends StatefulWidget {
 
 class _TimeInputState extends State<TimeInput> {
   late String text = DateFormat("HH:mm", getLocale()).format(widget.date);
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting(getLocale(), null);

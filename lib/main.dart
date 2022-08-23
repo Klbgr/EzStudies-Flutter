@@ -43,7 +43,7 @@ class EzStudies extends StatelessWidget {
       home: FutureBuilder<bool>(
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data == true) {
-              return const Welcome();
+              return const Main();
             } else {
               return const Welcome();
             }
@@ -70,6 +70,7 @@ class _MainState extends State<Main> {
     const Search(),
     const Settings(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
