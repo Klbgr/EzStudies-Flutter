@@ -39,6 +39,8 @@ dependencies:
   intl: ^0.17.0
   sqflite: ^2.0.3+1
   animations: ^2.0.3
+  settings_ui: ^2.0.2
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

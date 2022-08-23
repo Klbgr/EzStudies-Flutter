@@ -11,9 +11,11 @@
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
+import 'package:ezstudies/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
@@ -25,7 +27,6 @@ class EzStudies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget home = const Main();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -39,7 +40,17 @@ class EzStudies extends StatelessWidget {
         Locale('fr', ''),
       ],
       title: "EzStudies",
-      home: home,
+      home: FutureBuilder<bool>(
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data == true) {
+              return const Welcome();
+            } else {
+              return const Welcome();
+            }
+          },
+          future: SharedPreferences.getInstance().then((value) {
+            return value.getBool("welcome") ?? false;
+          })),
     );
   }
 }

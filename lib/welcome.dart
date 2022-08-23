@@ -2,6 +2,8 @@ import 'package:ezstudies/templates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'main.dart';
+
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
 
@@ -18,40 +20,53 @@ class _WelcomeState extends State<Welcome> {
     Widget child = PageView(
       controller: pageController,
       children: [
-        Center(
-          child: TextButton(
-            child: const Text("yo"),
-            onPressed: () {
-              next();
-            },
+        Stack(children: [
+          Container(
+            alignment: Alignment.bottomRight,
+            margin: const EdgeInsets.only(bottom: 20, right: 20),
+            child: FloatingActionButton.extended(
+                onPressed: () => next(),
+                label: const Text("next"),
+                icon: const Icon(Icons.arrow_forward)),
+          )
+        ]),
+        Stack(children: [
+          Container(
+            alignment: Alignment.bottomLeft,
+            margin: const EdgeInsets.only(bottom: 20, left: 20),
+            child: FloatingActionButton.extended(
+                onPressed: () => previous(),
+                label: const Text("previous"),
+                icon: const Icon(Icons.arrow_back)),
           ),
-        ),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextButton(
-                child: const Text('previous'),
-                onPressed: () {
-                  previous();
-                },
-              ),
-              TextButton(
-                child: const Text('next'),
-                onPressed: () {
-                  next();
-                },
-              ),
-            ],
+          Container(
+            alignment: Alignment.bottomRight,
+            margin: const EdgeInsets.only(bottom: 20, right: 20),
+            child: FloatingActionButton.extended(
+                onPressed: () => next(),
+                label: const Text("next"),
+                icon: const Icon(Icons.arrow_forward)),
+          )
+        ]),
+        Stack(children: [
+          Container(
+            alignment: Alignment.bottomLeft,
+            margin: const EdgeInsets.only(bottom: 20, left: 20),
+            child: FloatingActionButton.extended(
+                heroTag: "previous",
+                onPressed: () => previous(),
+                label: const Text("previous"),
+                icon: const Icon(Icons.arrow_back)),
           ),
-        ),
-        Center(
-          child: TextButton(
-            child: const Text('start'),
-            onPressed: () {},
-          ),
-        ),
+          Container(
+            alignment: Alignment.bottomRight,
+            margin: const EdgeInsets.only(bottom: 20, right: 20),
+            child: FloatingActionButton.extended(
+                onPressed: () => start(),
+                label: const Text("start"),
+                icon: const Icon(Icons.arrow_forward)),
+          )
+        ])
       ],
     );
 
@@ -66,5 +81,10 @@ class _WelcomeState extends State<Welcome> {
   void previous() {
     pageController.previousPage(
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  }
+
+  void start() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => const Main()));
   }
 }
