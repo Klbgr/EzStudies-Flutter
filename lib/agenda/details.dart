@@ -111,111 +111,116 @@ class Details extends StatelessWidget {
           )));
     }
 
-    List<Widget> buttons = <Widget>[
-      FloatingActionButton.extended(
-          backgroundColor: Colors.green,
-          icon: const Icon(Icons.save),
-          onPressed: () {
-            DateTime dateTime = date.getDate();
-            TimeOfDay startTime = TimeOfDay.fromDateTime(start.getDate());
-            TimeOfDay endTime = TimeOfDay.fromDateTime(end.getDate());
-            newData.start = DateTime(dateTime.year, dateTime.month,
-                    dateTime.day, startTime.hour, startTime.minute, 0, 0, 0)
-                .millisecondsSinceEpoch;
-            newData.end = DateTime(dateTime.year, dateTime.month, dateTime.day,
-                    endTime.hour, endTime.minute, 0, 0, 0)
-                .millisecondsSinceEpoch;
-            DatabaseHelper database = DatabaseHelper();
-            database.open().then((_) {
-              if (newData.added == 0) {
-                if (newData.edited == 0) {
-                  newData.edited = 1;
-                  database.insertOrReplace(DatabaseHelper.backup, data).then(
-                      (value) => database
-                          .insertOrReplace(DatabaseHelper.agenda, newData)
-                          .then((value) => database
-                              .close()
-                              .then((value) => Navigator.pop(context))));
+    List<Widget> column = [
+      Expanded(
+          child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(left: 20, right: 20),
+                  child: Column(children: form))))
+    ];
+
+    if (editable) {
+      List<Widget> buttons = <Widget>[
+        FloatingActionButton.extended(
+            backgroundColor: Colors.green,
+            icon: const Icon(Icons.save),
+            onPressed: () {
+              DateTime dateTime = date.getDate();
+              TimeOfDay startTime = TimeOfDay.fromDateTime(start.getDate());
+              TimeOfDay endTime = TimeOfDay.fromDateTime(end.getDate());
+              newData.start = DateTime(dateTime.year, dateTime.month,
+                      dateTime.day, startTime.hour, startTime.minute, 0, 0, 0)
+                  .millisecondsSinceEpoch;
+              newData.end = DateTime(dateTime.year, dateTime.month,
+                      dateTime.day, endTime.hour, endTime.minute, 0, 0, 0)
+                  .millisecondsSinceEpoch;
+              DatabaseHelper database = DatabaseHelper();
+              database.open().then((_) {
+                if (newData.added == 0) {
+                  if (newData.edited == 0) {
+                    newData.edited = 1;
+                    database.insertOrReplace(DatabaseHelper.backup, data).then(
+                        (value) => database
+                            .insertOrReplace(DatabaseHelper.agenda, newData)
+                            .then((value) => database
+                                .close()
+                                .then((value) => Navigator.pop(context))));
+                  } else {
+                    database
+                        .insertOrReplace(DatabaseHelper.agenda, newData)
+                        .then((value) => database
+                            .close()
+                            .then((value) => Navigator.pop(context)));
+                  }
                 } else {
                   database.insertOrReplace(DatabaseHelper.agenda, newData).then(
                       (value) => database
                           .close()
                           .then((value) => Navigator.pop(context)));
                 }
-              } else {
-                database.insertOrReplace(DatabaseHelper.agenda, newData).then(
-                    (value) => database
-                        .close()
-                        .then((value) => Navigator.pop(context)));
-              }
-            });
-          },
-          label: Text(AppLocalizations.of(context)!.save))
-    ];
+              });
+            },
+            label: Text(AppLocalizations.of(context)!.save))
+      ];
 
-    if (newData.added == 0 && newData.edited == 1) {
-      buttons.insert(
-          0,
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            child: FloatingActionButton.extended(
-                backgroundColor: Colors.red,
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  AgendaCellData backup;
-                  DatabaseHelper database = DatabaseHelper();
-                  database.open().then((_) {
-                    database
-                        .getById(DatabaseHelper.backup, newData.id)
-                        .then((value) {
-                      if (value.isEmpty) {
-                        //TODO: error
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialogTemplate(
-                              AppLocalizations.of(context)!.error, "error", [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(AppLocalizations.of(context)!.ok))
-                          ]),
-                        );
-                        database.close();
-                      } else {
-                        backup = value[0];
-                        database
-                            .insertOrReplace(DatabaseHelper.agenda, backup)
-                            .then((value) => database
-                                    .delete(DatabaseHelper.backup, backup)
-                                    .then((value) {
-                                  database
-                                      .close()
-                                      .then((value) => Navigator.pop(context));
-                                }));
-                      }
+      if (newData.added == 0 && newData.edited == 1) {
+        buttons.insert(
+            0,
+            Container(
+              margin: const EdgeInsets.only(right: 20),
+              child: FloatingActionButton.extended(
+                  backgroundColor: Colors.red,
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    AgendaCellData backup;
+                    DatabaseHelper database = DatabaseHelper();
+                    database.open().then((_) {
+                      database
+                          .getById(DatabaseHelper.backup, newData.id)
+                          .then((value) {
+                        if (value.isEmpty) {
+                          //TODO: error
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialogTemplate(
+                                AppLocalizations.of(context)!.error, "error", [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(AppLocalizations.of(context)!.ok))
+                            ]),
+                          );
+                          database.close();
+                        } else {
+                          backup = value[0];
+                          database
+                              .insertOrReplace(DatabaseHelper.agenda, backup)
+                              .then((value) => database
+                                      .delete(DatabaseHelper.backup, backup)
+                                      .then((value) {
+                                    database.close().then(
+                                        (value) => Navigator.pop(context));
+                                  }));
+                        }
+                      });
                     });
-                  });
-                },
-                label: Text(AppLocalizations.of(context)!.reset)),
-          ));
+                  },
+                  label: Text(AppLocalizations.of(context)!.reset)),
+            ));
+      }
+
+      column.add(Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: buttons,
+        ),
+      ));
     }
 
     Widget child = Column(
-      children: [
-        Expanded(
-            child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.only(left: 20, right: 20),
-                    child: Column(children: form)))),
-        Container(
-          margin: const EdgeInsets.only(bottom: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: buttons,
-          ),
-        )
-      ],
+      children: column,
     );
 
     return Template(AppLocalizations.of(context)!.details, child, null, true);
