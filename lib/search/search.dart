@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:ezstudies/search/search_agenda.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../agenda/agenda.dart';
 import '../utils/secret.dart';
 import '../utils/templates.dart';
 
@@ -132,7 +132,7 @@ class _SearchCell extends StatelessWidget {
           Text("${data.name} (${data.dept})", overflow: TextOverflow.ellipsis),
     );
 
-    Widget child2 = SearchAgenda(data);
+    Widget child2 = Agenda(search: true, data: data);
 
     return OpenContainerTemplate(child1, child2, () {});
   }

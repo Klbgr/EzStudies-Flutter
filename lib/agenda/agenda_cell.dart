@@ -8,12 +8,15 @@ import 'details.dart';
 
 class AgendaCell extends StatelessWidget {
   const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth, this.onClose,
+      this.openable, this.editable,
       {Key? key})
       : super(key: key);
   final bool firstOfDay;
   final bool firstOfMonth;
   final AgendaCellData data;
   final Function onClose;
+  final bool openable;
+  final bool editable;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class AgendaCell extends StatelessWidget {
       children.add(const Icon(Icons.person, size: 16));
     }
 
-    Widget child1 = Row(children: [
+    Widget child = Row(children: [
       Container(
         alignment: Alignment.center,
         width: 30,
@@ -79,11 +82,12 @@ class AgendaCell extends StatelessWidget {
               ])))
     ]);
 
-    Widget child2 = Details(data);
-
-    Widget child = OpenContainerTemplate(child1, child2, () {
-      onClose();
-    });
+    if (openable) {
+      child =
+          OpenContainerTemplate(child, Details(data, editable: editable), () {
+        onClose();
+      });
+    }
 
     if (firstOfMonth) {
       child = Column(children: [

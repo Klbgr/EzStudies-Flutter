@@ -8,9 +8,10 @@ import 'agenda_cell_data.dart';
 import 'date_input.dart';
 
 class Details extends StatelessWidget {
-  Details(this.data, {Key? key}) : super(key: key);
+  Details(this.data, {this.editable = true, Key? key}) : super(key: key);
   final AgendaCellData data;
   late AgendaCellData newData;
+  final bool editable;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
 
   @override
@@ -33,21 +34,25 @@ class Details extends StatelessWidget {
     DateInput date = DateInput(
         AppLocalizations.of(context)!.date,
         const Icon(Icons.calendar_month),
-        DateTime.fromMillisecondsSinceEpoch(newData.start));
+        DateTime.fromMillisecondsSinceEpoch(newData.start),
+        editable: editable);
     TimeInput start = TimeInput(
         AppLocalizations.of(context)!.start,
         const Icon(Icons.access_time),
-        DateTime.fromMillisecondsSinceEpoch(newData.start));
+        DateTime.fromMillisecondsSinceEpoch(newData.start),
+        editable: editable);
     TimeInput end = TimeInput(
         AppLocalizations.of(context)!.end,
         const Icon(Icons.access_time_filled),
-        DateTime.fromMillisecondsSinceEpoch(newData.end));
+        DateTime.fromMillisecondsSinceEpoch(newData.end),
+        editable: editable);
 
     List<Widget> form = <Container>[
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
           child: TextFormField(
+              enabled: editable,
               keyboardType: TextInputType.multiline,
               minLines: 1,
               maxLines: 5,
@@ -61,6 +66,7 @@ class Details extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: margin,
           child: TextFormField(
+              enabled: editable,
               keyboardType: TextInputType.multiline,
               minLines: 1,
               maxLines: 5,

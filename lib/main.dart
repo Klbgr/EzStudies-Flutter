@@ -68,7 +68,7 @@ class _MainState extends State<Main> {
   int selectedIndex = 0;
   PageController pageController = PageController(initialPage: 0);
   final List<Widget> widgets = <Widget>[
-    const Agenda(),
+    const Agenda(agenda: true),
     const Search(),
     const Settings(),
   ];

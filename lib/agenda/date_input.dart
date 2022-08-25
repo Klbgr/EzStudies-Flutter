@@ -5,10 +5,12 @@ import 'package:intl/intl.dart';
 import '../utils/timestamp_utils.dart';
 
 class DateInput extends StatefulWidget {
-  DateInput(this.label, this.icon, this.date, {Key? key}) : super(key: key);
+  DateInput(this.label, this.icon, this.date, {this.editable = true, Key? key})
+      : super(key: key);
   final String label;
   final Icon icon;
   DateTime date;
+  final bool editable;
 
   @override
   State<DateInput> createState() => _DateInputState();
@@ -28,6 +30,7 @@ class _DateInputState extends State<DateInput> {
     DateTime date =
         DateTime(widget.date.year, widget.date.month, widget.date.day);
     return TextFormField(
+      enabled: widget.editable,
       decoration: InputDecoration(
           label: Text(widget.label),
           hintText: widget.label.toLowerCase(),

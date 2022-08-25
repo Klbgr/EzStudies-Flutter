@@ -82,7 +82,7 @@ class OpenContainerTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
-      closedColor: Colors.transparent,
+      closedColor: Colors.white,
       closedElevation: 0,
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, action) {
