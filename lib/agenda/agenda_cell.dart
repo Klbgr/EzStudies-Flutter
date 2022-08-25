@@ -29,12 +29,21 @@ class AgendaCell extends StatelessWidget {
       description = "($description)";
     }
 
-    List<Text> date = <Text>[];
+    List<Widget> date = <Text>[];
     if (firstOfDay) {
+      bool today = isSameDay(data.start, DateTime.now().millisecondsSinceEpoch);
+
       date = [
-        Text(timestampToWeekDay(data.start)),
-        Text(timestampToDayOfMonth(data.start).toString(),
-            style: const TextStyle(fontSize: 20))
+        Text(timestampToWeekDay(data.start),
+            style: TextStyle(color: (today) ? Colors.blue : Colors.black)),
+        ClipOval(
+            child: AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                    alignment: Alignment.center,
+                    color: (today) ? Colors.blue : Colors.transparent,
+                    child: Text(timestampToDayOfMonth(data.start).toString(),
+                        style: const TextStyle(fontSize: 20))))),
       ];
     }
     List<Widget> children = [
@@ -55,7 +64,7 @@ class AgendaCell extends StatelessWidget {
     Widget child = Row(children: [
       Container(
         alignment: Alignment.center,
-        width: 30,
+        width: 35,
         child: Column(children: date),
       ),
       Expanded(
@@ -86,7 +95,7 @@ class AgendaCell extends StatelessWidget {
       child =
           OpenContainerTemplate(child, Details(data, editable: editable), () {
         onClose();
-      });
+      }, radius: 16);
     }
 
     if (firstOfMonth) {

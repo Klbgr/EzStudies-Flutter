@@ -72,18 +72,27 @@ class MenuTemplate extends StatelessWidget {
 }
 
 class OpenContainerTemplate extends StatelessWidget {
-  OpenContainerTemplate(this.child1, this.child2, this.onClosed, {Key? key})
+  OpenContainerTemplate(this.child1, this.child2, this.onClosed,
+      {this.color = Colors.white,
+      this.radius = 0,
+      this.elevation = 0,
+      Key? key})
       : super(key: key);
   final Widget child1;
   final Widget child2;
   final Function onClosed;
   Function trigger = () {};
+  final Color color;
+  final double radius;
+  final double elevation;
 
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
-      closedColor: Colors.white,
-      closedElevation: 0,
+      closedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(radius))),
+      closedColor: color,
+      closedElevation: elevation,
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, action) {
         trigger = action;

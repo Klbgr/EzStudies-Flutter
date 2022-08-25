@@ -49,8 +49,7 @@ class EzStudies extends StatelessWidget {
             }
           },
           future: SharedPreferences.getInstance().then((value) {
-            return (value.getBool("welcome") ?? false) &&
-                (value.getString("name") ?? "").isNotEmpty &&
+            return (value.getString("name") ?? "").isNotEmpty &&
                 (value.getString("password") ?? "").isNotEmpty;
           })),
     );

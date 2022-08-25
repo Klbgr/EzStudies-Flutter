@@ -103,18 +103,21 @@ class _AgendaState extends State<Agenda> {
     if (widget.agenda) {
       OpenContainerTemplate add = OpenContainerTemplate(
           Container(
-              margin: const EdgeInsets.only(bottom: 10),
               child: FloatingActionButton.extended(
+                  elevation: 0,
                   onPressed: null,
                   label: Text(AppLocalizations.of(context)!.add),
                   icon: const Icon(Icons.add))),
           Add(),
-          () => load());
+          () => load(),
+          radius: 24,
+          elevation: 6,
+          color: Colors.blue);
       child = Stack(
         children: [
           child,
           Container(
-            margin: const EdgeInsets.only(right: 20, bottom: 10),
+            margin: const EdgeInsets.only(right: 20, bottom: 20),
             alignment: Alignment.bottomRight,
             child: add,
           )
@@ -124,7 +127,8 @@ class _AgendaState extends State<Agenda> {
       OpenContainerTemplate trash = OpenContainerTemplate(
           Text(AppLocalizations.of(context)!.trash, style: menuStyle),
           const Agenda(trash: true),
-          () => load());
+          () => load(),
+          color: Colors.transparent);
 
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(value: "trash", child: trash),

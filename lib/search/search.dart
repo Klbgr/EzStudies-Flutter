@@ -65,18 +65,12 @@ class _SearchState extends State<Search> {
               ],
             ),
             Container(
-                margin: const EdgeInsets.only(top: 20),
-                padding: const EdgeInsets.all(10),
                 height: 200,
-                decoration: BoxDecoration(
-                    color:
-                        (list.isEmpty) ? Colors.transparent : Colors.blue[50],
-                    borderRadius: BorderRadius.circular(16)),
                 child: ListView.builder(
+                  shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   itemCount: list.length,
-                  itemBuilder: (context, index) =>
-                      _SearchCell(list[index], index == list.length - 1),
+                  itemBuilder: (context, index) => _SearchCell(list[index]),
                 ))
           ],
         ));
@@ -116,24 +110,19 @@ class _SearchState extends State<Search> {
 }
 
 class _SearchCell extends StatelessWidget {
-  const _SearchCell(this.data, this.last, {Key? key}) : super(key: key);
+  const _SearchCell(this.data, {Key? key}) : super(key: key);
   final SearchCellData data;
-  final bool last;
 
   @override
   Widget build(BuildContext context) {
     Widget child1 = Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-          border: (last)
-              ? null
-              : const Border(bottom: BorderSide(color: Colors.grey))),
       child:
           Text("${data.name} (${data.dept})", overflow: TextOverflow.ellipsis),
     );
 
     Widget child2 = Agenda(search: true, data: data);
 
-    return OpenContainerTemplate(child1, child2, () {});
+    return OpenContainerTemplate(child1, child2, () {}, elevation: 1);
   }
 }
