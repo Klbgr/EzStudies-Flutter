@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
-import 'agenda/agenda_cell_data.dart';
+import '../agenda/agenda_cell_data.dart';
 
 class DatabaseHelper {
   static const String agenda = "agenda";

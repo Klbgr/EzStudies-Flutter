@@ -1,9 +1,9 @@
 import 'package:ezstudies/agenda/time_input.dart';
-import 'package:ezstudies/database_helper.dart';
+import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../templates.dart';
+import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 import 'date_input.dart';
 
@@ -24,18 +24,12 @@ class Add extends StatelessWidget {
   Widget build(BuildContext context) {
     EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
 
-    DateInput date = DateInput(
-        label: AppLocalizations.of(context)!.date,
-        icon: const Icon(Icons.calendar_month),
-        date: DateTime.now());
-    TimeInput start = TimeInput(
-        label: AppLocalizations.of(context)!.start,
-        icon: const Icon(Icons.access_time),
-        date: DateTime.now());
-    TimeInput end = TimeInput(
-        label: AppLocalizations.of(context)!.end,
-        icon: const Icon(Icons.access_time_filled),
-        date: DateTime.now().add(const Duration(hours: 1)));
+    DateInput date = DateInput(AppLocalizations.of(context)!.date,
+        const Icon(Icons.calendar_month), DateTime.now());
+    TimeInput start = TimeInput(AppLocalizations.of(context)!.start,
+        const Icon(Icons.access_time), DateTime.now());
+    TimeInput end = TimeInput(AppLocalizations.of(context)!.end,
+        const Icon(Icons.access_time_filled), DateTime.now());
 
     List<Widget> form = <Container>[
       Container(

@@ -1,15 +1,14 @@
 import 'package:ezstudies/agenda/trash.dart';
-import 'package:ezstudies/database_helper.dart';
+import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
-import '../templates.dart';
-import '../timestamp_utils.dart';
+import '../utils/templates.dart';
+import '../utils/timestamp_utils.dart';
 import 'add.dart';
+import 'agenda_cell.dart';
 import 'agenda_cell_data.dart';
-import 'details.dart';
 
 class Agenda extends StatefulWidget {
   const Agenda({Key? key}) : super(key: key);
@@ -131,11 +130,11 @@ class _AgendaState extends State<Agenda> {
                           Icon(Icons.delete),
                           Icon(Icons.delete)
                         ]))),
-            child: _AgendaCell(
-                this,
+            child: AgendaCell(
                 data,
                 index == 0 || !isSameDay(data.start, list[index - 1].start),
-                index == 0 || !isSameMonth(data.start, list[index - 1].start)),
+                index == 0 || !isSameMonth(data.start, list[index - 1].start),
+                () => load()),
           );
         },
       );
@@ -190,110 +189,5 @@ class _AgendaState extends State<Agenda> {
 
   Future<void> refresh() async {
     load();
-  }
-}
-
-class _AgendaCell extends StatelessWidget {
-  const _AgendaCell(this.parent, this.data, this.firstOfDay, this.firstOfMonth,
-      {Key? key})
-      : super(key: key);
-  final _AgendaState parent;
-  final bool firstOfDay;
-  final bool firstOfMonth;
-  final AgendaCellData data;
-
-  @override
-  Widget build(BuildContext context) {
-    initializeDateFormatting(getLocale(), null);
-
-    String start = timestampToTime(data.start);
-    String end = timestampToTime(data.end);
-    String description = data.description;
-    if (description != "") {
-      description = "($description)";
-    }
-
-    List<Text> date = <Text>[];
-    if (firstOfDay) {
-      date = [
-        Text(timestampToWeekDay(data.start)),
-        Text(timestampToDayOfMonth(data.start).toString(),
-            style: const TextStyle(fontSize: 20))
-      ];
-    }
-    List<Widget> children = [
-      Text(
-        data.title,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      )
-    ];
-
-    if (data.added == 0 && data.edited == 1) {
-      children.add(const Icon(Icons.edit, size: 16));
-    } else if (data.added == 1) {
-      children.add(const Icon(Icons.add, size: 16));
-    }
-
-    Widget child1 = Row(children: [
-      Container(
-        alignment: Alignment.center,
-        width: 30,
-        child: Column(children: date),
-      ),
-      Expanded(
-          child: Container(
-              margin: const EdgeInsets.only(left: 20),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: data.getColor(),
-                  borderRadius: const BorderRadius.all(Radius.circular(16))),
-              child: Column(children: [
-                Container(
-                    margin: const EdgeInsets.only(bottom: 2.5),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: children)),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "$start - $end $description",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ])))
-    ]);
-
-    Widget child2 = Details(data);
-
-    Widget child = OpenContainerTemplate(child1, child2, () => parent.load());
-
-    if (firstOfMonth) {
-      child = Column(children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          margin: const EdgeInsets.only(left: 50, top: 15, bottom: 10),
-          child: Text(
-            timestampToMonthYear(data.start),
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-        child,
-      ]);
-    }
-
-    double margin = 0;
-    if (firstOfMonth) {
-      margin = 5;
-    } else if (firstOfDay) {
-      margin = 5;
-    }
-
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: margin),
-      child: child,
-    );
   }
 }

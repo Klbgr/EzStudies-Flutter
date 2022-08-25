@@ -27,5 +27,10 @@
   "refresh": "Refresh",
   "next": "Next",
   "previous": "Previous",
-  "begin": "Begin"
+  "begin": "Begin",
+  "general": "General",
+  "account": "Account",
+  "about": "About",
+  "name": "Name",
+  "password": "Password"
 }

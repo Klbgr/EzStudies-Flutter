@@ -41,6 +41,8 @@ dependencies:
   animations: ^2.0.3
   settings_ui: ^2.0.2
   shared_preferences: ^2.0.15
+  encrypt: ^5.0.1
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +60,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - secrets.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

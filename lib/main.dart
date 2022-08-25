@@ -11,7 +11,7 @@
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
-import 'package:ezstudies/welcome.dart';
+import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -49,7 +49,9 @@ class EzStudies extends StatelessWidget {
             }
           },
           future: SharedPreferences.getInstance().then((value) {
-            return value.getBool("welcome") ?? false;
+            return (value.getBool("welcome") ?? false) &&
+                (value.getString("name") ?? "").isNotEmpty &&
+                (value.getString("password") ?? "").isNotEmpty;
           })),
     );
   }

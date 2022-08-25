@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-import '../timestamp_utils.dart';
+import '../utils/timestamp_utils.dart';
 
 class DateInput extends StatefulWidget {
-  DateInput(
-      {Key? key, required this.label, required this.icon, required this.date})
-      : super(key: key);
+  DateInput(this.label, this.icon, this.date, {Key? key}) : super(key: key);
   final String label;
   final Icon icon;
   DateTime date;
@@ -27,6 +25,8 @@ class _DateInputState extends State<DateInput> {
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting(getLocale(), null);
+    DateTime date =
+        DateTime(widget.date.year, widget.date.month, widget.date.day);
     return TextFormField(
       decoration: InputDecoration(
           label: Text(widget.label),
@@ -37,10 +37,8 @@ class _DateInputState extends State<DateInput> {
         showDatePicker(
                 context: context,
                 initialDate: widget.date,
-                lastDate: DateTime(
-                    widget.date.year, widget.date.month + 1, widget.date.day),
-                firstDate: DateTime(
-                    widget.date.year, widget.date.month - 1, widget.date.day))
+                lastDate: date.add(const Duration(days: 30)),
+                firstDate: date.subtract(const Duration(days: 30)))
             .then((value) {
           if (value != null) {
             widget.date = DateTime(value.year, value.month, value.day,

@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-import '../timestamp_utils.dart';
+import '../utils/timestamp_utils.dart';
 
 class TimeInput extends StatefulWidget {
-  TimeInput(
-      {Key? key, required this.label, required this.icon, required this.date})
-      : super(key: key);
+  TimeInput(this.label, this.icon, this.date, {Key? key}) : super(key: key);
   final String label;
   final Icon icon;
   DateTime date;

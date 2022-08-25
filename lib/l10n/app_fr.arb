@@ -27,5 +27,10 @@
   "refresh": "Rafraîchir",
   "next": "Suivant",
   "previous": "Précédent",
-  "begin": "Commencer"
+  "begin": "Commencer",
+  "general": "Général",
+  "account": "Compte",
+  "about": "À propos",
+  "name": "Nom",
+  "password": "Mot de passe"
 }

@@ -1,9 +1,9 @@
 import 'package:ezstudies/agenda/time_input.dart';
-import 'package:ezstudies/database_helper.dart';
-import 'package:ezstudies/templates.dart';
+import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 import 'date_input.dart';
 
@@ -31,17 +31,17 @@ class Details extends StatelessWidget {
     }
 
     DateInput date = DateInput(
-        label: AppLocalizations.of(context)!.date,
-        icon: const Icon(Icons.calendar_month),
-        date: DateTime.fromMillisecondsSinceEpoch(newData.start));
+        AppLocalizations.of(context)!.date,
+        const Icon(Icons.calendar_month),
+        DateTime.fromMillisecondsSinceEpoch(newData.start));
     TimeInput start = TimeInput(
-        label: AppLocalizations.of(context)!.start,
-        icon: const Icon(Icons.access_time),
-        date: DateTime.fromMillisecondsSinceEpoch(newData.start));
+        AppLocalizations.of(context)!.start,
+        const Icon(Icons.access_time),
+        DateTime.fromMillisecondsSinceEpoch(newData.start));
     TimeInput end = TimeInput(
-        label: AppLocalizations.of(context)!.end,
-        icon: const Icon(Icons.access_time_filled),
-        date: DateTime.fromMillisecondsSinceEpoch(newData.end));
+        AppLocalizations.of(context)!.end,
+        const Icon(Icons.access_time_filled),
+        DateTime.fromMillisecondsSinceEpoch(newData.end));
 
     List<Widget> form = <Container>[
       Container(
