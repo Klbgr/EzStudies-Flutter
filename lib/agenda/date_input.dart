@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import '../utils/style.dart';
 import '../utils/timestamp_utils.dart';
 
 class DateInput extends StatefulWidget {
   DateInput(this.label, this.icon, this.date, {this.editable = true, Key? key})
       : super(key: key);
   final String label;
-  final Icon icon;
+  final IconData icon;
   DateTime date;
   final bool editable;
 
@@ -31,10 +32,24 @@ class _DateInputState extends State<DateInput> {
         DateTime(widget.date.year, widget.date.month, widget.date.day);
     return TextFormField(
       enabled: widget.editable,
+      readOnly: true,
+      cursorColor: Style.primary,
+      style: TextStyle(color: Style.text),
       decoration: InputDecoration(
-          label: Text(widget.label),
-          hintText: widget.label.toLowerCase(),
-          icon: widget.icon),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.primary),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.hint),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.hint),
+        ),
+        hintText: widget.label.toLowerCase(),
+        hintStyle: TextStyle(color: Style.hint),
+        label: Text(widget.label, style: TextStyle(color: Style.hint)),
+        icon: Icon(widget.icon, color: Style.primary),
+      ),
       controller: TextEditingController(text: text),
       onTap: () {
         showDatePicker(

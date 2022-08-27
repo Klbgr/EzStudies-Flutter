@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
 import 'agenda_cell_data.dart';
 import 'details.dart';
 
 class AgendaCell extends StatelessWidget {
-  const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth, this.onClose,
-      this.openable, this.editable,
-      {Key? key})
+  const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth,
+      {required this.onClosed,
+      this.editable = true,
+      this.add = false,
+      Key? key})
       : super(key: key);
   final bool firstOfDay;
   final bool firstOfMonth;
   final AgendaCellData data;
-  final Function onClose;
-  final bool openable;
+  final Function onClosed;
   final bool editable;
+  final bool add;
 
   @override
   Widget build(BuildContext context) {
@@ -35,30 +38,30 @@ class AgendaCell extends StatelessWidget {
 
       date = [
         Text(timestampToWeekDay(data.start),
-            style: TextStyle(color: (today) ? Colors.blue : Colors.black)),
+            style: TextStyle(color: (today) ? Style.primary : Style.text)),
         ClipOval(
             child: AspectRatio(
                 aspectRatio: 1,
                 child: Container(
                     alignment: Alignment.center,
-                    color: (today) ? Colors.blue : Colors.transparent,
+                    color: (today) ? Style.primary : Colors.transparent,
                     child: Text(timestampToDayOfMonth(data.start).toString(),
-                        style: const TextStyle(fontSize: 20))))),
+                        style: TextStyle(fontSize: 20, color: Style.text))))),
       ];
     }
     List<Widget> children = [
       Text(
         data.title,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(fontWeight: FontWeight.bold, color: Style.text),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       )
     ];
 
     if (data.added == 0 && data.edited == 1) {
-      children.add(const Icon(Icons.edit, size: 16));
+      children.add(Icon(Icons.edit, size: 16, color: Style.text));
     } else if (data.added == 1) {
-      children.add(const Icon(Icons.person, size: 16));
+      children.add(Icon(Icons.person, size: 16, color: Style.text));
     }
 
     Widget child = Row(children: [
@@ -82,21 +85,18 @@ class AgendaCell extends StatelessWidget {
                         children: children)),
                 Container(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    "$start - $end $description",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text("$start - $end $description",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Style.text)),
                 ),
               ])))
     ]);
 
-    if (openable) {
-      child =
-          OpenContainerTemplate(child, Details(data, editable: editable), () {
-        onClose();
-      }, radius: 16);
-    }
+    child = OpenContainerTemplate(
+        child, Details(data: data, editable: editable, add: add), () {
+      onClosed();
+    }, radius: 16, color: Style.background, trigger: (_) {});
 
     if (firstOfMonth) {
       child = Column(children: [
@@ -105,7 +105,7 @@ class AgendaCell extends StatelessWidget {
           margin: const EdgeInsets.only(left: 50, top: 15, bottom: 10),
           child: Text(
             timestampToMonthYear(data.start),
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20, color: Style.text),
           ),
         ),
         child,

@@ -1,14 +1,15 @@
+import 'package:ezstudies/agenda/details.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/utils/secret.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/preferences.dart';
+import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
-import 'add.dart';
 import 'agenda_cell.dart';
 import 'agenda_cell_data.dart';
 
@@ -32,7 +33,6 @@ class Agenda extends StatefulWidget {
 class _AgendaState extends State<Agenda> {
   bool initialized = false;
   List<AgendaCellData> list = [];
-  final TextStyle menuStyle = const TextStyle(fontSize: 16);
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +44,22 @@ class _AgendaState extends State<Agenda> {
 
     Widget content = Center(
         child: widget.trash
-            ? Text(AppLocalizations.of(context)!.nothing_to_show)
+            ? Text(AppLocalizations.of(context)!.nothing_to_show,
+                style: TextStyle(color: Style.text))
             : TextButton(
                 onPressed: () => refresh(),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    child: const Icon(Icons.refresh, size: 16),
-                  ),
-                  Text(AppLocalizations.of(context)!.refresh)
-                ])));
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child:
+                            Icon(Icons.refresh, size: 16, color: Style.primary),
+                      ),
+                      Text(AppLocalizations.of(context)!.refresh,
+                          style: TextStyle(color: Style.primary))
+                    ])));
 
     if (list.isNotEmpty) {
       content = ListView.builder(
@@ -66,9 +71,8 @@ class _AgendaState extends State<Agenda> {
               data,
               index == 0 || !isSameDay(data.start, list[index - 1].start),
               index == 0 || !isSameMonth(data.start, list[index - 1].start),
-              () => load(),
-              !widget.trash,
-              widget.agenda);
+              onClosed: () => load(),
+              editable: widget.agenda);
           return widget.search
               ? cell
               : Dismissible(
@@ -83,12 +87,16 @@ class _AgendaState extends State<Agenda> {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(widget.agenda
-                                    ? Icons.delete
-                                    : Icons.restore_from_trash),
-                                Icon(widget.agenda
-                                    ? Icons.delete
-                                    : Icons.restore_from_trash)
+                                Icon(
+                                    widget.agenda
+                                        ? Icons.delete
+                                        : Icons.restore_from_trash,
+                                    color: Style.text),
+                                Icon(
+                                    widget.agenda
+                                        ? Icons.delete
+                                        : Icons.restore_from_trash,
+                                    color: Style.text)
                               ]))),
                   child: cell,
                 );
@@ -98,21 +106,26 @@ class _AgendaState extends State<Agenda> {
 
     Widget child = widget.trash
         ? content
-        : RefreshIndicator(onRefresh: () => refresh(), child: content);
+        : RefreshIndicator(
+            onRefresh: () => refresh(),
+            backgroundColor: Style.background,
+            child: content);
     Widget? menu;
     if (widget.agenda) {
       OpenContainerTemplate add = OpenContainerTemplate(
-          Container(
-              child: FloatingActionButton.extended(
-                  elevation: 0,
-                  onPressed: null,
-                  label: Text(AppLocalizations.of(context)!.add),
-                  icon: const Icon(Icons.add))),
-          Add(),
+          FloatingActionButton.extended(
+              elevation: 0,
+              onPressed: null,
+              backgroundColor: Style.primary,
+              label: Text(AppLocalizations.of(context)!.add,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.add, color: Style.text)),
+          Details(add: true),
           () => load(),
           radius: 24,
           elevation: 6,
-          color: Colors.blue);
+          color: Style.primary,
+          trigger: (_) {});
       child = Stack(
         children: [
           child,
@@ -124,22 +137,30 @@ class _AgendaState extends State<Agenda> {
         ],
       );
 
+      Function trashTrigger = () {};
+
       OpenContainerTemplate trash = OpenContainerTemplate(
-          Text(AppLocalizations.of(context)!.trash, style: menuStyle),
+          Text(AppLocalizations.of(context)!.trash,
+              style: TextStyle(fontSize: 16, color: Style.text)),
           const Agenda(trash: true),
           () => load(),
-          color: Colors.transparent);
+          color: Colors.transparent,
+          trigger: (value) => trashTrigger = value);
 
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(value: "trash", child: trash),
         PopupMenuItem<String>(
-            value: "reset", child: Text(AppLocalizations.of(context)!.reset)),
+            value: "reset",
+            child: Text(AppLocalizations.of(context)!.reset,
+                style: TextStyle(color: Style.text))),
         PopupMenuItem<String>(
-            value: "help", child: Text(AppLocalizations.of(context)!.help))
+            value: "help",
+            child: Text(AppLocalizations.of(context)!.help,
+                style: TextStyle(color: Style.text)))
       ], (value) {
         switch (value) {
           case "trash":
-            trash.getTrigger().call();
+            trashTrigger.call();
             break;
           case "reset":
             showDialog(
@@ -148,13 +169,15 @@ class _AgendaState extends State<Agenda> {
                   AppLocalizations.of(context)!.reset, "reset?", [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.cancel)),
+                    child: Text(AppLocalizations.of(context)!.cancel,
+                        style: TextStyle(color: Style.primary))),
                 TextButton(
                     onPressed: () {
                       reset();
                       Navigator.pop(context);
                     },
-                    child: Text(AppLocalizations.of(context)!.reset))
+                    child: Text(AppLocalizations.of(context)!.reset,
+                        style: TextStyle(color: Style.primary)))
               ]),
             );
             break;
@@ -165,7 +188,8 @@ class _AgendaState extends State<Agenda> {
                   AppLocalizations.of(context)!.help, "help", [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
+                    child: Text(AppLocalizations.of(context)!.ok,
+                        style: TextStyle(color: Style.primary))),
               ]),
             );
             break;
@@ -174,7 +198,9 @@ class _AgendaState extends State<Agenda> {
     } else if (widget.trash) {
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem(
-            value: "help", child: Text(AppLocalizations.of(context)!.help))
+            value: "help",
+            child: Text(AppLocalizations.of(context)!.help,
+                style: TextStyle(color: Style.text)))
       ], (value) {
         switch (value) {
           case "help":
@@ -184,7 +210,8 @@ class _AgendaState extends State<Agenda> {
                         AppLocalizations.of(context)!.help, "help?", [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok))
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary)))
                     ]));
             break;
         }
@@ -192,7 +219,9 @@ class _AgendaState extends State<Agenda> {
     } else if (widget.search) {
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(
-            value: "help", child: Text(AppLocalizations.of(context)!.help))
+            value: "help",
+            child: Text(AppLocalizations.of(context)!.help,
+                style: TextStyle(color: Style.text)))
       ], (value) {
         switch (value) {
           case "help":
@@ -202,7 +231,8 @@ class _AgendaState extends State<Agenda> {
                   AppLocalizations.of(context)!.help, "help", [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
+                    child: Text(AppLocalizations.of(context)!.ok,
+                        style: TextStyle(color: Style.primary))),
               ]),
             );
             break;
@@ -219,7 +249,7 @@ class _AgendaState extends State<Agenda> {
       title = widget.data!.name;
     }
 
-    return Template(title, child, menu, !widget.agenda);
+    return Template(title, child, menu: menu, back: !widget.agenda);
   }
 
   void load() {
@@ -239,20 +269,17 @@ class _AgendaState extends State<Agenda> {
                 database.close();
               }));
     } else if (widget.search) {
-      SecretLoader().load().then((value) {
-        String url = value.serverUrl;
-        SharedPreferences.getInstance().then((value) {
-          String name = value.getString("name") ?? "";
-          String password = value.getString("password") ?? "";
-          http.post(Uri.parse(url), body: <String, String>{
-            "request": "cyu",
-            "name": name,
-            "password": password,
-            "id": widget.data!.id
-          }).then((value) {
-            print(value.body);
-          });
-        });
+      String url = Secret.serverUrl;
+      String name = Preferences.sharedPreferences.getString("name") ?? "";
+      String password =
+          Preferences.sharedPreferences.getString("password") ?? "";
+      http.post(Uri.parse(url), body: <String, String>{
+        "request": "cyu",
+        "name": name,
+        "password": password,
+        "id": widget.data!.id
+      }).then((value) {
+        print(value.body);
       });
     }
   }

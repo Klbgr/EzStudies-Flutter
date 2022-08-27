@@ -2,48 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+import '../utils/style.dart';
 import '../utils/timestamp_utils.dart';
 
 class TimeInput extends StatefulWidget {
-  TimeInput(this.label, this.icon, this.date, {this.editable = true, Key? key})
+  const TimeInput(this.label, this.icon, this.date,
+      {this.editable = true, required this.onChanged, Key? key})
       : super(key: key);
   final String label;
-  final Icon icon;
-  DateTime date;
+  final IconData icon;
+  final DateTime date;
   final bool editable;
+  final Function(int) onChanged;
 
   @override
   State<TimeInput> createState() => _TimeInputState();
-
-  DateTime getDate() {
-    return date;
-  }
 }
 
 class _TimeInputState extends State<TimeInput> {
-  late String text = DateFormat("HH:mm", getLocale()).format(widget.date);
+  late DateTime date = widget.date;
 
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting(getLocale(), null);
     return TextFormField(
       enabled: widget.editable,
+      readOnly: true,
+      cursorColor: Style.primary,
+      style: TextStyle(color: Style.text),
       decoration: InputDecoration(
-          label: Text(widget.label),
-          hintText: widget.label.toLowerCase(),
-          icon: widget.icon),
-      controller: TextEditingController(text: text),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.primary),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.hint),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Style.hint),
+        ),
+        hintText: widget.label.toLowerCase(),
+        hintStyle: TextStyle(color: Style.hint),
+        label: Text(widget.label, style: TextStyle(color: Style.hint)),
+        icon: Icon(widget.icon, color: Style.primary),
+      ),
+      controller: TextEditingController(
+          text: DateFormat("HH:mm", getLocale()).format(date)),
       onTap: () {
         showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.fromDateTime(widget.date))
+                context: context, initialTime: TimeOfDay.fromDateTime(date))
             .then((value) {
           if (value != null) {
-            widget.date = DateTime(widget.date.year, widget.date.month,
-                widget.date.day, value.hour, value.minute, 0, 0, 0);
             setState(() {
-              text = DateFormat("HH:mm", getLocale()).format(widget.date);
+              date = DateTime(date.year, date.month, date.day, value.hour,
+                  value.minute, 0, 0, 0);
             });
+            widget.onChanged(date.millisecondsSinceEpoch);
           }
         });
       },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/style.dart';
+
 class AgendaCellData {
   String id;
   String title;
@@ -40,6 +42,8 @@ class AgendaCellData {
       value += title.codeUnitAt(i);
     }
     value = (value % Colors.primaries.length).toInt();
-    return Colors.primaries[value].shade400;
+    return (Style.theme == 0)
+        ? Colors.primaries[value].shade400
+        : Colors.primaries[value].shade700;
   }
 }

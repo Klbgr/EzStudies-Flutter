@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import '../utils/cipher.dart';
+import '../utils/preferences.dart';
 import '../utils/secret.dart';
+import '../utils/style.dart';
 import '../utils/templates.dart';
 
 class Welcome extends StatefulWidget {
@@ -25,37 +26,31 @@ class _WelcomeState extends State<Welcome> {
 
   @override
   Widget build(BuildContext context) {
-    Widget page1 = const Center(
-      child: Text("welcome+illu"),
+    Widget page1 = Center(
+      child: Text("welcome+illu", style: TextStyle(color: Style.text)),
     );
-    Widget page2 = const Center(
-      child: Text("features+illu"),
+    Widget page2 = Center(
+      child: Text("features+illu", style: TextStyle(color: Style.text)),
     );
     Widget page3 = Container(
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          TextFormField(
-              decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context)!.name),
-                  hintText: AppLocalizations.of(context)!.name.toLowerCase(),
-                  icon: const Icon(Icons.person)),
-              initialValue: name,
+          TextFormFieldTemplate(
+              AppLocalizations.of(context)!.name, Icons.person,
               onChanged: (value) => name = value),
-          TextFormField(
-              obscureText: true,
-              decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context)!.password),
-                  hintText:
-                      AppLocalizations.of(context)!.password.toLowerCase(),
-                  icon: const Icon(Icons.password)),
-              initialValue: password,
-              onChanged: (value) => password = value)
+          TextFormFieldTemplate(
+              AppLocalizations.of(context)!.password, Icons.password,
+              onChanged: (value) => password = value, hidden: true)
         ]));
     List<Widget> pages = [page1, page2, page3];
 
     Widget child = Stack(children: [
       PageView(
-        onPageChanged: (value) => setState(() => selectedIndex = value),
+        onPageChanged: (value) {
+          name = "";
+          password = "";
+          setState(() => selectedIndex = value);
+        },
         controller: pageController,
         children: buildPages(pages),
       ),
@@ -67,7 +62,7 @@ class _WelcomeState extends State<Welcome> {
               children: buildDots(pages.length)))
     ]);
 
-    return Template(AppLocalizations.of(context)!.welcome, child, null, false);
+    return Template(AppLocalizations.of(context)!.welcome, child, back: false);
   }
 
   void next() {
@@ -87,38 +82,36 @@ class _WelcomeState extends State<Welcome> {
             AlertDialogTemplate(AppLocalizations.of(context)!.error, "empty", [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.ok))
+              child: Text(AppLocalizations.of(context)!.ok,
+                  style: TextStyle(color: Style.primary)))
         ]),
       );
     } else {
-      SecretLoader().load().then((value) {
-        String encryptedName = encrypt(name, value.cipherKey);
-        String encryptedPassword = encrypt(password, value.cipherKey);
-        http.post(Uri.parse(value.serverUrl), body: <String, String>{
-          "request": "cyu",
-          "name": encryptedName,
-          "password": encryptedPassword
-        }).then((value) {
-          if (value.statusCode == 200 && value.body.isNotEmpty) {
-            //TODO insert bd
-            SharedPreferences.getInstance().then((value) {
-              value.setString("name", encryptedName);
-              value.setString("password", encryptedPassword);
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => const Main()));
-            });
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.error, "wrong", [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-            );
-          }
-        });
+      String encryptedName = encrypt(name, Secret.cipherKey);
+      String encryptedPassword = encrypt(password, Secret.cipherKey);
+      http.post(Uri.parse(Secret.serverUrl), body: <String, String>{
+        "request": "cyu",
+        "name": encryptedName,
+        "password": encryptedPassword
+      }).then((value) {
+        if (value.statusCode == 200 && value.body.isNotEmpty) {
+          //TODO insert bd
+          Preferences.sharedPreferences.setString("name", encryptedName);
+          Preferences.sharedPreferences
+              .setString("password", encryptedPassword);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (_) => Main(reloadTheme: () {})));
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                AppLocalizations.of(context)!.error, "wrong", [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok))
+            ]),
+          );
+        }
       });
     }
   }
@@ -133,53 +126,65 @@ class _WelcomeState extends State<Welcome> {
           alignment: Alignment.bottomRight,
           margin: const EdgeInsets.only(bottom: margin, right: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               onPressed: () => start(),
-              label: Text(AppLocalizations.of(context)!.begin),
-              icon: const Icon(Icons.arrow_forward)),
+              label: Text(AppLocalizations.of(context)!.begin,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_forward, color: Style.text)),
         ));
       } else if (i == 0) {
         children.add(Container(
           alignment: Alignment.bottomRight,
           margin: const EdgeInsets.only(bottom: margin, right: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               onPressed: () => next(),
-              label: Text(AppLocalizations.of(context)!.next),
-              icon: const Icon(Icons.arrow_forward)),
+              label: Text(AppLocalizations.of(context)!.next,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_forward, color: Style.text)),
         ));
       } else if (i == widgets.length - 1) {
         children.add(Container(
           alignment: Alignment.bottomLeft,
           margin: const EdgeInsets.only(bottom: margin, left: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               heroTag: "previous",
               onPressed: () => previous(),
-              label: Text(AppLocalizations.of(context)!.previous),
-              icon: const Icon(Icons.arrow_back)),
+              label: Text(AppLocalizations.of(context)!.previous,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_back, color: Style.text)),
         ));
         children.add(Container(
           alignment: Alignment.bottomRight,
           margin: const EdgeInsets.only(bottom: margin, right: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               onPressed: () => start(),
-              label: Text(AppLocalizations.of(context)!.begin),
-              icon: const Icon(Icons.arrow_forward)),
+              label: Text(AppLocalizations.of(context)!.begin,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_forward, color: Style.text)),
         ));
       } else {
         children.add(Container(
           alignment: Alignment.bottomLeft,
           margin: const EdgeInsets.only(bottom: margin, left: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               onPressed: () => previous(),
-              label: Text(AppLocalizations.of(context)!.previous),
-              icon: const Icon(Icons.arrow_back)),
+              label: Text(AppLocalizations.of(context)!.previous,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_back, color: Style.text)),
         ));
         children.add(Container(
           alignment: Alignment.bottomRight,
           margin: const EdgeInsets.only(bottom: margin, right: margin),
           child: FloatingActionButton.extended(
+              backgroundColor: Style.primary,
               onPressed: () => next(),
-              label: Text(AppLocalizations.of(context)!.next),
-              icon: const Icon(Icons.arrow_forward)),
+              label: Text(AppLocalizations.of(context)!.next,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.arrow_forward, color: Style.text)),
         ));
       }
       pages.add(Stack(children: children));
@@ -193,7 +198,8 @@ class _WelcomeState extends State<Welcome> {
       dots.add(GestureDetector(
           child: Icon(
               (selectedIndex == i) ? Icons.circle : Icons.circle_outlined,
-              size: 10),
+              size: 10,
+              color: Style.text),
           onTap: () => pageController.animateToPage(i,
               duration: animationDuration, curve: animationCurve)));
     }

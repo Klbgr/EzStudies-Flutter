@@ -1,114 +1,133 @@
-import 'package:ezstudies/agenda/time_input.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../utils/style.dart';
 import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
-import 'date_input.dart';
 
 class Details extends StatelessWidget {
-  Details(this.data, {this.editable = true, Key? key}) : super(key: key);
-  final AgendaCellData data;
+  Details({this.add = false, this.data, this.editable = true, Key? key})
+      : super(key: key);
+  final bool add;
+  final AgendaCellData? data;
   late AgendaCellData newData;
   final bool editable;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
 
   @override
   Widget build(BuildContext context) {
-    newData = AgendaCellData(
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        start: data.start,
-        end: data.end,
-        added: data.added,
-        edited: data.edited,
-        trashed: data.trashed);
-
-    String source = AppLocalizations.of(context)!.internet;
-    if (newData.added == 1) {
-      source = AppLocalizations.of(context)!.user;
+    if (add) {
+      newData = AgendaCellData(
+        id: "",
+        title: "",
+        description: "",
+        start: DateTime.now().millisecondsSinceEpoch,
+        end: DateTime.now()
+            .add(const Duration(minutes: 1))
+            .millisecondsSinceEpoch,
+        added: 1,
+        edited: 0,
+        trashed: 0,
+      );
+    } else {
+      newData = AgendaCellData(
+          id: data!.id,
+          title: data!.title,
+          description: data!.description,
+          start: data!.start,
+          end: data!.end,
+          added: data!.added,
+          edited: data!.edited,
+          trashed: data!.trashed);
     }
 
-    DateInput date = DateInput(
-        AppLocalizations.of(context)!.date,
-        const Icon(Icons.calendar_month),
-        DateTime.fromMillisecondsSinceEpoch(newData.start),
-        editable: editable);
-    TimeInput start = TimeInput(
-        AppLocalizations.of(context)!.start,
-        const Icon(Icons.access_time),
-        DateTime.fromMillisecondsSinceEpoch(newData.start),
-        editable: editable);
-    TimeInput end = TimeInput(
-        AppLocalizations.of(context)!.end,
-        const Icon(Icons.access_time_filled),
-        DateTime.fromMillisecondsSinceEpoch(newData.end),
-        editable: editable);
-
-    List<Widget> form = <Container>[
+    List<Widget> form = <Widget>[
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
-          child: TextFormField(
-              enabled: editable,
-              keyboardType: TextInputType.multiline,
-              minLines: 1,
-              maxLines: 5,
-              decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context)!.title),
-                  hintText: AppLocalizations.of(context)!.title.toLowerCase(),
-                  icon: const Icon(Icons.title)),
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.title, Icons.title,
               initialValue: newData.title,
-              onChanged: (value) => newData.title = value)),
+              onChanged: (value) => newData.title = value,
+              enabled: editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
-          child: TextFormField(
-              enabled: editable,
-              keyboardType: TextInputType.multiline,
-              minLines: 1,
-              maxLines: 5,
-              decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context)!.description),
-                  hintText:
-                      AppLocalizations.of(context)!.description.toLowerCase(),
-                  icon: const Icon(Icons.description)),
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.description, Icons.description,
               initialValue: newData.description,
-              onChanged: (value) => newData.description = value)),
-      Container(alignment: Alignment.centerLeft, margin: margin, child: date),
-      Container(alignment: Alignment.centerLeft, margin: margin, child: start),
-      Container(alignment: Alignment.centerLeft, margin: margin, child: end),
+              onChanged: (value) => newData.description = value,
+              enabled: editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
-          child: TextFormField(
-            enabled: false,
-            decoration: InputDecoration(
-                label: Text(AppLocalizations.of(context)!.source),
-                hintText: AppLocalizations.of(context)!.source.toLowerCase(),
-                icon: const Icon(Icons.info_outline)),
-            initialValue: source,
-          ))
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.date, Icons.calendar_month,
+              dateTime: DateTime.fromMillisecondsSinceEpoch(newData.start),
+              date: true,
+              onTapped: (value) => newData.start = value,
+              enabled: editable)),
+      Container(
+          alignment: Alignment.centerLeft,
+          margin: margin,
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.start, Icons.access_time,
+              dateTime: DateTime.fromMillisecondsSinceEpoch(newData.start),
+              time: true,
+              onTapped: (value) => newData.start = value,
+              enabled: editable)),
+      Container(
+          alignment: Alignment.centerLeft,
+          margin: margin,
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.end, Icons.access_time_filled,
+              dateTime: DateTime.fromMillisecondsSinceEpoch(newData.end),
+              time: true,
+              onTapped: (value) => newData.end = value,
+              enabled: editable)),
     ];
 
-    if (newData.added == 0) {
-      String edited = AppLocalizations.of(context)!.no;
-      if (newData.edited == 1) {
-        edited = AppLocalizations.of(context)!.yes;
-      }
+    if (!add) {
       form.add(Container(
           alignment: Alignment.centerLeft,
           margin: margin,
-          child: TextFormField(
-            enabled: false,
-            decoration: InputDecoration(
-                label: Text(AppLocalizations.of(context)!.edited),
+          child: TextFormFieldTemplate(
+              AppLocalizations.of(context)!.source, Icons.info_outline,
+              initialValue: (newData.added == 1)
+                  ? AppLocalizations.of(context)!.user
+                  : AppLocalizations.of(context)!.internet,
+              onChanged: (_) {},
+              enabled: false)));
+      if (newData.added == 0) {
+        form.add(Container(
+            alignment: Alignment.centerLeft,
+            margin: margin,
+            child: TextFormField(
+              enabled: false,
+              cursorColor: Style.primary,
+              style: TextStyle(color: Style.text),
+              decoration: InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Style.primary),
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Style.hint),
+                ),
+                disabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Style.hint),
+                ),
                 hintText: AppLocalizations.of(context)!.edited.toLowerCase(),
-                icon: const Icon(Icons.edit)),
-            initialValue: edited,
-          )));
+                hintStyle: TextStyle(color: Style.hint),
+                label: Text(AppLocalizations.of(context)!.edited,
+                    style: TextStyle(color: Style.hint)),
+                icon: Icon(Icons.edit, color: Style.primary),
+              ),
+              initialValue: (newData.edited == 1)
+                  ? AppLocalizations.of(context)!.yes
+                  : AppLocalizations.of(context)!.no,
+            )));
+      }
     }
 
     List<Widget> column = [
@@ -121,58 +140,110 @@ class Details extends StatelessWidget {
                   child: Column(children: form))))
     ];
 
-    if (editable) {
+    if (editable || add) {
       List<Widget> buttons = <Widget>[
         FloatingActionButton.extended(
             backgroundColor: Colors.green,
-            icon: const Icon(Icons.save),
+            icon: Icon(add ? Icons.add : Icons.save, color: Style.text),
             onPressed: () {
-              DateTime dateTime = date.getDate();
-              TimeOfDay startTime = TimeOfDay.fromDateTime(start.getDate());
-              TimeOfDay endTime = TimeOfDay.fromDateTime(end.getDate());
-              newData.start = DateTime(dateTime.year, dateTime.month,
-                      dateTime.day, startTime.hour, startTime.minute, 0, 0, 0)
-                  .millisecondsSinceEpoch;
-              newData.end = DateTime(dateTime.year, dateTime.month,
-                      dateTime.day, endTime.hour, endTime.minute, 0, 0, 0)
-                  .millisecondsSinceEpoch;
-              DatabaseHelper database = DatabaseHelper();
-              database.open().then((_) {
-                if (newData.added == 0) {
-                  if (newData.edited == 0) {
-                    newData.edited = 1;
-                    database.insertOrReplace(DatabaseHelper.backup, data).then(
-                        (value) => database
+              if (newData.title.isEmpty) {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialogTemplate(
+                            AppLocalizations.of(context)!.error,
+                            "title empty", [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(AppLocalizations.of(context)!.ok))
+                        ]));
+              } else if (newData.end <= newData.start) {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialogTemplate(
+                            AppLocalizations.of(context)!.error,
+                            "error end <= start", [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(AppLocalizations.of(context)!.ok))
+                        ]));
+              } else {
+                if (add) {
+                  DateTime start =
+                      DateTime.fromMillisecondsSinceEpoch(newData.start);
+                  DateTime end =
+                      DateTime.fromMillisecondsSinceEpoch(newData.end);
+                  newData.end = DateTime(start.year, start.month, start.day,
+                          end.hour, end.minute, 0, 0, 0)
+                      .millisecondsSinceEpoch;
+                  newData.id = newData.title + newData.start.toString();
+                  DatabaseHelper database = DatabaseHelper();
+                  database.open().then((_) => database
+                          .insert(DatabaseHelper.agenda, newData)
+                          .then((value) {
+                        if (!value) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialogTemplate(
+                                      AppLocalizations.of(context)!.error,
+                                      "error", [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                            AppLocalizations.of(context)!.ok))
+                                  ]));
+                          database.close();
+                        } else {
+                          database
+                              .close()
+                              .then((value) => Navigator.pop(context));
+                        }
+                      }));
+                } else {
+                  DatabaseHelper database = DatabaseHelper();
+                  database.open().then((_) {
+                    if (newData.added == 0) {
+                      if (newData.edited == 0) {
+                        newData.edited = 1;
+                        database
+                            .insertOrReplace(DatabaseHelper.backup, data!)
+                            .then((value) => database
+                                .insertOrReplace(DatabaseHelper.agenda, newData)
+                                .then((value) => database
+                                    .close()
+                                    .then((value) => Navigator.pop(context))));
+                      } else {
+                        database
                             .insertOrReplace(DatabaseHelper.agenda, newData)
                             .then((value) => database
                                 .close()
-                                .then((value) => Navigator.pop(context))));
-                  } else {
-                    database
-                        .insertOrReplace(DatabaseHelper.agenda, newData)
-                        .then((value) => database
-                            .close()
-                            .then((value) => Navigator.pop(context)));
-                  }
-                } else {
-                  database.insertOrReplace(DatabaseHelper.agenda, newData).then(
-                      (value) => database
-                          .close()
-                          .then((value) => Navigator.pop(context)));
+                                .then((value) => Navigator.pop(context)));
+                      }
+                    } else {
+                      database
+                          .insertOrReplace(DatabaseHelper.agenda, newData)
+                          .then((value) => database
+                              .close()
+                              .then((value) => Navigator.pop(context)));
+                    }
+                  });
                 }
-              });
+              }
             },
-            label: Text(AppLocalizations.of(context)!.save))
+            label: Text(
+                add
+                    ? AppLocalizations.of(context)!.add
+                    : AppLocalizations.of(context)!.save,
+                style: TextStyle(color: Style.text))),
       ];
 
-      if (newData.added == 0 && newData.edited == 1) {
+      if (newData.added == 0 && newData.edited == 1 && !add) {
         buttons.insert(
             0,
             Container(
               margin: const EdgeInsets.only(right: 20),
               child: FloatingActionButton.extended(
                   backgroundColor: Colors.red,
-                  icon: const Icon(Icons.refresh),
+                  icon: Icon(Icons.refresh, color: Style.text),
                   onPressed: () {
                     AgendaCellData backup;
                     DatabaseHelper database = DatabaseHelper();
@@ -206,7 +277,8 @@ class Details extends StatelessWidget {
                       });
                     });
                   },
-                  label: Text(AppLocalizations.of(context)!.reset)),
+                  label: Text(AppLocalizations.of(context)!.reset,
+                      style: TextStyle(color: Style.text))),
             ));
       }
 
@@ -223,6 +295,11 @@ class Details extends StatelessWidget {
       children: column,
     );
 
-    return Template(AppLocalizations.of(context)!.details, child, null, true);
+    return Template(
+        add
+            ? AppLocalizations.of(context)!.add
+            : AppLocalizations.of(context)!.details,
+        child,
+        back: true);
   }
 }

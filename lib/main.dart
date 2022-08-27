@@ -11,53 +11,65 @@
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
+import 'package:ezstudies/utils/preferences.dart';
+import 'package:ezstudies/utils/secret.dart';
+import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
-  runApp(const EzStudies());
+  WidgetsFlutterBinding.ensureInitialized();
+  Preferences.load().then((value) => Secret.load().then(
+      (value) => Style.load().then((value) => runApp(const EzStudies()))));
 }
 
-class EzStudies extends StatelessWidget {
+class EzStudies extends StatefulWidget {
   const EzStudies({Key? key}) : super(key: key);
 
   @override
+  State<EzStudies> createState() => _EzStudiesState();
+}
+
+class _EzStudiesState extends State<EzStudies> {
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', ''),
-        Locale('fr', ''),
-      ],
-      title: "EzStudies",
-      home: FutureBuilder<bool>(
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data == true) {
-              return const Main();
-            } else {
-              return const Welcome();
-            }
-          },
-          future: SharedPreferences.getInstance().then((value) {
-            return (value.getString("name") ?? "").isNotEmpty &&
-                (value.getString("password") ?? "").isNotEmpty;
-          })),
-    );
+        theme: ThemeData(
+            textSelectionTheme:
+                TextSelectionThemeData(selectionColor: Style.primary),
+            colorScheme: ColorScheme.fromSwatch()
+                .copyWith(primary: Style.primary, secondary: Style.primary),
+            unselectedWidgetColor: Style.text,
+            toggleableActiveColor: Style.primary),
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', ''),
+          Locale('fr', ''),
+        ],
+        title: "EzStudies",
+        home: ((Preferences.sharedPreferences.getString("name") ?? "")
+                    .isNotEmpty &&
+                (Preferences.sharedPreferences.getString("password") ?? "")
+                    .isNotEmpty)
+            ? Main(
+                reloadTheme: () => setState(() {}),
+              )
+            : const Welcome());
   }
 }
 
 class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+  const Main({required this.reloadTheme, Key? key}) : super(key: key);
+  final Function reloadTheme;
 
   @override
   State<Main> createState() => _MainState();
@@ -66,14 +78,14 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int selectedIndex = 0;
   PageController pageController = PageController(initialPage: 0);
-  final List<Widget> widgets = <Widget>[
-    const Agenda(agenda: true),
-    const Search(),
-    const Settings(),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> widgets = <Widget>[
+      const Agenda(agenda: true),
+      const Search(),
+      Settings(reloadTheme: () => setState(() => widget.reloadTheme())),
+    ];
     return Scaffold(
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
@@ -84,7 +96,7 @@ class _MainState extends State<Main> {
       bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Style.background,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: getIcon(0),
@@ -100,18 +112,18 @@ class _MainState extends State<Main> {
             ),
           ],
           currentIndex: selectedIndex,
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.black,
-          iconSize: 25,
-          unselectedFontSize: 15,
-          selectedFontSize: 15,
+          selectedItemColor: Style.primary,
+          unselectedItemColor: Style.text,
+          iconSize: 24,
+          unselectedFontSize: 16,
+          selectedFontSize: 16,
           onTap: (value) => pageController.animateToPage(value,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut)),
     );
   }
 
-  Icon getIcon(int index) {
+  Widget getIcon(int index) {
     const List<IconData> icons = <IconData>[
       Icons.view_agenda_outlined,
       Icons.search_outlined,
@@ -124,10 +136,15 @@ class _MainState extends State<Main> {
       Icons.settings
     ];
 
-    if (index == selectedIndex) {
-      return Icon(iconsSelected[index]);
-    } else {
-      return Icon(icons[index]);
-    }
+    return Container(
+        decoration: BoxDecoration(
+            color:
+                (index == selectedIndex) ? Style.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(24)),
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 5, top: 5),
+        margin: const EdgeInsets.only(bottom: 5),
+        child: Icon(
+            (index == selectedIndex) ? iconsSelected[index] : icons[index],
+            color: Style.text));
   }
 }

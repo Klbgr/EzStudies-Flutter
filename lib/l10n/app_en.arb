@@ -32,5 +32,15 @@
   "account": "Account",
   "about": "About",
   "name": "Name",
-  "password": "Password"
+  "password": "Password",
+  "theme": "Theme",
+  "automatic": "Automatic",
+  "light": "Light",
+  "dark": "Dark",
+  "accent_color": "Accent color",
+  "notifications": "Notifications",
+  "logout": "Logout",
+  "report_bug_feddback": "Report bug/feedback",
+  "made_by": "Made by",
+  "version": "Version"
 }

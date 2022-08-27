@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^2.0.15
   encrypt: ^5.0.1
   http: ^0.13.5
+  url_launcher: ^6.1.5
+  package_info_plus: ^1.4.3+1
 
 dev_dependencies:
   flutter_test:

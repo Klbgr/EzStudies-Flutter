@@ -32,5 +32,15 @@
   "account": "Compte",
   "about": "À propos",
   "name": "Nom",
-  "password": "Mot de passe"
+  "password": "Mot de passe",
+  "theme": "Thème",
+  "automatic": "Automatique",
+  "light": "Clair",
+  "dark": "Sombre",
+  "accent_color": "Couleur d'accentuation",
+  "notifications": "Notifications",
+  "logout": "Déconnexion",
+  "report_bug_feddback": "Signaler un bug/suggestion",
+  "made_by": "Créé par",
+  "version": "Version"
 }
