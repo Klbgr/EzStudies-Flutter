@@ -33,6 +33,7 @@ class Agenda extends StatefulWidget {
 class _AgendaState extends State<Agenda> {
   bool initialized = false;
   List<AgendaCellData> list = [];
+  bool pop = true;
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +115,7 @@ class _AgendaState extends State<Agenda> {
     if (widget.agenda) {
       OpenContainerTemplate add = OpenContainerTemplate(
           FloatingActionButton.extended(
+            heroTag: "add",
               elevation: 0,
               onPressed: null,
               backgroundColor: Style.primary,
@@ -127,14 +129,7 @@ class _AgendaState extends State<Agenda> {
           color: Style.primary,
           trigger: (_) {});
       child = Stack(
-        children: [
-          child,
-          Container(
-            margin: const EdgeInsets.only(right: 20, bottom: 20),
-            alignment: Alignment.bottomRight,
-            child: add,
-          )
-        ],
+        children: [child, Positioned(right: 20, bottom: 20, child: add)],
       );
 
       Function trashTrigger = () {};
@@ -143,7 +138,13 @@ class _AgendaState extends State<Agenda> {
           Text(AppLocalizations.of(context)!.trash,
               style: TextStyle(fontSize: 16, color: Style.text)),
           const Agenda(trash: true),
-          () => load(),
+          () {
+            if (pop) {
+              Navigator.pop(context);
+            }
+            pop = true;
+            load();
+          },
           color: Colors.transparent,
           trigger: (value) => trashTrigger = value);
 
@@ -160,6 +161,7 @@ class _AgendaState extends State<Agenda> {
       ], (value) {
         switch (value) {
           case "trash":
+            pop = false;
             trashTrigger.call();
             break;
           case "reset":

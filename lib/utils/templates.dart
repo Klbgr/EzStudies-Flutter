@@ -81,7 +81,7 @@ class MenuTemplate extends StatelessWidget {
 }
 
 class OpenContainerTemplate extends StatelessWidget {
-  OpenContainerTemplate(this.child1, this.child2, this.onClosed,
+  const OpenContainerTemplate(this.child1, this.child2, this.onClosed,
       {this.color,
       this.radius = 0,
       this.elevation = 0,

@@ -50,12 +50,13 @@ class AgendaCell extends StatelessWidget {
       ];
     }
     List<Widget> children = [
-      Text(
+      Flexible(
+          child: Text(
         data.title,
         style: TextStyle(fontWeight: FontWeight.bold, color: Style.text),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-      )
+      ))
     ];
 
     if (data.added == 0 && data.edited == 1) {
@@ -66,37 +67,37 @@ class AgendaCell extends StatelessWidget {
 
     Widget child = Row(children: [
       Container(
+        margin: const EdgeInsets.only(right: 20),
         alignment: Alignment.center,
         width: 35,
         child: Column(children: date),
       ),
       Expanded(
-          child: Container(
-              margin: const EdgeInsets.only(left: 20),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: data.getColor(),
-                  borderRadius: const BorderRadius.all(Radius.circular(16))),
-              child: Column(children: [
-                Container(
-                    margin: const EdgeInsets.only(bottom: 2.5),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: children)),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text("$start - $end $description",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Style.text)),
-                ),
-              ])))
+          child: OpenContainerTemplate(
+              Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: data.getColor(),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(16))),
+                  child: Column(children: [
+                    Container(
+                        margin: const EdgeInsets.only(bottom: 2.5),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: children)),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text("$start - $end $description",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Style.text)),
+                    ),
+                  ])),
+              Details(data: data, editable: editable, add: add), () {
+        onClosed();
+      }, radius: 16, color: data.getColor(), trigger: (_) {}))
     ]);
-
-    child = OpenContainerTemplate(
-        child, Details(data: data, editable: editable, add: add), () {
-      onClosed();
-    }, radius: 16, color: Style.background, trigger: (_) {});
 
     if (firstOfMonth) {
       child = Column(children: [

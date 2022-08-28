@@ -117,75 +117,21 @@ class _WelcomeState extends State<Welcome> {
   }
 
   List<Widget> buildPages(List<Widget> widgets) {
-    const double margin = 20;
     List<Widget> pages = <Widget>[];
     for (int i = 0; i < widgets.length; i++) {
       List<Widget> children = [widgets[i]];
       if (i == 0 && widgets.length == 1) {
-        children.add(Container(
-          alignment: Alignment.bottomRight,
-          margin: const EdgeInsets.only(bottom: margin, right: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              onPressed: () => start(),
-              label: Text(AppLocalizations.of(context)!.begin,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_forward, color: Style.text)),
-        ));
+        children.add(WelcomeFABTemplate(begin: true, onPressed: () => start()));
       } else if (i == 0) {
-        children.add(Container(
-          alignment: Alignment.bottomRight,
-          margin: const EdgeInsets.only(bottom: margin, right: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              onPressed: () => next(),
-              label: Text(AppLocalizations.of(context)!.next,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_forward, color: Style.text)),
-        ));
+        children.add(WelcomeFABTemplate(next: true, onPressed: () => next()));
       } else if (i == widgets.length - 1) {
-        children.add(Container(
-          alignment: Alignment.bottomLeft,
-          margin: const EdgeInsets.only(bottom: margin, left: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              heroTag: "previous",
-              onPressed: () => previous(),
-              label: Text(AppLocalizations.of(context)!.previous,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_back, color: Style.text)),
-        ));
-        children.add(Container(
-          alignment: Alignment.bottomRight,
-          margin: const EdgeInsets.only(bottom: margin, right: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              onPressed: () => start(),
-              label: Text(AppLocalizations.of(context)!.begin,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_forward, color: Style.text)),
-        ));
+        children.add(WelcomeFABTemplate(begin: true, onPressed: () => start()));
+        children.add(
+            WelcomeFABTemplate(previous: true, onPressed: () => previous()));
       } else {
-        children.add(Container(
-          alignment: Alignment.bottomLeft,
-          margin: const EdgeInsets.only(bottom: margin, left: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              onPressed: () => previous(),
-              label: Text(AppLocalizations.of(context)!.previous,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_back, color: Style.text)),
-        ));
-        children.add(Container(
-          alignment: Alignment.bottomRight,
-          margin: const EdgeInsets.only(bottom: margin, right: margin),
-          child: FloatingActionButton.extended(
-              backgroundColor: Style.primary,
-              onPressed: () => next(),
-              label: Text(AppLocalizations.of(context)!.next,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.arrow_forward, color: Style.text)),
-        ));
+        children.add(WelcomeFABTemplate(next: true, onPressed: () => next()));
+        children.add(
+            WelcomeFABTemplate(previous: true, onPressed: () => previous()));
       }
       pages.add(Stack(children: children));
     }
@@ -204,5 +150,44 @@ class _WelcomeState extends State<Welcome> {
               duration: animationDuration, curve: animationCurve)));
     }
     return dots;
+  }
+}
+
+class WelcomeFABTemplate extends StatelessWidget {
+  const WelcomeFABTemplate(
+      {this.next = false,
+      this.previous = false,
+      this.begin = false,
+      required this.onPressed,
+      Key? key})
+      : super(key: key);
+  final bool next;
+  final bool previous;
+  final bool begin;
+  final Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    String label = AppLocalizations.of(context)!.next;
+    IconData icon = Icons.arrow_forward;
+    if (previous) {
+      label = AppLocalizations.of(context)!.previous;
+      icon = Icons.arrow_back;
+    } else if (begin) {
+      label = AppLocalizations.of(context)!.begin;
+      icon = Icons.start;
+    }
+
+    return Positioned(
+      bottom: 20,
+      right: (next || begin) ? 20 : null,
+      left: (next || begin) ? null : 20,
+      child: FloatingActionButton.extended(
+          heroTag: (begin) ? "add" : null,
+          backgroundColor: Style.primary,
+          onPressed: () => onPressed(),
+          label: Text(label, style: TextStyle(color: Style.text)),
+          icon: Icon(icon, color: Style.text)),
+    );
   }
 }

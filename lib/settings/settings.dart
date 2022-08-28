@@ -1,3 +1,5 @@
+import 'package:ezstudies/settings/color_dialog.dart';
+import 'package:ezstudies/settings/theme_dialog.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +57,7 @@ class _SettingsState extends State<Settings> {
               onPressed: (context) => showDialog(
                   context: context,
                   builder: (context) =>
-                      _ThemeChoice(onClosed: () => reloadTheme())),
+                      ThemeDialog(onClosed: () => reloadTheme())),
             ),
             SettingsTile(
                 leading: const Icon(Icons.color_lens),
@@ -63,16 +65,16 @@ class _SettingsState extends State<Settings> {
                 value: Icon(Icons.circle,
                     color: (Style.theme == 0)
                         ? Colors.primaries[
-                            Preferences.sharedPreferences.getInt("accent") ?? 0]
+                            Preferences.sharedPreferences.getInt("accent") ?? 5]
                         : Colors
                             .primaries[Preferences.sharedPreferences
                                     .getInt("accent") ??
-                                0]
+                                5]
                             .shade700),
                 onPressed: (context) => showDialog(
                     context: context,
                     builder: (context) =>
-                        _ColorPalette(onClosed: () => reloadTheme()))),
+                        ColorDialog(onClosed: () => reloadTheme()))),
             SettingsTile.switchTile(
                 leading: const Icon(Icons.notifications),
                 initialValue:
@@ -145,124 +147,5 @@ class _SettingsState extends State<Settings> {
                   context,
                   MaterialPageRoute(builder: (context) => const Welcome())))));
         }));
-  }
-}
-
-class _ColorPalette extends StatefulWidget {
-  const _ColorPalette({required this.onClosed, Key? key}) : super(key: key);
-  final Function onClosed;
-
-  @override
-  State<_ColorPalette> createState() => _ColorPaletteState();
-}
-
-class _ColorPaletteState extends State<_ColorPalette> {
-  final int itemsPerLine = 4;
-  int selectedIndex = Preferences.sharedPreferences.getInt("accent") ?? 0;
-
-  @override
-  Widget build(BuildContext context) {
-    Column column = Column(mainAxisSize: MainAxisSize.min, children: []);
-    Row row =
-        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: []);
-    for (int i = 0; i < Colors.primaries.length; i++) {
-      if (i != 0 && i % itemsPerLine == 0) {
-        column.children.add(row);
-        row =
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: []);
-      } else if (i == Colors.primaries.length - 1) {
-        column.children.add(row);
-      }
-      row.children.add(Stack(
-        children: [
-          Icon(
-            Icons.circle,
-            color: (Style.theme == 0)
-                ? Colors.primaries[i]
-                : Colors.primaries[i].shade700,
-            size: 64,
-          ),
-          GestureDetector(
-              child: Icon(Icons.check_rounded,
-                  size: 64,
-                  color: (i == selectedIndex)
-                      ? Style.background
-                      : Colors.transparent),
-              onTap: () => setState(() => selectedIndex = i))
-        ],
-      ));
-    }
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
-      backgroundColor: Style.background,
-      title: Text(AppLocalizations.of(context)!.accent_color,
-          style: TextStyle(color: Style.text)),
-      content: column,
-      actions: <Widget>[
-        TextButton(
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Style.primary)),
-            onPressed: () => Preferences.sharedPreferences
-                    .setInt("accent", selectedIndex)
-                    .then((value) {
-                  Navigator.pop(context);
-                  widget.onClosed();
-                })),
-      ],
-    );
-  }
-}
-
-class _ThemeChoice extends StatefulWidget {
-  const _ThemeChoice({required this.onClosed, Key? key}) : super(key: key);
-  final Function onClosed;
-
-  @override
-  State<_ThemeChoice> createState() => _ThemeChoiceState();
-}
-
-class _ThemeChoiceState extends State<_ThemeChoice> {
-  int selectedIndex = Preferences.sharedPreferences.getInt("theme") ?? 0;
-
-  @override
-  Widget build(BuildContext context) {
-    Column column = Column(mainAxisSize: MainAxisSize.min, children: []);
-    List<String> names = [
-      AppLocalizations.of(context)!.automatic,
-      AppLocalizations.of(context)!.light,
-      AppLocalizations.of(context)!.dark
-    ];
-    for (int i = 0; i < 3; i++) {
-      column.children.add(ListTile(
-          title: GestureDetector(
-              child: Text(names[i]),
-              onTap: () => setState(() => selectedIndex = i)),
-          textColor: Style.text,
-          leading: Radio<int>(
-              activeColor: Style.primary,
-              value: i,
-              groupValue: selectedIndex,
-              onChanged: (value) => setState(() => selectedIndex = value!))));
-    }
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
-      backgroundColor: Style.background,
-      title: Text(AppLocalizations.of(context)!.theme,
-          style: TextStyle(color: Style.text)),
-      content: column,
-      actions: <Widget>[
-        TextButton(
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Style.primary)),
-            onPressed: () => Preferences.sharedPreferences
-                    .setInt("theme", selectedIndex)
-                    .then((value) {
-                  Navigator.pop(context);
-                  widget.onClosed();
-                })),
-      ],
-    );
   }
 }

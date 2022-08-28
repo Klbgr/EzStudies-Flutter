@@ -1,6 +1,7 @@
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:system_theme/system_theme.dart';
 
 class Style {
   static late int theme;

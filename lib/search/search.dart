@@ -74,9 +74,7 @@ class _SearchState extends State<Search> {
                         onSubmitted: (value) => search(),
                         onChanged: (value) {
                           query = value;
-                          if (query.length >= 3) {
-                            search();
-                          }
+                          search();
                         })),
                 IconButton(
                     icon: Icon(Icons.search, color: Style.text),
@@ -98,7 +96,7 @@ class _SearchState extends State<Search> {
   }
 
   void search() {
-    if (query.isNotEmpty) {
+    if (query.length >= 3) {
       String url = Secret.serverUrl;
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =

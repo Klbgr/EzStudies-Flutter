@@ -1,10 +1,3 @@
-//TODO welcome page
-//TODO celcat api + database
-//TODO page info cours
-//TODO generation couleur cours
-//TODO strings
-//TODO mode autre etudiant
-//TODO ajout cours perso
 //TODO notification
 //TODO widget
 
@@ -22,8 +15,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
   WidgetsFlutterBinding.ensureInitialized();
-  Preferences.load().then((value) => Secret.load().then(
-      (value) => Style.load().then((value) => runApp(const EzStudies()))));
+  await Preferences.load();
+  await Secret.load();
+  await Style.load();
+  runApp(const EzStudies());
 }
 
 class EzStudies extends StatefulWidget {
