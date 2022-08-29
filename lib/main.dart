@@ -11,10 +11,12 @@ import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:system_theme/system_theme.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
   WidgetsFlutterBinding.ensureInitialized();
+  SystemTheme.accentColor;
   await Preferences.load();
   await Secret.load();
   await Style.load();
@@ -91,7 +93,7 @@ class _MainState extends State<Main> {
       bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           elevation: 0,
-          backgroundColor: Style.background,
+          backgroundColor: Style.secondary,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: getIcon(0),
@@ -107,7 +109,7 @@ class _MainState extends State<Main> {
             ),
           ],
           currentIndex: selectedIndex,
-          selectedItemColor: Style.primary,
+          selectedItemColor: Style.text,
           unselectedItemColor: Style.text,
           iconSize: 24,
           unselectedFontSize: 16,

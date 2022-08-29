@@ -96,7 +96,10 @@ class AgendaCell extends StatelessWidget {
                   ])),
               Details(data: data, editable: editable, add: add), () {
         onClosed();
-      }, radius: 16, color: data.getColor(), trigger: (_) {}))
+      },
+              radius: const BorderRadius.all(Radius.circular(16)),
+              color: data.getColor(),
+              trigger: (_) {}))
     ]);
 
     if (firstOfMonth) {

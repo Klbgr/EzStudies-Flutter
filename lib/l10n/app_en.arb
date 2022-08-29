@@ -42,5 +42,6 @@
   "logout": "Logout",
   "report_bug_feddback": "Report bug/feedback",
   "made_by": "Made by",
-  "version": "Version"
+  "version": "Version",
+  "use_system_accent_color": "Use system accent color"
 }

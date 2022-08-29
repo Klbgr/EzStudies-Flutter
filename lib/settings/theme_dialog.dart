@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../utils/preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../utils/preferences.dart';
 import '../utils/style.dart';
 
 class ThemeDialog extends StatefulWidget {
@@ -48,11 +47,11 @@ class _ThemeDialogState extends State<ThemeDialog> {
             child: Text(AppLocalizations.of(context)!.ok,
                 style: TextStyle(color: Style.primary)),
             onPressed: () => Preferences.sharedPreferences
-                .setInt("theme", selectedIndex)
-                .then((value) {
-              Navigator.pop(context);
-              widget.onClosed();
-            })),
+                    .setInt("theme", selectedIndex)
+                    .then((value) {
+                  Navigator.pop(context);
+                  widget.onClosed();
+                })),
       ],
     );
   }

@@ -115,7 +115,7 @@ class _AgendaState extends State<Agenda> {
     if (widget.agenda) {
       OpenContainerTemplate add = OpenContainerTemplate(
           FloatingActionButton.extended(
-            heroTag: "add",
+              heroTag: "add",
               elevation: 0,
               onPressed: null,
               backgroundColor: Style.primary,
@@ -124,7 +124,7 @@ class _AgendaState extends State<Agenda> {
               icon: Icon(Icons.add, color: Style.text)),
           Details(add: true),
           () => load(),
-          radius: 24,
+          radius: const BorderRadius.all(Radius.circular(24)),
           elevation: 6,
           color: Style.primary,
           trigger: (_) {});
@@ -137,16 +137,13 @@ class _AgendaState extends State<Agenda> {
       OpenContainerTemplate trash = OpenContainerTemplate(
           Text(AppLocalizations.of(context)!.trash,
               style: TextStyle(fontSize: 16, color: Style.text)),
-          const Agenda(trash: true),
-          () {
-            if (pop) {
-              Navigator.pop(context);
-            }
-            pop = true;
-            load();
-          },
-          color: Colors.transparent,
-          trigger: (value) => trashTrigger = value);
+          const Agenda(trash: true), () {
+        if (pop) {
+          Navigator.pop(context);
+        }
+        pop = true;
+        load();
+      }, color: Colors.transparent, trigger: (value) => trashTrigger = value);
 
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(value: "trash", child: trash),

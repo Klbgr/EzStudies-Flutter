@@ -62,15 +62,7 @@ class _SettingsState extends State<Settings> {
             SettingsTile(
                 leading: const Icon(Icons.color_lens),
                 title: Text(AppLocalizations.of(context)!.accent_color),
-                value: Icon(Icons.circle,
-                    color: (Style.theme == 0)
-                        ? Colors.primaries[
-                            Preferences.sharedPreferences.getInt("accent") ?? 5]
-                        : Colors
-                            .primaries[Preferences.sharedPreferences
-                                    .getInt("accent") ??
-                                5]
-                            .shade700),
+                value: Icon(Icons.circle, color: Style.primary),
                 onPressed: (context) => showDialog(
                     context: context,
                     builder: (context) =>

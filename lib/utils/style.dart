@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:ezstudies/utils/preferences.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 import 'package:system_theme/system_theme.dart';
 
 class Style {
@@ -13,40 +17,44 @@ class Style {
   static late Color ripple;
 
   static Future<void> load() async {
-    int index = Preferences.sharedPreferences.getInt("accent") ?? 5;
+    MaterialColor color =
+        Colors.primaries[Preferences.sharedPreferences.getInt("accent") ?? 5];
+    if ((Preferences.sharedPreferences.getBool("use_system_accent") ?? true) &&
+        (Platform.isAndroid || kIsWeb)) {
+      color = generateMaterialColor(color: SystemTheme.accentColor.accent);
+    }
     switch (Preferences.sharedPreferences.getInt("theme") ?? 0) {
       case 0:
-        Brightness brightness =
-            SchedulerBinding.instance.window.platformBrightness;
-        (brightness == Brightness.light)
-            ? _setLightTheme(index)
-            : _setDarkTheme(index);
+        (SchedulerBinding.instance.window.platformBrightness ==
+                Brightness.light)
+            ? _setLightTheme(color)
+            : _setDarkTheme(color);
         break;
       case 1:
-        _setLightTheme(index);
+        _setLightTheme(color);
         break;
       case 2:
-        _setDarkTheme(index);
+        _setDarkTheme(color);
         break;
     }
   }
 
-  static _setLightTheme(int index) {
+  static _setLightTheme(MaterialColor color) {
     theme = 0;
-    primary = Colors.primaries[index];
-    secondary = Colors.primaries[index].shade100;
-    background = Colors.primaries[index].shade50;
+    primary = color.shade600;
+    secondary = color.shade100;
+    background = color.shade50;
     text = Colors.black;
     hint = Colors.grey;
     ripple = primary.withAlpha(50);
   }
 
-  static _setDarkTheme(int index) {
+  static _setDarkTheme(MaterialColor color) {
     theme = 1;
-    primary = Colors.primaries[index].shade700;
-    secondary = Colors.primaries[index].shade800;
+    primary = color.shade700;
+    secondary = const Color(0xFF151515);
     background = const Color(0xFF121212);
-    text = Colors.primaries[index].shade50;
+    text = color.shade50;
     hint = Colors.grey;
     ripple = primary.withAlpha(50);
   }

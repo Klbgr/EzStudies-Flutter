@@ -46,49 +46,65 @@ class _SearchState extends State<Search> {
     });
 
     Widget child = Container(
-        margin: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: MediaQuery.of(context).size.height * 0.25),
+        margin: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           children: [
-            Row(
-              children: [
-                Flexible(
-                    child: TextField(
-                        autocorrect: false,
-                        cursorColor: Style.primary,
-                        style: TextStyle(color: Style.text),
-                        decoration: InputDecoration(
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Style.primary),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Style.hint),
-                            ),
-                            disabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Style.hint),
-                            ),
-                            hintText: AppLocalizations.of(context)!.search,
-                            hintStyle: TextStyle(color: Style.hint)),
-                        onSubmitted: (value) => search(),
-                        onChanged: (value) {
-                          query = value;
-                          search();
-                        })),
-                IconButton(
-                    icon: Icon(Icons.search, color: Style.text),
-                    onPressed: () => search())
-              ],
-            ),
-            SizedBox(
-                height: MediaQuery.of(context).size.height * 0.25,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  itemCount: list.length,
-                  itemBuilder: (context, index) => _SearchCell(list[index]),
-                ))
+            TextField(
+                autocorrect: false,
+                cursorColor: Style.primary,
+                style: TextStyle(color: Style.text),
+                decoration: InputDecoration(
+                    suffixIcon: Icon(Icons.search, color: Style.text),
+                    filled: true,
+                    fillColor: Style.secondary,
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft:
+                                Radius.circular(list.isNotEmpty ? 0 : 16),
+                            bottomRight:
+                                Radius.circular(list.isNotEmpty ? 0 : 16)),
+                        borderSide:
+                            const BorderSide(color: Colors.transparent)),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft:
+                                Radius.circular(list.isNotEmpty ? 0 : 16),
+                            bottomRight:
+                                Radius.circular(list.isNotEmpty ? 0 : 16)),
+                        borderSide:
+                            const BorderSide(color: Colors.transparent)),
+                    disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft:
+                                Radius.circular(list.isNotEmpty ? 0 : 16),
+                            bottomRight:
+                                Radius.circular(list.isNotEmpty ? 0 : 16)),
+                        borderSide:
+                            const BorderSide(color: Colors.transparent)),
+                    hintText:
+                        AppLocalizations.of(context)!.search.toLowerCase(),
+                    hintStyle: TextStyle(color: Style.hint)),
+                onSubmitted: (value) => search(),
+                onChanged: (value) {
+                  query = value;
+                  search();
+                }),
+            Flexible(
+                child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: list.length,
+                      itemBuilder: (context, index) => _SearchCell(list[index],
+                          last: index == list.length - 1),
+                    )))
           ],
         ));
 
@@ -122,8 +138,9 @@ class _SearchState extends State<Search> {
 }
 
 class _SearchCell extends StatelessWidget {
-  const _SearchCell(this.data, {Key? key}) : super(key: key);
+  const _SearchCell(this.data, {this.last = false, Key? key}) : super(key: key);
   final SearchCellData data;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +153,10 @@ class _SearchCell extends StatelessWidget {
     Widget child2 = Agenda(search: true, data: data);
 
     return OpenContainerTemplate(child1, child2, () {},
-        elevation: 6, trigger: (_) {});
+        trigger: (_) {},
+        color: Style.secondary,
+        radius: BorderRadius.only(
+            bottomLeft: Radius.circular(last ? 16 : 0),
+            bottomRight: Radius.circular(last ? 16 : 0)));
   }
 }

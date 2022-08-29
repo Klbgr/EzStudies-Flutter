@@ -83,7 +83,7 @@ class MenuTemplate extends StatelessWidget {
 class OpenContainerTemplate extends StatelessWidget {
   const OpenContainerTemplate(this.child1, this.child2, this.onClosed,
       {this.color,
-      this.radius = 0,
+      this.radius = BorderRadius.zero,
       this.elevation = 0,
       required this.trigger,
       Key? key})
@@ -93,14 +93,13 @@ class OpenContainerTemplate extends StatelessWidget {
   final Function onClosed;
   final Function(Function) trigger;
   final Color? color;
-  final double radius;
+  final BorderRadiusGeometry radius;
   final double elevation;
 
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
-      closedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(radius))),
+      closedShape: RoundedRectangleBorder(borderRadius: radius),
       closedColor: (color == null) ? Style.background : color!,
       openColor: Style.background,
       closedElevation: elevation,
@@ -173,15 +172,17 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
       cursorColor: Style.primary,
       style: TextStyle(color: Style.text),
       decoration: InputDecoration(
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Style.primary),
-        ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Style.hint),
-        ),
-        disabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Style.hint),
-        ),
+        filled: true,
+        fillColor: Style.secondary,
+        focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            borderSide: BorderSide(color: Colors.transparent)),
+        enabledBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            borderSide: BorderSide(color: Colors.transparent)),
+        disabledBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            borderSide: BorderSide(color: Colors.transparent)),
         hintText: widget.label.toLowerCase(),
         hintStyle: TextStyle(color: Style.hint),
         label: Text(widget.label, style: TextStyle(color: Style.hint)),

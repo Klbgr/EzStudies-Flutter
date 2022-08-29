@@ -42,5 +42,6 @@
   "logout": "Déconnexion",
   "report_bug_feddback": "Signaler un bug/suggestion",
   "made_by": "Créé par",
-  "version": "Version"
+  "version": "Version",
+  "use_system_accent_color": "Utiliser la couleur d'accentuation du système"
 }
