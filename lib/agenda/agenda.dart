@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:ezstudies/agenda/details.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/utils/secret.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/preferences.dart';
@@ -70,7 +73,8 @@ class _AgendaState extends State<Agenda> {
               index == 0 || !isSameDay(data.start, list[index - 1].start),
               index == 0 || !isSameMonth(data.start, list[index - 1].start),
               onClosed: () => load(),
-              editable: widget.agenda);
+              editable: widget.agenda,
+              search: widget.search);
           return widget.search
               ? cell
               : Dismissible(
@@ -275,7 +279,55 @@ class _AgendaState extends State<Agenda> {
         "password": password,
         "id": widget.data!.id
       }).then((value) {
-        print(value.body);
+        if (value.body.isNotEmpty) {
+          List<AgendaCellData> newList = [];
+          List<dynamic> data = jsonDecode(value.body);
+          for (int i = 0; i < data.length; i++) {
+            var item = data[i];
+            List<String> start = item["start"].toString().split("T");
+            List<int> startDate = start[0]
+                .split("-")
+                .map((element) => int.parse(element))
+                .toList();
+            List<int> startTime = start[1]
+                .split(":")
+                .map((element) => int.parse(element))
+                .toList();
+            int startTimestamp = DateTime(
+                    startDate[0],
+                    startDate[1],
+                    startDate[2],
+                    startTime[0],
+                    startTime[1],
+                    startTime[2],
+                    0,
+                    0)
+                .millisecondsSinceEpoch;
+            List<String> end = item["end"].toString().split("T");
+            List<int> endDate =
+                end[0].split("-").map((element) => int.parse(element)).toList();
+            List<int> endTime =
+                end[1].split(":").map((element) => int.parse(element)).toList();
+            int endTimestamp = DateTime(endDate[0], endDate[1], endDate[2],
+                    endTime[0], endTime[1], endTime[2], 0, 0)
+                .millisecondsSinceEpoch;
+
+            String description = item["description"]
+                .toString()
+                .replaceAll("\n", "")
+                .replaceAll("\r", "")
+                .replaceAll("<br />", "\n");
+            description = HtmlUnescape().convert(description);
+            newList.add(AgendaCellData(
+                id: item["id"],
+                description: description,
+                start: startTimestamp,
+                end: endTimestamp));
+          }
+          setState(() {
+            list = newList;
+          });
+        }
       });
     }
   }

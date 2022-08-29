@@ -12,9 +12,9 @@ class DatabaseHelper {
     database = await openDatabase("database.db", version: 1,
         onCreate: (Database db, int version) async {
       await db.execute(
-          "CREATE TABLE $agenda(id TEXT PRIMARY KEY, title TEXT, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
+          "CREATE TABLE $agenda(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
       await db.execute(
-          "CREATE TABLE $backup(id TEXT PRIMARY KEY, title TEXT, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
+          "CREATE TABLE $backup(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
     });
   }
 
@@ -65,7 +65,6 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) {
       return AgendaCellData(
         id: maps[i]["id"],
-        title: maps[i]["title"],
         description: maps[i]["description"],
         start: maps[i]["start"],
         end: maps[i]["end"],
@@ -82,7 +81,6 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) {
       return AgendaCellData(
         id: maps[i]["id"],
-        title: maps[i]["title"],
         description: maps[i]["description"],
         start: maps[i]["start"],
         end: maps[i]["end"],

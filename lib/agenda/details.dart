@@ -7,12 +7,18 @@ import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 
 class Details extends StatelessWidget {
-  Details({this.add = false, this.data, this.editable = true, Key? key})
+  Details(
+      {this.add = false,
+      this.data,
+      this.editable = true,
+      this.search = false,
+      Key? key})
       : super(key: key);
   final bool add;
   final AgendaCellData? data;
   late AgendaCellData newData;
   final bool editable;
+  final bool search;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
 
   @override
@@ -20,7 +26,6 @@ class Details extends StatelessWidget {
     if (add) {
       newData = AgendaCellData(
         id: "",
-        title: "",
         description: "",
         start: DateTime.now().millisecondsSinceEpoch,
         end: DateTime.now()
@@ -33,7 +38,6 @@ class Details extends StatelessWidget {
     } else {
       newData = AgendaCellData(
           id: data!.id,
-          title: data!.title,
           description: data!.description,
           start: data!.start,
           end: data!.end,
@@ -47,18 +51,11 @@ class Details extends StatelessWidget {
           alignment: Alignment.centerLeft,
           margin: margin,
           child: TextFormFieldTemplate(
-              AppLocalizations.of(context)!.title, Icons.title,
-              initialValue: newData.title,
-              onChanged: (value) => newData.title = value,
-              enabled: editable)),
-      Container(
-          alignment: Alignment.centerLeft,
-          margin: margin,
-          child: TextFormFieldTemplate(
               AppLocalizations.of(context)!.description, Icons.description,
               initialValue: newData.description,
               onChanged: (value) => newData.description = value,
-              enabled: editable)),
+              enabled: editable,
+              multiline: true)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
@@ -88,7 +85,7 @@ class Details extends StatelessWidget {
               enabled: editable)),
     ];
 
-    if (!add) {
+    if (!add && !search) {
       form.add(Container(
           alignment: Alignment.centerLeft,
           margin: margin,
@@ -103,30 +100,13 @@ class Details extends StatelessWidget {
         form.add(Container(
             alignment: Alignment.centerLeft,
             margin: margin,
-            child: TextFormField(
-              enabled: false,
-              cursorColor: Style.primary,
-              style: TextStyle(color: Style.text),
-              decoration: InputDecoration(
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Style.primary),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Style.hint),
-                ),
-                disabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Style.hint),
-                ),
-                hintText: AppLocalizations.of(context)!.edited.toLowerCase(),
-                hintStyle: TextStyle(color: Style.hint),
-                label: Text(AppLocalizations.of(context)!.edited,
-                    style: TextStyle(color: Style.hint)),
-                icon: Icon(Icons.edit, color: Style.primary),
-              ),
-              initialValue: (newData.edited == 1)
-                  ? AppLocalizations.of(context)!.yes
-                  : AppLocalizations.of(context)!.no,
-            )));
+            child: TextFormFieldTemplate(
+                AppLocalizations.of(context)!.edited, Icons.edit,
+                initialValue: (newData.edited == 1)
+                    ? AppLocalizations.of(context)!.yes
+                    : AppLocalizations.of(context)!.no,
+                onChanged: (_) {},
+                enabled: false)));
       }
     }
 
@@ -146,7 +126,7 @@ class Details extends StatelessWidget {
             backgroundColor: Colors.green,
             icon: Icon(add ? Icons.add : Icons.save, color: Style.text),
             onPressed: () {
-              if (newData.title.isEmpty) {
+              if (newData.description.isEmpty) {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialogTemplate(
@@ -175,7 +155,7 @@ class Details extends StatelessWidget {
                   newData.end = DateTime(start.year, start.month, start.day,
                           end.hour, end.minute, 0, 0, 0)
                       .millisecondsSinceEpoch;
-                  newData.id = newData.title + newData.start.toString();
+                  newData.id = newData.description + newData.start.toString();
                   DatabaseHelper database = DatabaseHelper();
                   database.open().then((_) => database
                           .insert(DatabaseHelper.agenda, newData)

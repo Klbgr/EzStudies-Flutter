@@ -4,7 +4,6 @@ import '../utils/style.dart';
 
 class AgendaCellData {
   String id;
-  String title;
   String description;
   int start;
   int end;
@@ -14,7 +13,6 @@ class AgendaCellData {
 
   AgendaCellData({
     required this.id,
-    required this.title,
     required this.description,
     required this.start,
     required this.end,
@@ -26,7 +24,6 @@ class AgendaCellData {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "title": title,
       "description": description,
       "start": start,
       "end": end,
@@ -38,8 +35,8 @@ class AgendaCellData {
 
   Color getColor() {
     int value = 0;
-    for (int i = 0; i < title.length; i++) {
-      value += title.codeUnitAt(i);
+    for (int i = 0; i < description.length; i++) {
+      value += description.codeUnitAt(i);
     }
     value = (value % Colors.primaries.length).toInt();
     return (Style.theme == 0)

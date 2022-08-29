@@ -11,7 +11,7 @@ class AgendaCell extends StatelessWidget {
   const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth,
       {required this.onClosed,
       this.editable = true,
-      this.add = false,
+      this.search = false,
       Key? key})
       : super(key: key);
   final bool firstOfDay;
@@ -19,7 +19,7 @@ class AgendaCell extends StatelessWidget {
   final AgendaCellData data;
   final Function onClosed;
   final bool editable;
-  final bool add;
+  final bool search;
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +52,9 @@ class AgendaCell extends StatelessWidget {
     List<Widget> children = [
       Flexible(
           child: Text(
-        data.title,
-        style: TextStyle(fontWeight: FontWeight.bold, color: Style.text),
-        maxLines: 1,
+        data.description,
+        style: TextStyle(color: Style.text),
+        maxLines: null,
         overflow: TextOverflow.ellipsis,
       ))
     ];
@@ -81,20 +81,16 @@ class AgendaCell extends StatelessWidget {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(16))),
                   child: Column(children: [
-                    Container(
-                        margin: const EdgeInsets.only(bottom: 2.5),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: children)),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: children),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: Text("$start - $end $description",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      child: Text("$start - $end",
                           style: TextStyle(color: Style.text)),
                     ),
                   ])),
-              Details(data: data, editable: editable, add: add), () {
+              Details(data: data, editable: editable, search: search), () {
         onClosed();
       },
               radius: const BorderRadius.all(Radius.circular(16)),
