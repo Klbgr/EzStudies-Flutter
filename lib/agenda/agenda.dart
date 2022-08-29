@@ -45,8 +45,7 @@ class _AgendaState extends State<Agenda> {
 
     Widget content = Center(
         child: widget.trash
-            ? Text(AppLocalizations.of(context)!.nothing_to_show,
-                style: TextStyle(color: Style.text))
+            ? Text(AppLocalizations.of(context)!.nothing_to_show)
             : TextButton(
                 onPressed: () => refresh(),
                 child: Row(
@@ -55,11 +54,9 @@ class _AgendaState extends State<Agenda> {
                     children: [
                       Container(
                         margin: const EdgeInsets.only(right: 10),
-                        child:
-                            Icon(Icons.refresh, size: 16, color: Style.primary),
+                        child: const Icon(Icons.refresh, size: 16),
                       ),
-                      Text(AppLocalizations.of(context)!.refresh,
-                          style: TextStyle(color: Style.primary))
+                      Text(AppLocalizations.of(context)!.refresh)
                     ])));
 
     if (list.isNotEmpty) {

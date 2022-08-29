@@ -11,6 +11,7 @@ import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:system_theme/system_theme.dart';
 
 void main() async {
@@ -48,9 +49,11 @@ class _EzStudiesState extends State<EzStudies> {
                         ? Style.primary
                         : Style.text),
                 entryModeIconColor: Style.text),
-            textTheme: Theme.of(context)
-                .textTheme
-                .apply(bodyColor: Style.text, displayColor: Style.text),
+            textTheme:
+                GoogleFonts.openSansTextTheme(Theme.of(context).textTheme.apply(
+                      bodyColor: Style.text,
+                      displayColor: Style.text,
+                    )),
             textSelectionTheme:
                 TextSelectionThemeData(selectionColor: Style.primary),
             colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -77,14 +80,14 @@ class _EzStudiesState extends State<EzStudies> {
           Locale('fr', ''),
         ],
         title: "EzStudies",
-        home:
-            ((Preferences.sharedPreferences.getString("name") ?? "").isNotEmpty &&
-                    (Preferences.sharedPreferences.getString("password") ?? "")
-                        .isNotEmpty)
-                ? Main(
-                    reloadTheme: () => setState(() {}),
-                  )
-                : const Welcome());
+        home: ((Preferences.sharedPreferences.getString("name") ?? "")
+                    .isNotEmpty &&
+                (Preferences.sharedPreferences.getString("password") ?? "")
+                    .isNotEmpty)
+            ? Main(
+                reloadTheme: () => setState(() {}),
+              )
+            : const Welcome());
   }
 }
 

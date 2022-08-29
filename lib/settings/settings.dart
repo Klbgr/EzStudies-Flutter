@@ -4,6 +4,7 @@ import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,6 +23,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  final TextStyle font = GoogleFonts.openSans();
+
   @override
   Widget build(BuildContext context) {
     String theme = "";
@@ -48,12 +51,12 @@ class _SettingsState extends State<Settings> {
           tileHighlightColor: Style.ripple),
       sections: [
         SettingsSection(
-          title: Text(AppLocalizations.of(context)!.general),
+          title: Text(AppLocalizations.of(context)!.general, style: font),
           tiles: <SettingsTile>[
             SettingsTile(
               leading: const Icon(Icons.format_paint),
-              title: Text(AppLocalizations.of(context)!.theme),
-              value: Text(theme),
+              title: Text(AppLocalizations.of(context)!.theme, style: font),
+              value: Text(theme, style: GoogleFonts.openSans()),
               onPressed: (context) => showDialog(
                   context: context,
                   builder: (context) =>
@@ -61,7 +64,8 @@ class _SettingsState extends State<Settings> {
             ),
             SettingsTile(
                 leading: const Icon(Icons.color_lens),
-                title: Text(AppLocalizations.of(context)!.accent_color),
+                title: Text(AppLocalizations.of(context)!.accent_color,
+                    style: font),
                 value: Icon(Icons.circle, color: Style.primary),
                 onPressed: (context) => showDialog(
                     context: context,
@@ -81,42 +85,49 @@ class _SettingsState extends State<Settings> {
                         : Preferences.sharedPreferences
                             .setBool("notifications", true)
                             .then((value) => setState(() {})),
-                title: Text(AppLocalizations.of(context)!.notifications))
+                title: Text(AppLocalizations.of(context)!.notifications,
+                    style: font),
+                description: Text("desc", style: GoogleFonts.openSans()))
           ],
         ),
         SettingsSection(
-            title: Text(AppLocalizations.of(context)!.account),
+            title: Text(AppLocalizations.of(context)!.account, style: font),
             tiles: <SettingsTile>[
               SettingsTile(
                   leading: const Icon(Icons.person),
-                  title: Text(AppLocalizations.of(context)!.account),
-                  value: Text(decrypt(
-                      Preferences.sharedPreferences.getString("name") ?? "",
-                      Secret.cipherKey))),
+                  title:
+                      Text(AppLocalizations.of(context)!.account, style: font),
+                  value: Text(
+                      decrypt(
+                          Preferences.sharedPreferences.getString("name") ?? "",
+                          Secret.cipherKey),
+                      style: font)),
               SettingsTile(
                 leading: const Icon(Icons.logout),
-                title: Text(AppLocalizations.of(context)!.logout),
+                title: Text(AppLocalizations.of(context)!.logout, style: font),
                 onPressed: (context) => disconnect(),
               )
             ]),
         SettingsSection(
-            title: Text(AppLocalizations.of(context)!.about),
+            title: Text(AppLocalizations.of(context)!.about, style: font),
             tiles: [
               SettingsTile(
                   leading: const Icon(Icons.bug_report),
-                  title:
-                      Text(AppLocalizations.of(context)!.report_bug_feddback)),
+                  title: Text(AppLocalizations.of(context)!.report_bug_feddback,
+                      style: font)),
               SettingsTile(
                   leading: const Icon(Icons.logo_dev),
-                  title: Text(AppLocalizations.of(context)!.made_by),
-                  value: const Text("Antoine Qiu (GitHub: @Klbgr)"),
+                  title:
+                      Text(AppLocalizations.of(context)!.made_by, style: font),
+                  value: Text("Antoine Qiu (GitHub: @Klbgr)", style: font),
                   onPressed: (context) => launchUrl(
                       Uri.parse("https://github.com/Klbgr"),
                       mode: LaunchMode.externalApplication)),
               SettingsTile(
                   leading: const Icon(Icons.numbers),
-                  title: Text(AppLocalizations.of(context)!.version),
-                  value: Text(Preferences.packageInfo.version)),
+                  title:
+                      Text(AppLocalizations.of(context)!.version, style: font),
+                  value: Text(Preferences.packageInfo.version, style: font)),
             ])
       ],
     );
