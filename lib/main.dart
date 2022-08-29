@@ -35,12 +35,36 @@ class _EzStudiesState extends State<EzStudies> {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
+            timePickerTheme: TimePickerThemeData(
+                backgroundColor: Style.background,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                helpTextStyle: TextStyle(color: Style.text),
+                hourMinuteColor: Style.secondary,
+                dialBackgroundColor: Style.secondary,
+                dialTextColor: Style.text,
+                hourMinuteTextColor: MaterialStateColor.resolveWith((states) =>
+                    states.contains(MaterialState.selected)
+                        ? Style.primary
+                        : Style.text),
+                entryModeIconColor: Style.text),
+            textTheme: Theme.of(context)
+                .textTheme
+                .apply(bodyColor: Style.text, displayColor: Style.text),
             textSelectionTheme:
                 TextSelectionThemeData(selectionColor: Style.primary),
-            colorScheme: ColorScheme.fromSwatch()
-                .copyWith(primary: Style.primary, secondary: Style.primary),
+            colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: Style.primary,
+                secondary: Style.primary,
+                onSurface: Style.text),
+            dialogTheme: DialogTheme(
+                backgroundColor: Style.background,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16))),
             unselectedWidgetColor: Style.text,
-            toggleableActiveColor: Style.primary),
+            toggleableActiveColor: Style.primary,
+            splashColor: Style.ripple,
+            highlightColor: Style.ripple),
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -53,14 +77,14 @@ class _EzStudiesState extends State<EzStudies> {
           Locale('fr', ''),
         ],
         title: "EzStudies",
-        home: ((Preferences.sharedPreferences.getString("name") ?? "")
-                    .isNotEmpty &&
-                (Preferences.sharedPreferences.getString("password") ?? "")
-                    .isNotEmpty)
-            ? Main(
-                reloadTheme: () => setState(() {}),
-              )
-            : const Welcome());
+        home:
+            ((Preferences.sharedPreferences.getString("name") ?? "").isNotEmpty &&
+                    (Preferences.sharedPreferences.getString("password") ?? "")
+                        .isNotEmpty)
+                ? Main(
+                    reloadTheme: () => setState(() {}),
+                  )
+                : const Welcome());
   }
 }
 

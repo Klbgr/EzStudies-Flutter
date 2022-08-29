@@ -28,7 +28,6 @@ class _ThemeDialogState extends State<ThemeDialog> {
           title: GestureDetector(
               child: Text(names[i]),
               onTap: () => setState(() => selectedIndex = i)),
-          textColor: Style.text,
           leading: Radio<int>(
               activeColor: Style.primary,
               value: i,
@@ -36,11 +35,8 @@ class _ThemeDialogState extends State<ThemeDialog> {
               onChanged: (value) => setState(() => selectedIndex = value!))));
     }
     return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
       backgroundColor: Style.background,
-      title: Text(AppLocalizations.of(context)!.theme,
-          style: TextStyle(color: Style.text)),
+      title: Text(AppLocalizations.of(context)!.theme),
       content: column,
       actions: <Widget>[
         TextButton(

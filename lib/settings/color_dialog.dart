@@ -58,27 +58,20 @@ class _ColorDialogState extends State<ColorDialog> {
     }
 
     if (Platform.isAndroid || kIsWeb) {
-      column.children.add(Row(children: [
-        Checkbox(
-            checkColor: Style.background,
-            value: useSystemAccent,
-            onChanged: (value) =>
-                setState(() => useSystemAccent = !useSystemAccent)),
-        GestureDetector(
-            child: Text(AppLocalizations.of(context)!.use_system_accent_color,
-                style: TextStyle(color: Style.text)),
-            onTap: () => setState(() => useSystemAccent = !useSystemAccent))
-      ]));
+      column.children.add(CheckboxListTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          value: useSystemAccent,
+          onChanged: (value) =>
+              setState(() => useSystemAccent = !useSystemAccent),
+          title: Text(AppLocalizations.of(context)!.use_system_accent_color,
+              style: TextStyle(color: Style.text)),
+          checkColor: Style.background));
     } else {
       useSystemAccent = false;
     }
 
     return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
-      backgroundColor: Style.background,
-      title: Text(AppLocalizations.of(context)!.accent_color,
-          style: TextStyle(color: Style.text)),
+      title: Text(AppLocalizations.of(context)!.accent_color),
       content: column,
       actions: <Widget>[
         TextButton(

@@ -124,12 +124,7 @@ class AlertDialogTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16))),
-        backgroundColor: Style.background,
-        title: Text(title, style: TextStyle(color: Style.text)),
-        content: Text(content, style: TextStyle(color: Style.text)),
-        actions: actions);
+        title: Text(title), content: Text(content), actions: actions);
   }
 }
 
