@@ -41,7 +41,7 @@ class Style {
 
   static _setLightTheme(MaterialColor color) {
     theme = 0;
-    primary = color.shade600;
+    primary = color;
     secondary = color.shade100;
     background = color.shade50;
     text = Colors.black;
@@ -52,7 +52,7 @@ class Style {
   static _setDarkTheme(MaterialColor color) {
     theme = 1;
     primary = color.shade700;
-    secondary = const Color(0xFF151515);
+    secondary = const Color(0xFF161616);
     background = const Color(0xFF121212);
     text = color.shade50;
     hint = Colors.grey;

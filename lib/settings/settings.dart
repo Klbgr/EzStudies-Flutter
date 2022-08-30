@@ -145,7 +145,7 @@ class _SettingsState extends State<Settings> {
     Preferences.sharedPreferences.remove("name").then((_) =>
         Preferences.sharedPreferences.remove("password").then((value) {
           DatabaseHelper database = DatabaseHelper();
-          database.open().then((value) => database.reset().then((value) =>
+          database.open().then((value) => database.deleteAll().then((value) =>
               database.close().then((value) => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const Welcome())))));

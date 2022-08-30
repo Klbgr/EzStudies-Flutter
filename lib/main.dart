@@ -1,5 +1,10 @@
-//TODO notification
+//TODO notifications
 //TODO widget
+//TODO welcome
+//TODO complete texts
+//TODO first time guide
+//TODO fix compatibility web/ios
+//TODO comments
 
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';

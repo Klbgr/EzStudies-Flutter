@@ -95,12 +95,13 @@ class _WelcomeState extends State<Welcome> {
         "password": encryptedPassword
       }).then((value) {
         if (value.statusCode == 200 && value.body.isNotEmpty) {
-          //TODO insert bd
-          Preferences.sharedPreferences.setString("name", encryptedName);
-          Preferences.sharedPreferences
-              .setString("password", encryptedPassword);
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (_) => Main(reloadTheme: () {})));
+          Preferences.sharedPreferences.setString("name", encryptedName).then(
+              (value) => Preferences.sharedPreferences
+                  .setString("password", encryptedPassword)
+                  .then((value) => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Main(reloadTheme: () {})))));
         } else {
           showDialog(
             context: context,

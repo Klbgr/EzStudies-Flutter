@@ -10,12 +10,18 @@ class DatabaseHelper {
 
   Future<void> open() async {
     database = await openDatabase("database.db", version: 1,
-        onCreate: (Database db, int version) async {
-      await db.execute(
-          "CREATE TABLE $agenda(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
-      await db.execute(
-          "CREATE TABLE $backup(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
+        onCreate: (db, version) async {
+      await _createTables(db);
+    }, onUpgrade: (db, oldVersion, newVersion) async {
+      await _createTables(db);
     });
+  }
+
+  Future<void> _createTables(Database db) async {
+    await db.execute(
+        "CREATE TABLE IF NOT EXISTS $agenda(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
+    await db.execute(
+        "CREATE TABLE IF NOT EXISTS $backup(id TEXT PRIMARY KEY, description TEXT, start INTEGER, end INTEGER, added INTEGER, edited INTEGER, trashed INTEGER)");
   }
 
   Future<bool> insert(String table, AgendaCellData data) async {
@@ -55,6 +61,11 @@ class DatabaseHelper {
             }));
   }
 
+  Future<void> deleteAll() async {
+    await database.delete(agenda);
+    await database.delete(backup);
+  }
+
   Future<void> close() async {
     await database.close();
   }
@@ -89,5 +100,28 @@ class DatabaseHelper {
         trashed: maps[i]["trashed"],
       );
     });
+  }
+
+  Future<void> insertAll(List<AgendaCellData> data) async {
+    List<AgendaCellData> list = await get(agenda);
+    list.removeWhere((element) =>
+        element.added == 0 && element.edited == 0 && element.trashed == 0);
+    await database.delete(agenda, where: "added = 0");
+    await database.delete(backup);
+    for (AgendaCellData d in data) {
+      for (AgendaCellData l in list) {
+        if (d.id == l.id) {
+          if (l.edited == 1) {
+            await insertOrReplace(backup, d);
+            d = l;
+          } else if (l.trashed == 1) {
+            d.trashed = 1;
+          }
+          list.remove(l);
+          break;
+        }
+      }
+      await insert(agenda, d);
+    }
   }
 }

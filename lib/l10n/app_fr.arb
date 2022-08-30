@@ -42,5 +42,6 @@
   "report_bug_feddback": "Signaler un bug/suggestion",
   "made_by": "Créé par",
   "version": "Version",
-  "use_system_accent_color": "Utiliser la couleur d'accentuation du système"
+  "use_system_accent_color": "Utiliser la couleur d'accentuation du système",
+  "scroll_to_today": "Défiler jusqu'à aujourd'hui"
 }

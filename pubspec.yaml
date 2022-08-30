@@ -49,6 +49,7 @@ dependencies:
   system_theme: ^2.0.0
   google_fonts: ^3.0.1
   html_unescape: ^2.0.0
+  scrollable_positioned_list: ^0.3.2
 
 dev_dependencies:
   flutter_test:

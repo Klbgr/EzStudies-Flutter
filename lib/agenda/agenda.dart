@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../utils/preferences.dart';
 import '../utils/style.dart';
@@ -37,6 +38,7 @@ class _AgendaState extends State<Agenda> {
   bool initialized = false;
   List<AgendaCellData> list = [];
   bool pop = true;
+  ItemScrollController itemScrollController = ItemScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +64,13 @@ class _AgendaState extends State<Agenda> {
                       Text(AppLocalizations.of(context)!.refresh)
                     ])));
 
+    Column buttons =
+        Column(crossAxisAlignment: CrossAxisAlignment.end, children: []);
+
     if (list.isNotEmpty) {
-      content = ListView.builder(
+      content = ScrollablePositionedList.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemScrollController: itemScrollController,
         scrollDirection: Axis.vertical,
         itemCount: list.length,
         itemBuilder: (context, index) {
@@ -104,14 +111,26 @@ class _AgendaState extends State<Agenda> {
                 );
         },
       );
+
+      buttons.children.add(Container(
+          margin: const EdgeInsets.only(top: 10),
+          child: FloatingActionButton.extended(
+              onPressed: () => scrollToToday(),
+              label: Text(AppLocalizations.of(context)!.scroll_to_today,
+                  style: TextStyle(color: Style.text)),
+              icon: Icon(Icons.today, color: Style.text))));
     }
 
-    Widget child = widget.trash
-        ? content
-        : RefreshIndicator(
-            onRefresh: () => refresh(),
-            backgroundColor: Style.background,
-            child: content);
+    Widget child = Stack(children: [
+      widget.trash
+          ? content
+          : RefreshIndicator(
+              onRefresh: () => refresh(),
+              backgroundColor: Style.background,
+              child: content),
+      Positioned(bottom: 20, right: 20, child: buttons)
+    ]);
+
     Widget? menu;
     if (widget.agenda) {
       OpenContainerTemplate add = OpenContainerTemplate(
@@ -129,9 +148,8 @@ class _AgendaState extends State<Agenda> {
           elevation: 6,
           color: Style.primary,
           trigger: (_) {});
-      child = Stack(
-        children: [child, Positioned(right: 20, bottom: 20, child: add)],
-      );
+
+      buttons.children.insert(0, add);
 
       Function trashTrigger = () {};
 
@@ -252,19 +270,53 @@ class _AgendaState extends State<Agenda> {
     return Template(title, child, menu: menu, back: !widget.agenda);
   }
 
-  void load() {
-    if (widget.agenda || widget.trash) {
-      int trash = 1;
-      if (widget.trash) {
-        trash = 0;
+  void scrollToToday() {
+    if (list.isNotEmpty) {
+      int now = DateTime.now().millisecondsSinceEpoch;
+      int index = 0;
+      if (now > list[0].start) {
+        while (index < list.length &&
+            (!isSameDay(list[index].start, now) || list[index].start < now)) {
+          index++;
+        }
       }
+      itemScrollController.scrollTo(
+          index: index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut);
+    }
+  }
+
+  void load() {
+    if (widget.agenda) {
+      String url = Secret.serverUrl;
+      String name = Preferences.sharedPreferences.getString("name") ?? "";
+      String password =
+          Preferences.sharedPreferences.getString("password") ?? "";
+      http.post(Uri.parse(url), body: <String, String>{
+        "request": "cyu",
+        "name": name,
+        "password": password,
+      }).then((value) {
+        DatabaseHelper database = DatabaseHelper();
+        database.open().then((_) => database
+            .insertAll(processJson(value.body))
+            .then((value) => database.get(DatabaseHelper.agenda).then((value) {
+                  setState(() {
+                    list = value;
+                    list.removeWhere((element) => element.trashed == 1);
+                  });
+                  database.close();
+                })));
+      });
+    } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
       database
           .open()
           .then((value) => database.get(DatabaseHelper.agenda).then((value) {
                 setState(() {
                   list = value;
-                  list.removeWhere((element) => element.trashed == trash);
+                  list.removeWhere((element) => element.trashed == 0);
                 });
                 database.close();
               }));
@@ -279,55 +331,7 @@ class _AgendaState extends State<Agenda> {
         "password": password,
         "id": widget.data!.id
       }).then((value) {
-        if (value.body.isNotEmpty) {
-          List<AgendaCellData> newList = [];
-          List<dynamic> data = jsonDecode(value.body);
-          for (int i = 0; i < data.length; i++) {
-            var item = data[i];
-            List<String> start = item["start"].toString().split("T");
-            List<int> startDate = start[0]
-                .split("-")
-                .map((element) => int.parse(element))
-                .toList();
-            List<int> startTime = start[1]
-                .split(":")
-                .map((element) => int.parse(element))
-                .toList();
-            int startTimestamp = DateTime(
-                    startDate[0],
-                    startDate[1],
-                    startDate[2],
-                    startTime[0],
-                    startTime[1],
-                    startTime[2],
-                    0,
-                    0)
-                .millisecondsSinceEpoch;
-            List<String> end = item["end"].toString().split("T");
-            List<int> endDate =
-                end[0].split("-").map((element) => int.parse(element)).toList();
-            List<int> endTime =
-                end[1].split(":").map((element) => int.parse(element)).toList();
-            int endTimestamp = DateTime(endDate[0], endDate[1], endDate[2],
-                    endTime[0], endTime[1], endTime[2], 0, 0)
-                .millisecondsSinceEpoch;
-
-            String description = item["description"]
-                .toString()
-                .replaceAll("\n", "")
-                .replaceAll("\r", "")
-                .replaceAll("<br />", "\n");
-            description = HtmlUnescape().convert(description);
-            newList.add(AgendaCellData(
-                id: item["id"],
-                description: description,
-                start: startTimestamp,
-                end: endTimestamp));
-          }
-          setState(() {
-            list = newList;
-          });
-        }
+        setState(() => list = processJson(value.body));
       });
     }
   }
@@ -355,6 +359,48 @@ class _AgendaState extends State<Agenda> {
     database.open().then((value) => database
         .reset()
         .then((value) => database.close().then((value) => load())));
+  }
+
+  List<AgendaCellData> processJson(String json) {
+    List<AgendaCellData> list = [];
+    if (json.isNotEmpty) {
+      List<dynamic> data = jsonDecode(json);
+      for (int i = 0; i < data.length; i++) {
+        var item = data[i];
+        List<String> start = item["start"].toString().split("T");
+        List<int> startDate =
+            start[0].split("-").map((element) => int.parse(element)).toList();
+        List<int> startTime =
+            start[1].split(":").map((element) => int.parse(element)).toList();
+        int startTimestamp = DateTime(startDate[0], startDate[1], startDate[2],
+                startTime[0], startTime[1], startTime[2], 0, 0)
+            .millisecondsSinceEpoch;
+        List<String> end = item["end"].toString().split("T");
+        List<int> endDate =
+            end[0].split("-").map((element) => int.parse(element)).toList();
+        List<int> endTime =
+            end[1].split(":").map((element) => int.parse(element)).toList();
+        int endTimestamp = DateTime(endDate[0], endDate[1], endDate[2],
+                endTime[0], endTime[1], endTime[2], 0, 0)
+            .millisecondsSinceEpoch;
+
+        String description = item["description"]
+            .toString()
+            .replaceAll("\n", "")
+            .replaceAll("\r", "")
+            .replaceAll("<br />", "\n");
+        description = HtmlUnescape().convert(description);
+        list.add(AgendaCellData(
+            id: item["id"],
+            description: description,
+            start: startTimestamp,
+            end: endTimestamp,
+            added: 0,
+            trashed: 0,
+            edited: 0));
+      }
+    }
+    return list;
   }
 
   Future<void> refresh() async {

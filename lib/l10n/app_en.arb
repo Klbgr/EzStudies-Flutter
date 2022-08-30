@@ -42,5 +42,6 @@
   "report_bug_feddback": "Report bug/feedback",
   "made_by": "Made by",
   "version": "Version",
-  "use_system_accent_color": "Use system accent color"
+  "use_system_accent_color": "Use system accent color",
+  "scroll_to_today": "Scroll to today"
 }
