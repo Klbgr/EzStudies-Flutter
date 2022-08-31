@@ -19,7 +19,7 @@ class Details extends StatelessWidget {
   late AgendaCellData newData;
   final bool editable;
   final bool search;
-  final EdgeInsetsGeometry margin = const EdgeInsets.only(bottom: 20);
+  final EdgeInsetsGeometry margin = const EdgeInsets.only(top: 10, bottom: 10);
 
   @override
   Widget build(BuildContext context) {

@@ -35,7 +35,8 @@ class _SearchState extends State<Search> {
           showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                      AppLocalizations.of(context)!.help, "help", [
+                      AppLocalizations.of(context)!.help,
+                      AppLocalizations.of(context)!.help_search, [
                     TextButton(
                         onPressed: () => Navigator.pop(context),
                         child: Text(AppLocalizations.of(context)!.ok,
@@ -123,13 +124,39 @@ class _SearchState extends State<Search> {
         "password": password,
         "query": query.replaceAll(" ", "+")
       }).then((value) {
-        List<dynamic> results = jsonDecode(value.body)["results"];
-        List<SearchCellData> newList = [];
-        for (var element in results) {
-          newList.add(SearchCellData(
-              id: element["id"], name: element["text"], dept: element["dept"]));
+        if (value.statusCode == 200) {
+          List<dynamic> results = jsonDecode(value.body)["results"];
+          List<SearchCellData> newList = [];
+          for (var element in results) {
+            newList.add(SearchCellData(
+                id: element["id"],
+                name: element["text"],
+                dept: element["dept"]));
+          }
+          setState(() => list = newList);
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                AppLocalizations.of(context)!.error,
+                AppLocalizations.of(context)!.error_internet, [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok))
+            ]),
+          );
         }
-        setState(() => list = newList);
+      }).catchError((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              AppLocalizations.of(context)!.error,
+              AppLocalizations.of(context)!.error_internet, [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(AppLocalizations.of(context)!.ok))
+          ]),
+        );
       });
     } else {
       setState(() => list = []);

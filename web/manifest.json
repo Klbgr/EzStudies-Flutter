@@ -1,6 +1,6 @@
 {
-    "name": "ezstudies",
-    "short_name": "ezstudies",
+    "name": "EzStudies",
+    "short_name": "EzStudies",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

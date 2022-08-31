@@ -43,5 +43,15 @@
   "made_by": "Créé par",
   "version": "Version",
   "use_system_accent_color": "Utiliser la couleur d'accentuation du système",
-  "scroll_to_today": "Défiler jusqu'à aujourd'hui"
+  "scroll_to_today": "Défiler jusqu'à aujourd'hui",
+  "reminder": "Rappel",
+  "notifications_desc": "Affiche une notification 15 minutes avant chaque événement",
+  "source_code": "Code source",
+  "reset_desc": "Supprime toutes les modifications faites par l'utilisateur",
+  "help_agenda": " - Appuie sur un évènement pour voir ou modifier ses détails\n - Glisse un évènement vers la gauche ou la droite pour le supprimer\n - Glisse vers le bas pour rafraîchir l'agenda",
+  "help_search": " - Entre dans la barre de recherche le nom de la personne dont tu veux voir l'agenda\n - Appuie sur n'importe quel nom afficheé pour voir son agenda",
+  "help_search_agenda": " - Appuie sur un évènement pour voir ses détails",
+  "help_trash": " - Appuie sur un évènement pour voir ses détails\n - Glisse un évènement vers la gauche ou la droite pour le restaurer",
+  "error_credentials": "Nom d'utilisateur ou mot de passe incorrect",
+  "error_internet": "Vérifier ta connexion à internet ou réessaye plus tard"
 }

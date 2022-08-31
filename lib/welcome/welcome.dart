@@ -90,29 +90,54 @@ class _WelcomeState extends State<Welcome> {
       String encryptedName = encrypt(name, Secret.cipherKey);
       String encryptedPassword = encrypt(password, Secret.cipherKey);
       http.post(Uri.parse(Secret.serverUrl), body: <String, String>{
-        "request": "cyu",
+        "request": "cyu_check",
         "name": encryptedName,
         "password": encryptedPassword
       }).then((value) {
-        if (value.statusCode == 200 && value.body.isNotEmpty) {
-          Preferences.sharedPreferences.setString("name", encryptedName).then(
-              (value) => Preferences.sharedPreferences
-                  .setString("password", encryptedPassword)
-                  .then((value) => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => Main(reloadTheme: () {})))));
+        if (value.statusCode == 200) {
+          if (value.body == "1") {
+            Preferences.sharedPreferences.setString("name", encryptedName).then(
+                (value) => Preferences.sharedPreferences
+                    .setString("password", encryptedPassword)
+                    .then((value) => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => Main(reloadTheme: () {})))));
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialogTemplate(
+                  AppLocalizations.of(context)!.error,
+                  AppLocalizations.of(context)!.error_credentials, [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
+            );
+          }
         } else {
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
-                AppLocalizations.of(context)!.error, "wrong", [
+                AppLocalizations.of(context)!.error,
+                AppLocalizations.of(context)!.error_internet, [
               TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(AppLocalizations.of(context)!.ok))
             ]),
           );
         }
+      }).catchError((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              AppLocalizations.of(context)!.error,
+              AppLocalizations.of(context)!.error_internet, [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(AppLocalizations.of(context)!.ok))
+          ]),
+        );
       });
     }
   }

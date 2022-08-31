@@ -43,5 +43,15 @@
   "made_by": "Made by",
   "version": "Version",
   "use_system_accent_color": "Use system accent color",
-  "scroll_to_today": "Scroll to today"
+  "scroll_to_today": "Scroll to today",
+  "reminder": "Reminder",
+  "notifications_desc": "Show notification 15 minutes before each event",
+  "source_code": "Source code",
+  "reset_desc": "Remove all modifications done by user",
+  "help_agenda": " - Tap on an event to see or edit its details\n - Swipe an event to the left or to the right to delete it\n - Swipe down to refresh the agenda",
+  "help_search": " - Type whoever's name in the search bar to view his agenda\n - Tap on any shown name to view his agenda",
+  "help_search_agenda": " - Tap on an event to see its details",
+  "help_trash": " - Tap on an event to see its details\n - Swipe an event to the left or to the right to restore it",
+  "error_credentials": "Incorrect name or password",
+  "error_internet": "Please check your internet connection or retry later"
 }

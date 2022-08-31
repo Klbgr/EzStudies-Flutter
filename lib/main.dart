@@ -9,6 +9,7 @@
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
+import 'package:ezstudies/utils/notifications.dart';
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:ezstudies/utils/secret.dart';
 import 'package:ezstudies/utils/style.dart';
@@ -26,6 +27,7 @@ void main() async {
   await Preferences.load();
   await Secret.load();
   await Style.load();
+  await Notifications.initNotifications();
   runApp(const EzStudies());
 }
 

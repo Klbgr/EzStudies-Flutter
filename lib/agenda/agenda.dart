@@ -10,6 +10,7 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../utils/notifications.dart';
 import '../utils/preferences.dart';
 import '../utils/style.dart';
 import '../utils/templates.dart';
@@ -184,7 +185,8 @@ class _AgendaState extends State<Agenda> {
             showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.reset, "reset?", [
+                  AppLocalizations.of(context)!.reset,
+                  AppLocalizations.of(context)!.reset_desc, [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(AppLocalizations.of(context)!.cancel,
@@ -203,7 +205,8 @@ class _AgendaState extends State<Agenda> {
             showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.help, "help", [
+                  AppLocalizations.of(context)!.help,
+                  AppLocalizations.of(context)!.help_agenda, [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(AppLocalizations.of(context)!.ok,
@@ -225,7 +228,8 @@ class _AgendaState extends State<Agenda> {
             showDialog(
                 context: context,
                 builder: (context) => AlertDialogTemplate(
-                        AppLocalizations.of(context)!.help, "help?", [
+                        AppLocalizations.of(context)!.help,
+                        AppLocalizations.of(context)!.help_trash, [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
                           child: Text(AppLocalizations.of(context)!.ok,
@@ -246,7 +250,8 @@ class _AgendaState extends State<Agenda> {
             showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.help, "help", [
+                  AppLocalizations.of(context)!.help,
+                  AppLocalizations.of(context)!.help_search_agenda, [
                 TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(AppLocalizations.of(context)!.ok,
@@ -270,13 +275,20 @@ class _AgendaState extends State<Agenda> {
     return Template(title, child, menu: menu, back: !widget.agenda);
   }
 
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    Future.delayed(const Duration(milliseconds: 300))
+        .then((value) => scrollToToday());
+  }
+
   void scrollToToday() {
     if (list.isNotEmpty) {
       int now = DateTime.now().millisecondsSinceEpoch;
       int index = 0;
       if (now > list[0].start) {
         while (index < list.length &&
-            (!isSameDay(list[index].start, now) || list[index].start < now)) {
+            !(isSameDay(list[index].start, now) || list[index].start >= now)) {
           index++;
         }
       }
@@ -298,16 +310,41 @@ class _AgendaState extends State<Agenda> {
         "name": name,
         "password": password,
       }).then((value) {
-        DatabaseHelper database = DatabaseHelper();
-        database.open().then((_) => database
-            .insertAll(processJson(value.body))
-            .then((value) => database.get(DatabaseHelper.agenda).then((value) {
-                  setState(() {
-                    list = value;
-                    list.removeWhere((element) => element.trashed == 1);
-                  });
-                  database.close();
-                })));
+        if (value.statusCode == 200) {
+          DatabaseHelper database = DatabaseHelper();
+          database.open().then((_) => database
+              .insertAll(processJson(value.body))
+              .then((value) =>
+                  database.get(DatabaseHelper.agenda).then((value) {
+                    setState(() {
+                      list = value;
+                      list.removeWhere((element) => element.trashed == 1);
+                    });
+                    database.close().then((value) => scheduleNotifications());
+                  })));
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                AppLocalizations.of(context)!.error,
+                AppLocalizations.of(context)!.error_internet, [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok))
+            ]),
+          );
+        }
+      }).catchError((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              AppLocalizations.of(context)!.error,
+              AppLocalizations.of(context)!.error_internet, [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(AppLocalizations.of(context)!.ok))
+          ]),
+        );
       });
     } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
@@ -359,6 +396,13 @@ class _AgendaState extends State<Agenda> {
     database.open().then((value) => database
         .reset()
         .then((value) => database.close().then((value) => load())));
+  }
+
+  void scheduleNotifications() {
+    if (Preferences.sharedPreferences.getBool("notifications") ?? true) {
+      Notifications.cancelNotifications()
+          .then((value) => Notifications.scheduleNotifications(context));
+    }
   }
 
   List<AgendaCellData> processJson(String json) {

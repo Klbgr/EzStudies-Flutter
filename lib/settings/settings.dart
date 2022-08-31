@@ -9,6 +9,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/cipher.dart';
+import '../utils/notifications.dart';
 import '../utils/preferences.dart';
 import '../utils/secret.dart';
 import '../utils/style.dart';
@@ -24,6 +25,8 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final TextStyle font = GoogleFonts.openSans();
+  int count = 0;
+  DateTime? date;
 
   @override
   Widget build(BuildContext context) {
@@ -76,18 +79,23 @@ class _SettingsState extends State<Settings> {
                 initialValue:
                     Preferences.sharedPreferences.getBool("notifications") ??
                         true,
-                onToggle: (value) =>
-                    (Preferences.sharedPreferences.getBool("notifications") ??
-                            true)
-                        ? Preferences.sharedPreferences
-                            .setBool("notifications", false)
-                            .then((value) => setState(() {}))
-                        : Preferences.sharedPreferences
-                            .setBool("notifications", true)
-                            .then((value) => setState(() {})),
+                onToggle: (value) {
+                  if (value) {
+                    Preferences.sharedPreferences
+                        .setBool("notifications", true)
+                        .then((value) => setState(() {}));
+                  } else {
+                    Preferences.sharedPreferences
+                        .setBool("notifications", false)
+                        .then((value) => setState(() {}));
+                    Notifications.cancelNotifications();
+                  }
+                },
                 title: Text(AppLocalizations.of(context)!.notifications,
                     style: font),
-                description: Text("desc", style: GoogleFonts.openSans()))
+                description: Text(
+                    AppLocalizations.of(context)!.notifications_desc,
+                    style: GoogleFonts.openSans()))
           ],
         ),
         SettingsSection(
@@ -114,20 +122,51 @@ class _SettingsState extends State<Settings> {
               SettingsTile(
                   leading: const Icon(Icons.bug_report),
                   title: Text(AppLocalizations.of(context)!.report_bug_feddback,
-                      style: font)),
+                      style: font),
+                  onPressed: (context) => launchUrl(
+                      Uri.parse(
+                          "https://docs.google.com/forms/d/e/1FAIpQLSeEDjP8qGxxHHmIadZYaxhaDkZw1_4rqaNBbegskcjbTUlxiQ/viewform?usp=pp_url"),
+                      mode: LaunchMode.externalApplication)),
               SettingsTile(
                   leading: const Icon(Icons.logo_dev),
                   title:
                       Text(AppLocalizations.of(context)!.made_by, style: font),
-                  value: Text("Antoine Qiu (GitHub: @Klbgr)", style: font),
+                  value: Text("Antoine Qiu (https://github.com/Klbgr)",
+                      style: font),
                   onPressed: (context) => launchUrl(
                       Uri.parse("https://github.com/Klbgr"),
+                      mode: LaunchMode.externalApplication)),
+              SettingsTile(
+                  leading: const Icon(Icons.code),
+                  title: Text(AppLocalizations.of(context)!.source_code,
+                      style: font),
+                  value: Text("https://github.com/Klbgr/EzStudies-Flutter",
+                      style: font),
+                  onPressed: (context) => launchUrl(
+                      Uri.parse("https://github.com/Klbgr/EzStudies-Flutter"),
                       mode: LaunchMode.externalApplication)),
               SettingsTile(
                   leading: const Icon(Icons.numbers),
                   title:
                       Text(AppLocalizations.of(context)!.version, style: font),
-                  value: Text(Preferences.packageInfo.version, style: font)),
+                  value: Text(Preferences.packageInfo.version, style: font),
+                  onPressed: (context) {
+                    DateTime now = DateTime.now();
+                    if (date == null ||
+                        now.millisecondsSinceEpoch -
+                                date!.millisecondsSinceEpoch >
+                            3 * 1000) {
+                      date = DateTime.now();
+                      count = 1;
+                    } else if (count == 4) {
+                      date = null;
+                      count = 0;
+                      launchUrl(Uri.parse("https://youtu.be/a3Z7zEc7AXQ"),
+                          mode: LaunchMode.externalApplication);
+                    } else {
+                      count++;
+                    }
+                  }),
             ])
       ],
     );
@@ -142,13 +181,12 @@ class _SettingsState extends State<Settings> {
   }
 
   void disconnect() {
-    Preferences.sharedPreferences.remove("name").then((_) =>
-        Preferences.sharedPreferences.remove("password").then((value) {
-          DatabaseHelper database = DatabaseHelper();
-          database.open().then((value) => database.deleteAll().then((value) =>
-              database.close().then((value) => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Welcome())))));
-        }));
+    Preferences.sharedPreferences.clear().then((value) {
+      DatabaseHelper database = DatabaseHelper();
+      database.open().then((value) => database.deleteAll().then((value) =>
+          database.close().then((value) => Notifications.cancelNotifications()
+              .then((value) => Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const Welcome()))))));
+    });
   }
 }
