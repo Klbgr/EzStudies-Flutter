@@ -53,5 +53,8 @@
   "help_search_agenda": " - Appuie sur un évènement pour voir ses détails",
   "help_trash": " - Appuie sur un évènement pour voir ses détails\n - Glisse un évènement vers la gauche ou la droite pour le restaurer",
   "error_credentials": "Nom d'utilisateur ou mot de passe incorrect",
-  "error_internet": "Vérifier ta connexion à internet ou réessaye plus tard"
+  "error_internet": "Vérifier ta connexion à internet ou réessaye plus tard",
+  "welcome_welcome": "Bienvenue sur EzStudies 👋\nUne application Open Source crée pour simplifier ta vie d'étudiant 😎\nAvec EzStudies, tu pourras gérer ton agenda, tes devoirs et bien plus encore 🔥",
+  "welcome_features": "Fonctionnalités:\n - Voir ton agenda et celui des autres étudiants de l'université 📅\n - Ajouter, supprimer ou modifier ton agenda ✏\n - Recevoir des rappels avant chaque cours 🔔\n - Renseigner tes devoirs 📖\n - Recevoir des rappels pour tes devoirs 🔔\n - Et plus 🔥",
+  "welcome_login": "Pour commencer, connecte toi en utilisant tes identifiants de l'ENT 👇\nNe t'en fait pas, tes identifiants seront chiffrés et n'iront pas n'importe où 🔒"
 }

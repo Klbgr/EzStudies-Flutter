@@ -3,7 +3,9 @@ import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/utils/timestamp_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:ms_undraw/ms_undraw.dart';
 
 class Template extends StatelessWidget {
   const Template(this.title, this.child,
@@ -230,6 +232,72 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
           });
         }
       },
+    );
+  }
+}
+
+class WelcomeFABTemplate extends StatelessWidget {
+  const WelcomeFABTemplate(
+      {this.next = false,
+      this.previous = false,
+      this.begin = false,
+      required this.onPressed,
+      Key? key})
+      : super(key: key);
+  final bool next;
+  final bool previous;
+  final bool begin;
+  final Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    String label = AppLocalizations.of(context)!.next;
+    IconData icon = Icons.arrow_forward;
+    if (previous) {
+      label = AppLocalizations.of(context)!.previous;
+      icon = Icons.arrow_back;
+    } else if (begin) {
+      label = AppLocalizations.of(context)!.begin;
+      icon = Icons.start;
+    }
+
+    return Positioned(
+      bottom: 20,
+      right: (next || begin) ? 20 : null,
+      left: (next || begin) ? null : 20,
+      child: FloatingActionButton.extended(
+          heroTag: (begin) ? "add" : null,
+          backgroundColor: Style.primary,
+          onPressed: () => onPressed(),
+          label: Text(label, style: TextStyle(color: Style.text)),
+          icon: Icon(icon, color: Style.text)),
+    );
+  }
+}
+
+class WelcomePageTemplate extends StatelessWidget {
+  const WelcomePageTemplate(this.content, this.illustration, {Key? key})
+      : super(key: key);
+  final Widget content;
+  final UnDrawIllustration illustration;
+
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height * 0.3;
+    return Container(
+      margin: const EdgeInsets.only(left: 20, right: 20),
+      alignment: Alignment.topCenter,
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            height: height,
+            child: UnDraw(
+              color: Style.primary,
+              illustration: illustration,
+              height: height,
+            )),
+        content
+      ]),
     );
   }
 }

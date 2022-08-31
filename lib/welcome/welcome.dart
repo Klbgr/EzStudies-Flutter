@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
+import 'package:ms_undraw/ms_undraw.dart';
 
 import '../main.dart';
 import '../utils/cipher.dart';
@@ -21,27 +22,37 @@ class _WelcomeState extends State<Welcome> {
   final PageController pageController = PageController(initialPage: 0);
   final Duration animationDuration = const Duration(milliseconds: 300);
   final Curve animationCurve = Curves.easeInOut;
+  final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 24);
   String name = "";
   String password = "";
 
   @override
   Widget build(BuildContext context) {
-    Widget page1 = Center(
-      child: Text("welcome+illu", style: TextStyle(color: Style.text)),
-    );
-    Widget page2 = Center(
-      child: Text("features+illu", style: TextStyle(color: Style.text)),
-    );
-    Widget page3 = Container(
-        margin: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          TextFormFieldTemplate(
-              AppLocalizations.of(context)!.name, Icons.person,
-              onChanged: (value) => name = value),
+    Widget page1 = WelcomePageTemplate(
+        Text(AppLocalizations.of(context)!.welcome_welcome,
+            style: textStyle, textAlign: TextAlign.center),
+        UnDrawIllustration.welcoming);
+
+    Widget page2 = WelcomePageTemplate(
+        Text(AppLocalizations.of(context)!.welcome_features,
+            style: textStyle, textAlign: TextAlign.center),
+        UnDrawIllustration.features_overview);
+
+    Widget page3 = WelcomePageTemplate(
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(AppLocalizations.of(context)!.welcome_login,
+              style: textStyle, textAlign: TextAlign.center),
+          Container(
+              margin: const EdgeInsets.only(bottom: 10, top: 20),
+              child: TextFormFieldTemplate(
+                  AppLocalizations.of(context)!.name, Icons.person,
+                  onChanged: (value) => name = value)),
           TextFormFieldTemplate(
               AppLocalizations.of(context)!.password, Icons.password,
               onChanged: (value) => password = value, hidden: true)
-        ]));
+        ]),
+        UnDrawIllustration.login);
+
     List<Widget> pages = [page1, page2, page3];
 
     Widget child = Stack(children: [
@@ -176,44 +187,5 @@ class _WelcomeState extends State<Welcome> {
               duration: animationDuration, curve: animationCurve)));
     }
     return dots;
-  }
-}
-
-class WelcomeFABTemplate extends StatelessWidget {
-  const WelcomeFABTemplate(
-      {this.next = false,
-      this.previous = false,
-      this.begin = false,
-      required this.onPressed,
-      Key? key})
-      : super(key: key);
-  final bool next;
-  final bool previous;
-  final bool begin;
-  final Function onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    String label = AppLocalizations.of(context)!.next;
-    IconData icon = Icons.arrow_forward;
-    if (previous) {
-      label = AppLocalizations.of(context)!.previous;
-      icon = Icons.arrow_back;
-    } else if (begin) {
-      label = AppLocalizations.of(context)!.begin;
-      icon = Icons.start;
-    }
-
-    return Positioned(
-      bottom: 20,
-      right: (next || begin) ? 20 : null,
-      left: (next || begin) ? null : 20,
-      child: FloatingActionButton.extended(
-          heroTag: (begin) ? "add" : null,
-          backgroundColor: Style.primary,
-          onPressed: () => onPressed(),
-          label: Text(label, style: TextStyle(color: Style.text)),
-          icon: Icon(icon, color: Style.text)),
-    );
   }
 }
