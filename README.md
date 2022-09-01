@@ -1,6 +1,7 @@
 # EzStudies [![Github All Releases](https://img.shields.io/github/downloads/Klbgr/EzStudies-Flutter/latest/total.svg)](https://github.com/Klbgr/EzStudies-Flutter/releases/latest)
 
 Ease your studies
+
 (English version below)
 
 ## Introduction
@@ -26,11 +27,14 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 ## Téléchargement
 
 Vous pouvez soit installer vous même les différents fichiers situés dans la section [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases), soit utiliser l'[intallateur en ligne](https://ezstudies.alwaysdata.net/install).
+
 La version Web est accéssible à [cette adresse](https://ezstudies.alwaysdata.net/).
 
 ## API
 
-Le code source de l'API personnalisée, utilisée pour faire fonctionner cette application, se trouve dans le dossier `EzStudies-Flutter/web/api`. L'API est incluse dans ce projet pour facilliter le déploiement de l'application Web.
+Le code source de l'API personnalisée, utilisée pour faire fonctionner cette application, se trouve dans le dossier `EzStudies-Flutter/web/api`.
+
+L'API est incluse dans ce projet pour facilliter le déploiement de l'application Web.
 
 ## Compilation
 
@@ -64,6 +68,7 @@ Note : il faut utiliser cette commande après toutes modifications des fichiers 
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 Note : il faut utiliser cette commande après toutes modifications du fichier `.env`.
+
 Enfin, l'application pourra être compilée et exécutée de façon habituelle.
 
 # EzStudies (English)
@@ -93,11 +98,14 @@ Compared to the previous version, this one has many differences. The main differ
 ## Download
 
 You can either download the files in the [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases) section, or use the [online installer](https://ezstudies.alwaysdata.net/install).
+
 The Web version is available at [this address](https://ezstudies.alwaysdata.net/).
 
 ## API
 
-The source code of the custom API, used to make this app work, is located on the `EzStudies-Flutter/web/api` folder. The API is included in this procjet ease the deployment of the Web app.
+The source code of the custom API, used to make this app work, is located on the `EzStudies-Flutter/web/api` folder.
+
+The API is included in this procjet ease the deployment of the Web app.
 
 ## Compilation
 
@@ -131,4 +139,5 @@ Note : you have to use this command each time you edit the files `app_en.arb` or
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 Note : you have to use this command each time you edit the `.env` file.
+
 Finally, the app can be compiled and executed as usual.
