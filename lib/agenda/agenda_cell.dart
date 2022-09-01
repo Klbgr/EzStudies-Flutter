@@ -5,7 +5,7 @@ import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
 import 'agenda_cell_data.dart';
-import 'details.dart';
+import 'agenda_details.dart';
 
 class AgendaCell extends StatelessWidget {
   const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth,
@@ -90,7 +90,8 @@ class AgendaCell extends StatelessWidget {
                           style: TextStyle(color: Style.text)),
                     ),
                   ])),
-              Details(data: data, editable: editable, search: search), () {
+              AgendaDetails(data: data, editable: editable, search: search),
+              onClosed: () {
         onClosed();
       },
               radius: const BorderRadius.all(Radius.circular(16)),

@@ -179,7 +179,8 @@ class _SearchCell extends StatelessWidget {
 
     Widget child2 = Agenda(search: true, data: data);
 
-    return OpenContainerTemplate(child1, child2, () {},
+    return OpenContainerTemplate(child1, child2,
+        onClosed: () {},
         trigger: (_) {},
         color: Style.secondary,
         radius: BorderRadius.only(

@@ -6,8 +6,8 @@ import '../utils/style.dart';
 import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 
-class Details extends StatelessWidget {
-  Details(
+class AgendaDetails extends StatelessWidget {
+  const AgendaDetails(
       {this.add = false,
       this.data,
       this.editable = true,
@@ -16,13 +16,13 @@ class Details extends StatelessWidget {
       : super(key: key);
   final bool add;
   final AgendaCellData? data;
-  late AgendaCellData newData;
   final bool editable;
   final bool search;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(top: 10, bottom: 10);
 
   @override
   Widget build(BuildContext context) {
+    AgendaCellData newData;
     if (add) {
       newData = AgendaCellData(
         id: "",
@@ -62,27 +62,39 @@ class Details extends StatelessWidget {
           child: TextFormFieldTemplate(
               AppLocalizations.of(context)!.date, Icons.calendar_month,
               dateTime: DateTime.fromMillisecondsSinceEpoch(newData.start),
-              date: true,
-              onTapped: (value) => newData.start = value,
-              enabled: editable)),
+              date: true, onTapped: (value) {
+            DateTime start = DateTime.fromMillisecondsSinceEpoch(newData.start);
+            DateTime date = DateTime.fromMillisecondsSinceEpoch(value);
+            newData.start = DateTime(date.year, date.month, date.day,
+                    start.hour, start.minute, 0, 0, 0)
+                .millisecondsSinceEpoch;
+          }, enabled: editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
           child: TextFormFieldTemplate(
               AppLocalizations.of(context)!.start, Icons.access_time,
               dateTime: DateTime.fromMillisecondsSinceEpoch(newData.start),
-              time: true,
-              onTapped: (value) => newData.start = value,
-              enabled: editable)),
+              time: true, onTapped: (value) {
+            DateTime start = DateTime.fromMillisecondsSinceEpoch(newData.start);
+            DateTime time = DateTime.fromMillisecondsSinceEpoch(value);
+            newData.start = DateTime(start.year, start.month, start.day,
+                    time.hour, time.minute, 0, 0, 0)
+                .millisecondsSinceEpoch;
+          }, enabled: editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
           child: TextFormFieldTemplate(
               AppLocalizations.of(context)!.end, Icons.access_time_filled,
               dateTime: DateTime.fromMillisecondsSinceEpoch(newData.end),
-              time: true,
-              onTapped: (value) => newData.end = value,
-              enabled: editable)),
+              time: true, onTapped: (value) {
+            DateTime start = DateTime.fromMillisecondsSinceEpoch(newData.start);
+            DateTime time = DateTime.fromMillisecondsSinceEpoch(value);
+            newData.end = DateTime(start.year, start.month, start.day,
+                    time.hour, time.minute, 0, 0, 0)
+                .millisecondsSinceEpoch;
+          }, enabled: editable)),
     ];
 
     if (!add && !search) {
@@ -126,12 +138,21 @@ class Details extends StatelessWidget {
             backgroundColor: Colors.green,
             icon: Icon(add ? Icons.add : Icons.save, color: Style.text),
             onPressed: () {
+              DateTime start =
+                  DateTime.fromMillisecondsSinceEpoch(newData.start);
+              DateTime end = DateTime.fromMillisecondsSinceEpoch(newData.end);
+              newData.start = DateTime(start.year, start.month, start.day,
+                      start.hour, start.minute, 0, 0, 0)
+                  .millisecondsSinceEpoch;
+              newData.end = DateTime(start.year, start.month, start.day,
+                      end.hour, end.minute, 0, 0, 0)
+                  .millisecondsSinceEpoch;
               if (newData.description.isEmpty) {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialogTemplate(
                             AppLocalizations.of(context)!.error,
-                            "title empty", [
+                            AppLocalizations.of(context)!.error_empty, [
                           TextButton(
                               onPressed: () => Navigator.pop(context),
                               child: Text(AppLocalizations.of(context)!.ok))
@@ -141,72 +162,73 @@ class Details extends StatelessWidget {
                     context: context,
                     builder: (context) => AlertDialogTemplate(
                             AppLocalizations.of(context)!.error,
-                            "error end <= start", [
+                            AppLocalizations.of(context)!.error_time, [
                           TextButton(
                               onPressed: () => Navigator.pop(context),
                               child: Text(AppLocalizations.of(context)!.ok))
                         ]));
-              } else {
-                if (add) {
-                  DateTime start =
-                      DateTime.fromMillisecondsSinceEpoch(newData.start);
-                  DateTime end =
-                      DateTime.fromMillisecondsSinceEpoch(newData.end);
-                  newData.end = DateTime(start.year, start.month, start.day,
-                          end.hour, end.minute, 0, 0, 0)
-                      .millisecondsSinceEpoch;
-                  newData.id = newData.description + newData.start.toString();
-                  DatabaseHelper database = DatabaseHelper();
-                  database.open().then((_) => database
-                          .insert(DatabaseHelper.agenda, newData)
-                          .then((value) {
-                        if (!value) {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialogTemplate(
-                                      AppLocalizations.of(context)!.error,
-                                      "error", [
-                                    TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text(
-                                            AppLocalizations.of(context)!.ok))
-                                  ]));
-                          database.close();
-                        } else {
-                          database
-                              .close()
-                              .then((value) => Navigator.pop(context));
-                        }
-                      }));
-                } else {
-                  DatabaseHelper database = DatabaseHelper();
-                  database.open().then((_) {
-                    if (newData.added == 0) {
-                      if (newData.edited == 0) {
-                        newData.edited = 1;
-                        database
-                            .insertOrReplace(DatabaseHelper.backup, data!)
-                            .then((value) => database
-                                .insertOrReplace(DatabaseHelper.agenda, newData)
-                                .then((value) => database
-                                    .close()
-                                    .then((value) => Navigator.pop(context))));
+              } else if (add) {
+                DateTime start =
+                    DateTime.fromMillisecondsSinceEpoch(newData.start);
+                DateTime end = DateTime.fromMillisecondsSinceEpoch(newData.end);
+                newData.end = DateTime(start.year, start.month, start.day,
+                        end.hour, end.minute, 0, 0, 0)
+                    .millisecondsSinceEpoch;
+                newData.id = newData.description + newData.start.toString();
+                DatabaseHelper database = DatabaseHelper();
+                database.open().then((_) => database
+                        .insertAgenda(DatabaseHelper.agenda, newData)
+                        .then((value) {
+                      if (!value) {
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialogTemplate(
+                                    AppLocalizations.of(context)!.error,
+                                    AppLocalizations.of(context)!
+                                        .error_conflict,
+                                    [
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                              AppLocalizations.of(context)!.ok))
+                                    ]));
+                        database.close();
                       } else {
                         database
-                            .insertOrReplace(DatabaseHelper.agenda, newData)
-                            .then((value) => database
-                                .close()
-                                .then((value) => Navigator.pop(context)));
+                            .close()
+                            .then((value) => Navigator.pop(context));
                       }
+                    }));
+              } else {
+                DatabaseHelper database = DatabaseHelper();
+                database.open().then((_) {
+                  if (newData.added == 0) {
+                    if (newData.edited == 0) {
+                      newData.edited = 1;
+                      database
+                          .insertOrReplaceAgenda(DatabaseHelper.backup, data!)
+                          .then((value) => database
+                              .insertOrReplaceAgenda(
+                                  DatabaseHelper.agenda, newData)
+                              .then((value) => database
+                                  .close()
+                                  .then((value) => Navigator.pop(context))));
                     } else {
                       database
-                          .insertOrReplace(DatabaseHelper.agenda, newData)
+                          .insertOrReplaceAgenda(DatabaseHelper.agenda, newData)
                           .then((value) => database
                               .close()
                               .then((value) => Navigator.pop(context)));
                     }
-                  });
-                }
+                  } else {
+                    database
+                        .insertOrReplaceAgenda(DatabaseHelper.agenda, newData)
+                        .then((value) => database
+                            .close()
+                            .then((value) => Navigator.pop(context)));
+                  }
+                });
               }
             },
             label: Text(
@@ -229,31 +251,19 @@ class Details extends StatelessWidget {
                     DatabaseHelper database = DatabaseHelper();
                     database.open().then((_) {
                       database
-                          .getById(DatabaseHelper.backup, newData.id)
+                          .getByIdAgenda(DatabaseHelper.backup, newData.id)
                           .then((value) {
-                        if (value.isEmpty) {
-                          //TODO: error
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialogTemplate(
-                                AppLocalizations.of(context)!.error, "error", [
-                              TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(AppLocalizations.of(context)!.ok))
-                            ]),
-                          );
-                          database.close();
-                        } else {
-                          backup = value[0];
-                          database
-                              .insertOrReplace(DatabaseHelper.agenda, backup)
-                              .then((value) => database
-                                      .delete(DatabaseHelper.backup, backup)
-                                      .then((value) {
-                                    database.close().then(
-                                        (value) => Navigator.pop(context));
-                                  }));
-                        }
+                        backup = value[0];
+                        database
+                            .insertOrReplaceAgenda(
+                                DatabaseHelper.agenda, backup)
+                            .then((value) => database
+                                    .deleteAgenda(DatabaseHelper.backup, backup)
+                                    .then((value) {
+                                  database
+                                      .close()
+                                      .then((value) => Navigator.pop(context));
+                                }));
                       });
                     });
                   },

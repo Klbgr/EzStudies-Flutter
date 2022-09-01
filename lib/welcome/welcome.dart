@@ -22,7 +22,7 @@ class _WelcomeState extends State<Welcome> {
   final PageController pageController = PageController(initialPage: 0);
   final Duration animationDuration = const Duration(milliseconds: 300);
   final Curve animationCurve = Curves.easeInOut;
-  final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 24);
+  final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 16);
   String name = "";
   String password = "";
 

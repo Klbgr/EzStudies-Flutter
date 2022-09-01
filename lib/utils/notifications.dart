@@ -45,14 +45,13 @@ class Notifications {
     );
   }
 
-  static Future<void> scheduleNotifications(BuildContext context) async {
+  static Future<void> scheduleNotificationsAgenda(BuildContext context) async {
     DatabaseHelper database = DatabaseHelper();
-    database
-        .open()
-        .then((value) => database.get(DatabaseHelper.agenda).then((value) {
+    database.open().then(
+        (value) => database.getAgenda(DatabaseHelper.agenda).then((value) {
               for (int i = 0; i < value.length; i++) {
                 if (value[i].trashed == 0 &&
-                    value[i].start + 15 * 60 * 1000 >=
+                    value[i].start - 15 * 60 * 1000 >=
                         DateTime.now().millisecondsSinceEpoch) {
                   _scheduleNotification(
                       i,
@@ -66,7 +65,45 @@ class Notifications {
             }));
   }
 
-  static Future<void> cancelNotifications() async {
+  static Future<void> scheduleNotificationsHomeworks(
+      BuildContext context) async {
+    DatabaseHelper database = DatabaseHelper();
+    database.open().then((value) => database.getHomeworks().then((value) {
+          for (int i = 0; i < value.length; i++) {
+            if (value[i].done == 0 &&
+                value[i].date - 24 * 60 * 60 * 1000 >=
+                    DateTime.now().millisecondsSinceEpoch) {
+              _scheduleNotification(
+                  i + 1000,
+                  context,
+                  AppLocalizations.of(context)!.reminder,
+                  value[i].description,
+                  value[i].date - 24 * 60 * 60 * 1000);
+            }
+          }
+          database.close();
+        }));
+  }
+
+  static Future<void> cancelNotificationsAgenda() async {
+    for (PendingNotificationRequest p in await flutterLocalNotificationsPlugin
+        .pendingNotificationRequests()) {
+      if (p.id < 1000) {
+        await flutterLocalNotificationsPlugin.cancel(p.id);
+      }
+    }
+  }
+
+  static Future<void> cancelNotificationsHomeworks() async {
+    for (PendingNotificationRequest p in await flutterLocalNotificationsPlugin
+        .pendingNotificationRequests()) {
+      if (p.id >= 1000) {
+        await flutterLocalNotificationsPlugin.cancel(p.id);
+      }
+    }
+  }
+
+  static Future<void> cancelAllNotifications() async {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 }

@@ -80,21 +80,36 @@ class _SettingsState extends State<Settings> {
                     Preferences.sharedPreferences.getBool("notifications") ??
                         true,
                 onToggle: (value) {
-                  if (value) {
-                    Preferences.sharedPreferences
-                        .setBool("notifications", true)
-                        .then((value) => setState(() {}));
-                  } else {
-                    Preferences.sharedPreferences
-                        .setBool("notifications", false)
-                        .then((value) => setState(() {}));
-                    Notifications.cancelNotifications();
+                  Preferences.sharedPreferences
+                      .setBool("notifications", value)
+                      .then((value) => setState(() {}));
+                  if (!value) {
+                    Notifications.cancelNotificationsAgenda();
                   }
                 },
-                title: Text(AppLocalizations.of(context)!.notifications,
+                title: Text(AppLocalizations.of(context)!.notifications_agenda,
                     style: font),
                 description: Text(
-                    AppLocalizations.of(context)!.notifications_desc,
+                    AppLocalizations.of(context)!.notifications_agenda_desc,
+                    style: GoogleFonts.openSans())),
+            SettingsTile.switchTile(
+                leading: const Icon(Icons.notifications),
+                initialValue: Preferences.sharedPreferences
+                        .getBool("notifications_homeworks") ??
+                    true,
+                onToggle: (value) {
+                  Preferences.sharedPreferences
+                      .setBool("notifications_homeworks", value)
+                      .then((value) => setState(() {}));
+                  if (!value) {
+                    Notifications.cancelNotificationsHomeworks();
+                  }
+                },
+                title: Text(
+                    AppLocalizations.of(context)!.notifications_homeworks,
+                    style: font),
+                description: Text(
+                    AppLocalizations.of(context)!.notifications_homeworks_desc,
                     style: GoogleFonts.openSans()))
           ],
         ),
@@ -121,7 +136,7 @@ class _SettingsState extends State<Settings> {
             tiles: [
               SettingsTile(
                   leading: const Icon(Icons.bug_report),
-                  title: Text(AppLocalizations.of(context)!.report_bug_feddback,
+                  title: Text(AppLocalizations.of(context)!.report_bug_feedback,
                       style: font),
                   onPressed: (context) => launchUrl(
                       Uri.parse(
@@ -184,9 +199,12 @@ class _SettingsState extends State<Settings> {
     Preferences.sharedPreferences.clear().then((value) {
       DatabaseHelper database = DatabaseHelper();
       database.open().then((value) => database.deleteAll().then((value) =>
-          database.close().then((value) => Notifications.cancelNotifications()
-              .then((value) => Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Welcome()))))));
+          database.close().then((value) =>
+              Notifications.cancelAllNotifications().then((value) =>
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Welcome()))))));
     });
   }
 }

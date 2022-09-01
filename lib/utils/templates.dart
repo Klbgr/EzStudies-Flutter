@@ -49,7 +49,7 @@ class Template extends StatelessWidget {
               margin: const EdgeInsets.only(left: 20, bottom: 20),
               child: Text(
                 title,
-                style: TextStyle(fontSize: 30, color: Style.text),
+                style: TextStyle(fontSize: 28, color: Style.text),
               ),
             ),
             Expanded(
@@ -83,8 +83,9 @@ class MenuTemplate extends StatelessWidget {
 }
 
 class OpenContainerTemplate extends StatelessWidget {
-  const OpenContainerTemplate(this.child1, this.child2, this.onClosed,
-      {this.color,
+  const OpenContainerTemplate(this.child1, this.child2,
+      {required this.onClosed,
+      this.color,
       this.radius = BorderRadius.zero,
       this.elevation = 0,
       required this.trigger,
@@ -284,20 +285,22 @@ class WelcomePageTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 0.3;
-    return Container(
-      margin: const EdgeInsets.only(left: 20, right: 20),
-      alignment: Alignment.topCenter,
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            height: height,
-            child: UnDraw(
-              color: Style.primary,
-              illustration: illustration,
-              height: height,
-            )),
-        content
-      ]),
-    );
+    return SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 80),
+          alignment: Alignment.topCenter,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                height: height,
+                child: UnDraw(
+                  color: Style.primary,
+                  illustration: illustration,
+                  height: height,
+                )),
+            content
+          ]),
+        ));
   }
 }

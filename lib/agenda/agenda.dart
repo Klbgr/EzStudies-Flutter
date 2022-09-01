@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ezstudies/agenda/details.dart';
+import 'package:ezstudies/agenda/agenda_details.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/utils/secret.dart';
@@ -143,8 +143,8 @@ class _AgendaState extends State<Agenda> {
               label: Text(AppLocalizations.of(context)!.add,
                   style: TextStyle(color: Style.text)),
               icon: Icon(Icons.add, color: Style.text)),
-          Details(add: true),
-          () => load(),
+          const AgendaDetails(add: true),
+          onClosed: () => load(),
           radius: const BorderRadius.all(Radius.circular(24)),
           elevation: 6,
           color: Style.primary,
@@ -157,13 +157,16 @@ class _AgendaState extends State<Agenda> {
       OpenContainerTemplate trash = OpenContainerTemplate(
           Text(AppLocalizations.of(context)!.trash,
               style: TextStyle(fontSize: 16, color: Style.text)),
-          const Agenda(trash: true), () {
-        if (pop) {
-          Navigator.pop(context);
-        }
-        pop = true;
-        load();
-      }, color: Colors.transparent, trigger: (value) => trashTrigger = value);
+          const Agenda(trash: true),
+          onClosed: () {
+            if (pop) {
+              Navigator.pop(context);
+            }
+            pop = true;
+            load();
+          },
+          color: Colors.transparent,
+          trigger: (value) => trashTrigger = value);
 
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(value: "trash", child: trash),
@@ -315,7 +318,7 @@ class _AgendaState extends State<Agenda> {
           database.open().then((_) => database
               .insertAll(processJson(value.body))
               .then((value) =>
-                  database.get(DatabaseHelper.agenda).then((value) {
+                  database.getAgenda(DatabaseHelper.agenda).then((value) {
                     setState(() {
                       list = value;
                       list.removeWhere((element) => element.trashed == 1);
@@ -348,9 +351,8 @@ class _AgendaState extends State<Agenda> {
       });
     } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
-      database
-          .open()
-          .then((value) => database.get(DatabaseHelper.agenda).then((value) {
+      database.open().then(
+          (value) => database.getAgenda(DatabaseHelper.agenda).then((value) {
                 setState(() {
                   list = value;
                   list.removeWhere((element) => element.trashed == 0);
@@ -378,14 +380,15 @@ class _AgendaState extends State<Agenda> {
       data.trashed = 1;
       DatabaseHelper database = DatabaseHelper();
       database.open().then((value) => database
-          .insertOrReplace(DatabaseHelper.agenda, data)
-          .then((value) => database.close()));
+          .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
+          .then((value) =>
+              database.close().then((value) => scheduleNotifications())));
       setState(() => list.remove(data));
     } else if (widget.trash) {
       data.trashed = 0;
       DatabaseHelper database = DatabaseHelper();
       database.open().then((value) => database
-          .insertOrReplace(DatabaseHelper.agenda, data)
+          .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
           .then((value) => database.close()));
       setState(() => list.remove(data));
     }
@@ -400,8 +403,8 @@ class _AgendaState extends State<Agenda> {
 
   void scheduleNotifications() {
     if (Preferences.sharedPreferences.getBool("notifications") ?? true) {
-      Notifications.cancelNotifications()
-          .then((value) => Notifications.scheduleNotifications(context));
+      Notifications.cancelNotificationsAgenda()
+          .then((value) => Notifications.scheduleNotificationsAgenda(context));
     }
   }
 
