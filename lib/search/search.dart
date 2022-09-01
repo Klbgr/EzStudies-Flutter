@@ -6,8 +6,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 import '../agenda/agenda.dart';
+import '../config/env.dart';
 import '../utils/preferences.dart';
-import '../utils/secret.dart';
 import '../utils/style.dart';
 import '../utils/templates.dart';
 
@@ -128,7 +128,7 @@ class _SearchState extends State<Search> {
 
   void search() {
     if (query.length >= 3) {
-      String url = "${Secret.serverUrl}api/index.php";
+      String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";

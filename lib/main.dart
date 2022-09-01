@@ -10,7 +10,6 @@ import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
 import 'package:ezstudies/utils/notifications.dart';
 import 'package:ezstudies/utils/preferences.dart';
-import 'package:ezstudies/utils/secret.dart';
 import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/foundation.dart';
@@ -22,12 +21,13 @@ import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'config/env.dart';
+
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
   WidgetsFlutterBinding.ensureInitialized();
   SystemTheme.accentColor;
   await Preferences.load();
-  await Secret.load();
   await Style.load();
   await Notifications.initNotifications();
   runApp(const EzStudies());
@@ -193,7 +193,7 @@ class _MainState extends State<Main> {
                           onPressed: () => setState(() => banner = false),
                           icon: Icon(Icons.close, color: Style.text))
                     ])),
-            onTap: () => launchUrl(Uri.parse("${Secret.serverUrl}install"),
+            onTap: () => launchUrl(Uri.parse("${Secret.server_url}install"),
                 mode: LaunchMode.externalApplication)),
         bottomNavigationBar
       ]);
@@ -266,7 +266,7 @@ class _MainState extends State<Main> {
                               onPressed: () {
                                 Navigator.pop(context);
                                 launchUrl(
-                                    Uri.parse("${Secret.serverUrl}install"),
+                                    Uri.parse("${Secret.server_url}install"),
                                     mode: LaunchMode.externalApplication);
                               },
                               child:

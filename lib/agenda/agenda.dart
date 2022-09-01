@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:ezstudies/agenda/agenda_details.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
-import 'package:ezstudies/utils/secret.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,6 +10,7 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../config/env.dart';
 import '../utils/notifications.dart';
 import '../utils/preferences.dart';
 import '../utils/style.dart';
@@ -375,7 +375,7 @@ class _AgendaState extends State<Agenda> {
 
   void load() {
     if (widget.agenda) {
-      String url = "${Secret.serverUrl}api/index.php";
+      String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";
@@ -437,7 +437,7 @@ class _AgendaState extends State<Agenda> {
                 database.close();
               }));
     } else if (widget.search) {
-      String url = "${Secret.serverUrl}api/index.php";
+      String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";

@@ -9,10 +9,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../config/env.dart';
 import '../utils/cipher.dart';
 import '../utils/notifications.dart';
 import '../utils/preferences.dart';
-import '../utils/secret.dart';
 import '../utils/style.dart';
 import '../utils/templates.dart';
 
@@ -147,7 +147,7 @@ class _SettingsState extends State<Settings> {
                   value: Text(
                       decrypt(
                           Preferences.sharedPreferences.getString("name") ?? "",
-                          Secret.cipherKey),
+                          Secret.cipher_key),
                       style: font)),
               SettingsTile(
                 leading: const Icon(Icons.logout),
@@ -220,15 +220,21 @@ class _SettingsState extends State<Settings> {
   }
 
   void disconnect() {
-    Preferences.sharedPreferences.clear().then((value) {
-      DatabaseHelper database = DatabaseHelper();
-      database.open().then((value) => database.deleteAll().then((value) =>
-          database.close().then((value) =>
-              Notifications.cancelAllNotifications().then((value) =>
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const Welcome()))))));
-    });
+    if (kIsWeb) {
+      Preferences.sharedPreferences.clear().then((value) =>
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const Welcome())));
+    } else {
+      Preferences.sharedPreferences.clear().then((value) {
+        DatabaseHelper database = DatabaseHelper();
+        database.open().then((value) => database.deleteAll().then((value) =>
+            database.close().then((value) =>
+                Notifications.cancelAllNotifications().then((value) =>
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Welcome()))))));
+      });
+    }
   }
 }

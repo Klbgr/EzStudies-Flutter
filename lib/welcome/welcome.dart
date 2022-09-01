@@ -3,10 +3,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:ms_undraw/ms_undraw.dart';
 
+import '../config/env.dart';
 import '../main.dart';
 import '../utils/cipher.dart';
 import '../utils/preferences.dart';
-import '../utils/secret.dart';
 import '../utils/style.dart';
 import '../utils/templates.dart';
 
@@ -90,7 +90,7 @@ class _WelcomeState extends State<Welcome> {
       showDialog(
         context: context,
         builder: (context) =>
-            AlertDialogTemplate(AppLocalizations.of(context)!.error, "empty", [
+            AlertDialogTemplate(AppLocalizations.of(context)!.error, AppLocalizations.of(context)!.error_empty, [
           TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(AppLocalizations.of(context)!.ok,
@@ -98,9 +98,9 @@ class _WelcomeState extends State<Welcome> {
         ]),
       );
     } else {
-      String encryptedName = encrypt(name, Secret.cipherKey);
-      String encryptedPassword = encrypt(password, Secret.cipherKey);
-      http.post(Uri.parse("${Secret.serverUrl}api/index.php"),
+      String encryptedName = encrypt(name, Secret.cipher_key);
+      String encryptedPassword = encrypt(password, Secret.cipher_key);
+      http.post(Uri.parse("${Secret.server_url}api/index.php"),
           body: <String, String>{
             "request": "cyu_check",
             "name": encryptedName,

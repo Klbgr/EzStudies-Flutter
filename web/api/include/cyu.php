@@ -88,7 +88,6 @@ function cyuGetCalendar(string $name, string $password, string $id = null) : str
         curl_setopt($curl, CURLOPT_URL, 'https://services-web.u-cergy.fr/calendar/Home/GetCalendarData');
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array('start' => date("Y-m-d", $timestamp - 60 * 60 * 24 * 15), 'end' => date("Y-m-d", $timestamp + 60 * 60 * 24 * 15), 'resType' => "104", "calView" => "listWeek", "federationIds[]" => $id)));
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
-        echo curl_getinfo($curl, CURLOPT_POSTFIELDS);
         $result = curl_exec($curl);
     }
 

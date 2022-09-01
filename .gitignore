@@ -45,4 +45,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-/secrets.json
+/.env
+/lib/config/env.g.dart
+/web/api/include/key
