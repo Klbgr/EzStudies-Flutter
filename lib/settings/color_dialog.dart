@@ -57,7 +57,7 @@ class _ColorDialogState extends State<ColorDialog> {
       ));
     }
 
-    if (Platform.isAndroid || kIsWeb) {
+    if (kIsWeb || Platform.isAndroid) {
       column.children.add(CheckboxListTile(
           controlAffinity: ListTileControlAffinity.leading,
           value: useSystemAccent,

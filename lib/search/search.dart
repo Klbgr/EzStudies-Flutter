@@ -24,6 +24,20 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
+    if (!(Preferences.sharedPreferences.getBool("help_search") ?? false)) {
+      Preferences.sharedPreferences.setBool("help_search", true).then((value) =>
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialogTemplate(
+                      AppLocalizations.of(context)!.help,
+                      AppLocalizations.of(context)!.help_search, [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(AppLocalizations.of(context)!.ok,
+                            style: TextStyle(color: Style.primary)))
+                  ])));
+    }
+
     Widget menu = MenuTemplate(<PopupMenuItem<String>>[
       PopupMenuItem<String>(
           value: "help",

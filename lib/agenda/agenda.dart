@@ -4,6 +4,7 @@ import 'package:ezstudies/agenda/agenda_details.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:ezstudies/utils/secret.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -83,7 +84,7 @@ class _AgendaState extends State<Agenda> {
               onClosed: () => load(),
               editable: widget.agenda,
               search: widget.search);
-          return widget.search
+          return widget.search || kIsWeb
               ? cell
               : Dismissible(
                   key: UniqueKey(),
@@ -134,23 +135,39 @@ class _AgendaState extends State<Agenda> {
 
     Widget? menu;
     if (widget.agenda) {
-      OpenContainerTemplate add = OpenContainerTemplate(
-          FloatingActionButton.extended(
-              heroTag: "add",
-              elevation: 0,
-              onPressed: null,
-              backgroundColor: Style.primary,
-              label: Text(AppLocalizations.of(context)!.add,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.add, color: Style.text)),
-          const AgendaDetails(add: true),
-          onClosed: () => load(),
-          radius: const BorderRadius.all(Radius.circular(24)),
-          elevation: 6,
-          color: Style.primary,
-          trigger: (_) {});
+      if (!(Preferences.sharedPreferences.getBool("help_agenda") ?? false)) {
+        Preferences.sharedPreferences.setBool("help_agenda", true).then(
+            (value) => showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                        AppLocalizations.of(context)!.help,
+                        AppLocalizations.of(context)!.help_agenda, [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary)))
+                    ])));
+      }
 
-      buttons.children.insert(0, add);
+      if (!kIsWeb) {
+        OpenContainerTemplate add = OpenContainerTemplate(
+            FloatingActionButton.extended(
+                heroTag: "add",
+                elevation: 0,
+                onPressed: null,
+                backgroundColor: Style.primary,
+                label: Text(AppLocalizations.of(context)!.add,
+                    style: TextStyle(color: Style.text)),
+                icon: Icon(Icons.add, color: Style.text)),
+            const AgendaDetails(add: true),
+            onClosed: () => load(),
+            radius: const BorderRadius.all(Radius.circular(24)),
+            elevation: 6,
+            color: Style.primary,
+            trigger: (_) {});
+
+        buttons.children.insert(0, add);
+      }
 
       Function trashTrigger = () {};
 
@@ -168,58 +185,97 @@ class _AgendaState extends State<Agenda> {
           color: Colors.transparent,
           trigger: (value) => trashTrigger = value);
 
-      menu = MenuTemplate(<PopupMenuItem<String>>[
-        PopupMenuItem<String>(value: "trash", child: trash),
-        PopupMenuItem<String>(
-            value: "reset",
-            child: Text(AppLocalizations.of(context)!.reset,
-                style: TextStyle(color: Style.text))),
-        PopupMenuItem<String>(
-            value: "help",
-            child: Text(AppLocalizations.of(context)!.help,
-                style: TextStyle(color: Style.text)))
-      ], (value) {
-        switch (value) {
-          case "trash":
-            pop = false;
-            trashTrigger.call();
-            break;
-          case "reset":
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.reset,
-                  AppLocalizations.of(context)!.reset_desc, [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.cancel,
-                        style: TextStyle(color: Style.primary))),
-                TextButton(
-                    onPressed: () {
-                      reset();
-                      Navigator.pop(context);
-                    },
-                    child: Text(AppLocalizations.of(context)!.reset,
-                        style: TextStyle(color: Style.primary)))
-              ]),
-            );
-            break;
-          case "help":
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.help,
-                  AppLocalizations.of(context)!.help_agenda, [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok,
-                        style: TextStyle(color: Style.primary))),
-              ]),
-            );
-            break;
-        }
-      });
+      if (kIsWeb) {
+        menu = MenuTemplate(<PopupMenuItem<String>>[
+          PopupMenuItem<String>(
+              value: "help",
+              child: Text(AppLocalizations.of(context)!.help,
+                  style: TextStyle(color: Style.text)))
+        ], (value) {
+          switch (value) {
+            case "help":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    AppLocalizations.of(context)!.help,
+                    AppLocalizations.of(context)!.help_agenda, [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok,
+                          style: TextStyle(color: Style.primary))),
+                ]),
+              );
+              break;
+          }
+        });
+      } else {
+        menu = MenuTemplate(<PopupMenuItem<String>>[
+          PopupMenuItem<String>(value: "trash", child: trash),
+          PopupMenuItem<String>(
+              value: "reset",
+              child: Text(AppLocalizations.of(context)!.reset,
+                  style: TextStyle(color: Style.text))),
+          PopupMenuItem<String>(
+              value: "help",
+              child: Text(AppLocalizations.of(context)!.help,
+                  style: TextStyle(color: Style.text)))
+        ], (value) {
+          switch (value) {
+            case "trash":
+              pop = false;
+              trashTrigger.call();
+              break;
+            case "reset":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    AppLocalizations.of(context)!.reset,
+                    AppLocalizations.of(context)!.reset_desc, [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.cancel,
+                          style: TextStyle(color: Style.primary))),
+                  TextButton(
+                      onPressed: () {
+                        reset();
+                        Navigator.pop(context);
+                      },
+                      child: Text(AppLocalizations.of(context)!.reset,
+                          style: TextStyle(color: Style.primary)))
+                ]),
+              );
+              break;
+            case "help":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    AppLocalizations.of(context)!.help,
+                    AppLocalizations.of(context)!.help_agenda, [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok,
+                          style: TextStyle(color: Style.primary))),
+                ]),
+              );
+              break;
+          }
+        });
+      }
     } else if (widget.trash) {
+      if (!(Preferences.sharedPreferences.getBool("help_trash") ?? false)) {
+        Preferences.sharedPreferences.setBool("help_trash", true).then(
+            (value) => showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                        AppLocalizations.of(context)!.help,
+                        AppLocalizations.of(context)!.help_trash, [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary)))
+                    ])));
+      }
+
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem(
             value: "help",
@@ -242,6 +298,21 @@ class _AgendaState extends State<Agenda> {
         }
       });
     } else if (widget.search) {
+      if (!(Preferences.sharedPreferences.getBool("help_search_agenda") ??
+          false)) {
+        Preferences.sharedPreferences.setBool("help_search_agenda", true).then(
+            (value) => showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                        AppLocalizations.of(context)!.help,
+                        AppLocalizations.of(context)!.help_search_agenda, [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary)))
+                    ])));
+      }
+
       menu = MenuTemplate(<PopupMenuItem<String>>[
         PopupMenuItem<String>(
             value: "help",
@@ -314,17 +385,23 @@ class _AgendaState extends State<Agenda> {
         "password": password,
       }).then((value) {
         if (value.statusCode == 200) {
-          DatabaseHelper database = DatabaseHelper();
-          database.open().then((_) => database
-              .insertAll(processJson(value.body))
-              .then((value) =>
-                  database.getAgenda(DatabaseHelper.agenda).then((value) {
-                    setState(() {
-                      list = value;
-                      list.removeWhere((element) => element.trashed == 1);
-                    });
-                    database.close().then((value) => scheduleNotifications());
-                  })));
+          if (kIsWeb) {
+            setState(() {
+              list = processJson(value.body);
+            });
+          } else {
+            DatabaseHelper database = DatabaseHelper();
+            database.open().then((_) => database
+                .insertAll(processJson(value.body))
+                .then((value) =>
+                    database.getAgenda(DatabaseHelper.agenda).then((value) {
+                      setState(() {
+                        list = value;
+                        list.removeWhere((element) => element.trashed == 1);
+                      });
+                      database.close().then((value) => scheduleNotifications());
+                    })));
+          }
         } else {
           showDialog(
             context: context,

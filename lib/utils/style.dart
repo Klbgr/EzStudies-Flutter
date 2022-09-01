@@ -20,7 +20,7 @@ class Style {
     MaterialColor color =
         Colors.primaries[Preferences.sharedPreferences.getInt("accent") ?? 5];
     if ((Preferences.sharedPreferences.getBool("use_system_accent") ?? true) &&
-        (Platform.isAndroid || kIsWeb)) {
+        (kIsWeb || Platform.isAndroid)) {
       color = generateMaterialColor(color: SystemTheme.accentColor.accent);
     }
     switch (Preferences.sharedPreferences.getInt("theme") ?? 0) {

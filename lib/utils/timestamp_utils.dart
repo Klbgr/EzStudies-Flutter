@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:intl/intl.dart';
+import 'package:universal_io/io.dart';
 
 String timestampToTime(int timestamp) {
   return DateFormat("HH:mm", getLocale())

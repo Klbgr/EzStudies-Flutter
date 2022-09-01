@@ -1,4 +1,5 @@
 import 'package:ezstudies/utils/database_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -54,7 +55,7 @@ class AgendaDetails extends StatelessWidget {
               AppLocalizations.of(context)!.description, Icons.description,
               initialValue: newData.description,
               onChanged: (value) => newData.description = value,
-              enabled: editable,
+              enabled: kIsWeb ? false : editable,
               multiline: true)),
       Container(
           alignment: Alignment.centerLeft,
@@ -68,7 +69,7 @@ class AgendaDetails extends StatelessWidget {
             newData.start = DateTime(date.year, date.month, date.day,
                     start.hour, start.minute, 0, 0, 0)
                 .millisecondsSinceEpoch;
-          }, enabled: editable)),
+          }, enabled: kIsWeb ? false : editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
@@ -81,7 +82,7 @@ class AgendaDetails extends StatelessWidget {
             newData.start = DateTime(start.year, start.month, start.day,
                     time.hour, time.minute, 0, 0, 0)
                 .millisecondsSinceEpoch;
-          }, enabled: editable)),
+          }, enabled: kIsWeb ? false : editable)),
       Container(
           alignment: Alignment.centerLeft,
           margin: margin,
@@ -94,7 +95,7 @@ class AgendaDetails extends StatelessWidget {
             newData.end = DateTime(start.year, start.month, start.day,
                     time.hour, time.minute, 0, 0, 0)
                 .millisecondsSinceEpoch;
-          }, enabled: editable)),
+          }, enabled: kIsWeb ? false : editable)),
     ];
 
     if (!add && !search) {
@@ -132,7 +133,7 @@ class AgendaDetails extends StatelessWidget {
                   child: Column(children: form))))
     ];
 
-    if (editable || add) {
+    if (!kIsWeb && (editable || add)) {
       List<Widget> buttons = <Widget>[
         FloatingActionButton.extended(
             backgroundColor: Colors.green,
@@ -238,7 +239,7 @@ class AgendaDetails extends StatelessWidget {
                 style: TextStyle(color: Style.text))),
       ];
 
-      if (newData.added == 0 && newData.edited == 1 && !add) {
+      if (newData.added == 0 && newData.edited == 1 && !add && !kIsWeb) {
         buttons.insert(
             0,
             Container(

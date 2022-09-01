@@ -27,6 +27,20 @@ class _HomeworksState extends State<Homeworks> {
 
   @override
   Widget build(BuildContext context) {
+    if (!(Preferences.sharedPreferences.getBool("help_homeworks") ?? false)) {
+      Preferences.sharedPreferences.setBool("help_homeworks", true).then(
+          (value) => showDialog(
+              context: context,
+              builder: (context) => AlertDialogTemplate(
+                      AppLocalizations.of(context)!.help,
+                      AppLocalizations.of(context)!.help_homeworks, [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(AppLocalizations.of(context)!.ok,
+                            style: TextStyle(color: Style.primary)))
+                  ])));
+    }
+
     if (!initialized) {
       initialized = true;
       load();
