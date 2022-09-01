@@ -89,8 +89,9 @@ class _WelcomeState extends State<Welcome> {
     if (name.isEmpty || password.isEmpty) {
       showDialog(
         context: context,
-        builder: (context) =>
-            AlertDialogTemplate(AppLocalizations.of(context)!.error, AppLocalizations.of(context)!.error_empty, [
+        builder: (context) => AlertDialogTemplate(
+            AppLocalizations.of(context)!.error,
+            AppLocalizations.of(context)!.error_empty, [
           TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(AppLocalizations.of(context)!.ok,

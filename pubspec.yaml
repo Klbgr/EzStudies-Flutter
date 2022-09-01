@@ -55,6 +55,8 @@ dependencies:
   ms_undraw: ^3.1.0+3
   universal_io: ^2.0.4
   envify: ^2.0.2
+  firebase_core: ^1.21.1
+  firebase_crashlytics: ^2.8.9
 
 dev_dependencies:
   build_runner: ^2.1.5

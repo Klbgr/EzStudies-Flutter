@@ -1,7 +1,7 @@
 //TODO widget
-//TODO fix compatibility web/ios
 //TODO comments
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ezstudies/agenda/agenda.dart';
@@ -12,6 +12,8 @@ import 'package:ezstudies/utils/notifications.dart';
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/welcome/welcome.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,15 +24,24 @@ import 'package:system_theme/system_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'config/env.dart';
+import 'firebase_options.dart';
 
 void main() async {
-  await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemTheme.accentColor;
-  await Preferences.load();
-  await Style.load();
-  await Notifications.initNotifications();
-  runApp(const EzStudies());
+  runZonedGuarded<Future<void>>(() async {
+    //await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    SystemTheme.accentColor;
+    await Preferences.load();
+    await Style.load();
+    await Notifications.initNotifications();
+    runApp(const EzStudies());
+  },
+      (error, stack) =>
+          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
 }
 
 class EzStudies extends StatefulWidget {
