@@ -375,7 +375,7 @@ class _AgendaState extends State<Agenda> {
 
   void load() {
     if (widget.agenda) {
-      String url = Secret.serverUrl;
+      String url = "${Secret.serverUrl}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";
@@ -437,7 +437,7 @@ class _AgendaState extends State<Agenda> {
                 database.close();
               }));
     } else if (widget.search) {
-      String url = Secret.serverUrl;
+      String url = "${Secret.serverUrl}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";

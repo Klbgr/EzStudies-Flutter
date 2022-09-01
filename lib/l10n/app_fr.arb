@@ -64,5 +64,8 @@
   "error_time": "L'heure de fin doit être après l'heure de début",
   "error_empty": "Au moins un des champs est vide",
   "help_homeworks": " - Coche ou décoche un devoir pour le marquer comme fait ou pas fait\n - Appuie sur un devoir pour voir ou modifier ses détails\n - Glisse un devoir vers la gauche ou la droite pour le supprimer",
-  "time": "Heure"
+  "time": "Heure",
+  "banner": "Clique ici pour installer l'application (Android et iOS)",
+  "update": "Mettre à jour",
+  "update_desc": "Une mise à jour est disponible"
 }

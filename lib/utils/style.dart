@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 import 'package:system_theme/system_theme.dart';
+import 'package:universal_io/io.dart';
 
 class Style {
   static late int theme;

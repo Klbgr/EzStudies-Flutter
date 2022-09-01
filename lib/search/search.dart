@@ -128,7 +128,7 @@ class _SearchState extends State<Search> {
 
   void search() {
     if (query.length >= 3) {
-      String url = Secret.serverUrl;
+      String url = "${Secret.serverUrl}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
       String password =
           Preferences.sharedPreferences.getString("password") ?? "";

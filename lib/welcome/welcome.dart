@@ -100,11 +100,12 @@ class _WelcomeState extends State<Welcome> {
     } else {
       String encryptedName = encrypt(name, Secret.cipherKey);
       String encryptedPassword = encrypt(password, Secret.cipherKey);
-      http.post(Uri.parse(Secret.serverUrl), body: <String, String>{
-        "request": "cyu_check",
-        "name": encryptedName,
-        "password": encryptedPassword
-      }).then((value) {
+      http.post(Uri.parse("${Secret.serverUrl}api/index.php"),
+          body: <String, String>{
+            "request": "cyu_check",
+            "name": encryptedName,
+            "password": encryptedPassword
+          }).then((value) {
         if (value.statusCode == 200) {
           if (value.body == "1") {
             Preferences.sharedPreferences.setString("name", encryptedName).then(
@@ -138,7 +139,7 @@ class _WelcomeState extends State<Welcome> {
             ]),
           );
         }
-      }).catchError((_) {
+      }).catchError((e) {
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(

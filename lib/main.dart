@@ -2,6 +2,8 @@
 //TODO fix compatibility web/ios
 //TODO comments
 
+import 'dart:convert';
+
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/homeworks/homeworks.dart';
 import 'package:ezstudies/search/search.dart';
@@ -16,7 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 100)); // temporary fix
@@ -107,6 +111,7 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int selectedIndex = 0;
   PageController pageController = PageController(initialPage: 0);
+  bool banner = true;
 
   @override
   Widget build(BuildContext context) {
@@ -158,28 +163,56 @@ class _MainState extends State<Main> {
         ),
       ];
     }
+
+    Widget bottomNavigationBar = BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        backgroundColor: Style.secondary,
+        items: items,
+        currentIndex: selectedIndex,
+        selectedItemColor: Style.text,
+        unselectedItemColor: Style.text,
+        iconSize: 24,
+        unselectedFontSize: 16,
+        selectedFontSize: 16,
+        onTap: (value) => pageController.animateToPage(value,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut));
+    if (kIsWeb && banner) {
+      bottomNavigationBar = Column(mainAxisSize: MainAxisSize.min, children: [
+        GestureDetector(
+            child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                color: Style.primary,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(AppLocalizations.of(context)!.banner,
+                          style: TextStyle(color: Style.text)),
+                      IconButton(
+                          onPressed: () => setState(() => banner = false),
+                          icon: Icon(Icons.close, color: Style.text))
+                    ])),
+            onTap: () => launchUrl(Uri.parse("${Secret.serverUrl}install"),
+                mode: LaunchMode.externalApplication)),
+        bottomNavigationBar
+      ]);
+    }
+
     return Scaffold(
-      body: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: pageController,
-        onPageChanged: (index) => setState(() => selectedIndex = index),
-        children: widgets,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          backgroundColor: Style.secondary,
-          items: items,
-          currentIndex: selectedIndex,
-          selectedItemColor: Style.text,
-          unselectedItemColor: Style.text,
-          iconSize: 24,
-          unselectedFontSize: 16,
-          selectedFontSize: 16,
-          onTap: (value) => pageController.animateToPage(value,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut)),
-    );
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: pageController,
+          onPageChanged: (index) => setState(() => selectedIndex = index),
+          children: widgets,
+        ),
+        bottomNavigationBar: bottomNavigationBar);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkUpdate();
   }
 
   Widget getIcon(int index) {
@@ -207,5 +240,67 @@ class _MainState extends State<Main> {
         child: Icon(
             (index == selectedIndex) ? iconsSelected[index] : icons[index],
             color: Style.text));
+  }
+
+  void checkUpdate() {
+    if (!kIsWeb) {
+      http
+          .get(Uri.parse(
+              "https://api.github.com/repos/Klbgr/EzStudies-Flutter/releases/latest"))
+          .then((value) {
+        if (value.statusCode == 200 && value.body.isNotEmpty) {
+          String tag = jsonDecode(value.body)["tag_name"];
+          if ((tagIsGreater(tag, Preferences.packageInfo.version))) {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                        title: Text(AppLocalizations.of(context)!.update),
+                        content:
+                            Text(AppLocalizations.of(context)!.update_desc),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child:
+                                  Text(AppLocalizations.of(context)!.cancel)),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                launchUrl(
+                                    Uri.parse("${Secret.serverUrl}install"),
+                                    mode: LaunchMode.externalApplication);
+                              },
+                              child:
+                                  Text(AppLocalizations.of(context)!.update)),
+                        ]));
+          }
+        }
+      }).catchError((_) {});
+    }
+  }
+
+  bool tagIsGreater(String tag1, String tag2) {
+    List<int> t1 =
+        tag1.split(".").map((element) => int.parse(element)).toList();
+    List<int> t2 =
+        tag2.split(".").map((element) => int.parse(element)).toList();
+    if (t1[0] > t2[0]) {
+      return true;
+    } else if (t1[0] == t2[0]) {
+      if (t1[1] > t2[1]) {
+        return true;
+      } else if (t1[1] == t2[1]) {
+        if (t1[2] > t2[2]) {
+          return true;
+        } else if (t1[2] == t2[2]) {
+          return false;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

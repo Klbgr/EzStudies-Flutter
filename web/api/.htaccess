@@ -1,0 +1,4 @@
+Options All -Indexes
+
+RedirectMatch 403 ^/include/.*$
+RedirectMatch 403 ^/cache/.*$
