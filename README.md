@@ -1,6 +1,6 @@
 # EzStudies [![Github All Releases](https://img.shields.io/github/downloads/Klbgr/EzStudies-Flutter/latest/total.svg)](https://github.com/Klbgr/EzStudies-Flutter/releases/latest)
 
-![logo](images/EzStudies_logo.png)
+![logo](images/EzStudies.png)
 
 Ease your studies
 
@@ -80,7 +80,7 @@ Enfin, l'application pourra être compilée et exécutée de façon habituelle.
 
 # EzStudies (English)
 
-![logo](images/EzStudies_logo.png)
+![logo](images/EzStudies.png)
 
 Ease your studies
 
