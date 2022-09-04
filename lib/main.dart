@@ -22,6 +22,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 import 'config/env.dart';
 import 'firebase_options.dart';
@@ -38,6 +39,7 @@ void main() async {
     await Preferences.load();
     await Style.load();
     await Notifications.initNotifications();
+    setPathUrlStrategy();
     runApp(const EzStudies());
   },
       (error, stack) =>
