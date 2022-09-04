@@ -1,5 +1,7 @@
 # EzStudies [![Github All Releases](https://img.shields.io/github/downloads/Klbgr/EzStudies-Flutter/latest/total.svg)](https://github.com/Klbgr/EzStudies-Flutter/releases/latest)
 
+![logo](images/EzStudies_logo.png)
+
 Ease your studies
 
 (English version below)
@@ -23,6 +25,11 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 - Interface inspirée de Material You, avec thème clair et thème sombre
 - Application en Anglais et en Français
 - Et plus encore
+
+## Sécurité
+
+Les identifiants de l'utilisateur sont stockées et utilisées de façon sécurisée. Tout d'abord, les identifiants de l'utilisateur sont chiffrés avant d'être stockés dans l'appareil. Puis, ceux-ci sont communiqués à l'API via une requête HTTPS POST. L'API se charge de déchiffrer ces identifiants avant de les communiquer à l'API de CYU.
+![diagramme sécurité](images/security_diagram.png)
 
 ## Téléchargement
 
@@ -73,6 +80,8 @@ Enfin, l'application pourra être compilée et exécutée de façon habituelle.
 
 # EzStudies (English)
 
+![logo](images/EzStudies_logo.png)
+
 Ease your studies
 
 ## Introduction
@@ -94,6 +103,11 @@ Compared to the previous version, this one has many differences. The main differ
 - Material You inspired interface, with light theme and dark theme
 - Application in English and French
 - And more
+
+## Security
+
+User's credentials are stored and used securely. First, user credentials are encrypted before being stored in the device. Then, these are communicated to the API via an HTTPS POST request. The API takes care of decrypting these credentials before communicating them to the API of CYU.
+![security diagram](images/security_diagram.png)
 
 ## Download
 
