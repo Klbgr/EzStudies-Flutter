@@ -238,9 +238,8 @@ class _HomeworksCellState extends State<_HomeworksCell> {
                     DatabaseHelper database = DatabaseHelper();
                     database.open().then((_) => database
                         .insertOrReplaceHomeworks(newData)
-                        .then((_) => database
-                            .close()
-                            .then((_) => widget.onChanged())));
+                        .then((_) =>
+                            database.close().then((_) => widget.onChanged())));
                   },
                 )),
             Expanded(

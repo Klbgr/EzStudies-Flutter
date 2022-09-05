@@ -12,7 +12,6 @@ import 'package:ezstudies/utils/notifications.dart';
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/welcome/welcome.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -35,8 +34,8 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
-    FirebaseAnalytics.instance;
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
     SystemTheme.accentColor;
     await Preferences.load();
     await Style.load();

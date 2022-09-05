@@ -230,8 +230,10 @@ class _SettingsState extends State<Settings> {
         database.open().then((_) => database.deleteAll().then((_) => database
             .close()
             .then((_) => Notifications.cancelAllNotifications().then((_) =>
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => const Welcome()))))));
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Welcome()))))));
       });
     }
   }
