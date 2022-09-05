@@ -47,8 +47,9 @@ class Notifications {
 
   static Future<void> scheduleNotificationsAgenda(BuildContext context) async {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then(
-        (value) => database.getAgenda(DatabaseHelper.agenda).then((value) {
+    database.open().then((_) => database
+        .getAgenda(DatabaseHelper.agenda)
+        .then((value) => database.close().then((_) {
               for (int i = 0; i < value.length; i++) {
                 if (value[i].trashed == 0 &&
                     value[i].start - 15 * 60 * 1000 >=
@@ -61,28 +62,27 @@ class Notifications {
                       value[i].start - 15 * 60 * 1000);
                 }
               }
-              database.close();
-            }));
+            })));
   }
 
   static Future<void> scheduleNotificationsHomeworks(
       BuildContext context) async {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((value) => database.getHomeworks().then((value) {
-          for (int i = 0; i < value.length; i++) {
-            if (value[i].done == 0 &&
-                value[i].date - 24 * 60 * 60 * 1000 >=
-                    DateTime.now().millisecondsSinceEpoch) {
-              _scheduleNotification(
-                  i + 1000,
-                  context,
-                  AppLocalizations.of(context)!.reminder,
-                  value[i].description,
-                  value[i].date - 24 * 60 * 60 * 1000);
-            }
-          }
-          database.close();
-        }));
+    database.open().then((_) =>
+        database.getHomeworks().then((value) => database.close().then((_) {
+              for (int i = 0; i < value.length; i++) {
+                if (value[i].done == 0 &&
+                    value[i].date - 24 * 60 * 60 * 1000 >=
+                        DateTime.now().millisecondsSinceEpoch) {
+                  _scheduleNotification(
+                      i + 1000,
+                      context,
+                      AppLocalizations.of(context)!.reminder,
+                      value[i].description,
+                      value[i].date - 24 * 60 * 60 * 1000);
+                }
+              }
+            })));
   }
 
   static Future<void> cancelNotificationsAgenda() async {

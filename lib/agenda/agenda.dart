@@ -393,14 +393,13 @@ class _AgendaState extends State<Agenda> {
             DatabaseHelper database = DatabaseHelper();
             database.open().then((_) => database
                 .insertAll(processJson(value.body))
-                .then((value) =>
-                    database.getAgenda(DatabaseHelper.agenda).then((value) {
-                      setState(() {
-                        list = value;
-                        list.removeWhere((element) => element.trashed == 1);
-                      });
-                      database.close().then((value) => scheduleNotifications());
-                    })));
+                .then((_) => database
+                    .getAgenda(DatabaseHelper.agenda)
+                    .then((value) => database.close().then((_) => setState(() {
+                          scheduleNotifications();
+                          list = value;
+                          list.removeWhere((element) => element.trashed == 1);
+                        })))));
           }
         } else {
           showDialog(
@@ -428,14 +427,12 @@ class _AgendaState extends State<Agenda> {
       });
     } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
-      database.open().then(
-          (value) => database.getAgenda(DatabaseHelper.agenda).then((value) {
-                setState(() {
-                  list = value;
-                  list.removeWhere((element) => element.trashed == 0);
-                });
-                database.close();
-              }));
+      database.open().then((_) => database
+          .getAgenda(DatabaseHelper.agenda)
+          .then((value) => database.close().then((_) => setState(() {
+                list = value;
+                list.removeWhere((element) => element.trashed == 0);
+              }))));
     } else if (widget.search) {
       String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
@@ -456,32 +453,32 @@ class _AgendaState extends State<Agenda> {
     if (widget.agenda) {
       data.trashed = 1;
       DatabaseHelper database = DatabaseHelper();
-      database.open().then((value) => database
+      database.open().then((_) => database
           .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
-          .then((value) =>
-              database.close().then((value) => scheduleNotifications())));
-      setState(() => list.remove(data));
+          .then((_) => database.close().then((_) => setState(() {
+                scheduleNotifications();
+                list.remove(data);
+              }))));
     } else if (widget.trash) {
       data.trashed = 0;
       DatabaseHelper database = DatabaseHelper();
-      database.open().then((value) => database
+      database.open().then((_) => database
           .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
-          .then((value) => database.close()));
-      setState(() => list.remove(data));
+          .then((_) =>
+              database.close().then((_) => setState(() => list.remove(data)))));
     }
   }
 
   void reset() {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((value) => database
-        .reset()
-        .then((value) => database.close().then((value) => load())));
+    database.open().then((_) =>
+        database.reset().then((_) => database.close().then((_) => load())));
   }
 
   void scheduleNotifications() {
     if (Preferences.sharedPreferences.getBool("notifications") ?? true) {
       Notifications.cancelNotificationsAgenda()
-          .then((value) => Notifications.scheduleNotificationsAgenda(context));
+          .then((_) => Notifications.scheduleNotificationsAgenda(context));
     }
   }
 

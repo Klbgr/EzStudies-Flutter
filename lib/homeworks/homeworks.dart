@@ -138,17 +138,22 @@ class _HomeworksState extends State<Homeworks> {
 
   void remove(HomeworksCellData data) {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((value) => database.deleteHomeworks(data).then(
-        (value) => database.close().then((value) => scheduleNotifications())));
-    setState(() => list.remove(data));
+    database.open().then((_) => database
+        .deleteHomeworks(data)
+        .then((_) => database.close().then((_) => setState(() {
+              scheduleNotifications();
+              list.remove(data);
+            }))));
   }
 
   void load() {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((value) => database.getHomeworks().then((value) {
-          setState(() => list = value);
-          database.close().then((value) => scheduleNotifications());
-        }));
+    database.open().then((_) => database
+        .getHomeworks()
+        .then((value) => database.close().then((_) => setState(() {
+              scheduleNotifications();
+              list = value;
+            }))));
   }
 
   void scrollToToday() {
@@ -231,11 +236,11 @@ class _HomeworksCellState extends State<_HomeworksCell> {
                     setState(() =>
                         (value == true) ? newData.done = 1 : newData.done = 0);
                     DatabaseHelper database = DatabaseHelper();
-                    database.open().then((value) => database
+                    database.open().then((_) => database
                         .insertOrReplaceHomeworks(newData)
-                        .then((value) => database
+                        .then((_) => database
                             .close()
-                            .then((value) => widget.onChanged())));
+                            .then((_) => widget.onChanged())));
                   },
                 )),
             Expanded(

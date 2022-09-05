@@ -99,38 +99,35 @@ class HomeworksDetails extends StatelessWidget {
                 } else if (add) {
                   newData.id = newData.description + newData.date.toString();
                   DatabaseHelper database = DatabaseHelper();
-                  database.open().then((value) {
-                    database.insertHomeworks(newData).then((value) {
-                      if (!value) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialogTemplate(
-                                    AppLocalizations.of(context)!.error,
-                                    AppLocalizations.of(context)!
-                                        .error_conflict,
-                                    [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text(
-                                              AppLocalizations.of(context)!.ok))
-                                    ]));
-                        database.close();
-                      } else {
-                        database
-                            .close()
-                            .then((value) => Navigator.pop(context));
-                      }
-                    });
-                  });
+                  database.open().then((_) => database
+                      .insertHomeworks(newData)
+                      .then((value) => database.close().then((_) {
+                            if (!value) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialogTemplate(
+                                          AppLocalizations.of(context)!.error,
+                                          AppLocalizations.of(context)!
+                                              .error_conflict,
+                                          [
+                                            TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text(AppLocalizations.of(
+                                                        context)!
+                                                    .ok))
+                                          ]));
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          })));
                 } else {
                   DatabaseHelper database = DatabaseHelper();
-                  database.open().then((value) {
-                    database.insertOrReplaceHomeworks(newData).then((value) =>
-                        database
-                            .close()
-                            .then((value) => Navigator.pop(context)));
-                  });
+                  database.open().then((_) => database
+                      .insertOrReplaceHomeworks(newData)
+                      .then((_) => database
+                          .close()
+                          .then((_) => Navigator.pop(context))));
                 }
               },
               label: Text(

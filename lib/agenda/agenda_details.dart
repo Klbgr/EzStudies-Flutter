@@ -178,29 +178,27 @@ class AgendaDetails extends StatelessWidget {
                 newData.id = newData.description + newData.start.toString();
                 DatabaseHelper database = DatabaseHelper();
                 database.open().then((_) => database
-                        .insertAgenda(DatabaseHelper.agenda, newData)
-                        .then((value) {
-                      if (!value) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialogTemplate(
-                                    AppLocalizations.of(context)!.error,
-                                    AppLocalizations.of(context)!
-                                        .error_conflict,
-                                    [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text(
-                                              AppLocalizations.of(context)!.ok))
-                                    ]));
-                        database.close();
-                      } else {
-                        database
-                            .close()
-                            .then((value) => Navigator.pop(context));
-                      }
-                    }));
+                    .insertAgenda(DatabaseHelper.agenda, newData)
+                    .then((value) => database.close().then((_) {
+                          if (!value) {
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialogTemplate(
+                                        AppLocalizations.of(context)!.error,
+                                        AppLocalizations.of(context)!
+                                            .error_conflict,
+                                        [
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .ok))
+                                        ]));
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        })));
               } else {
                 DatabaseHelper database = DatabaseHelper();
                 database.open().then((_) {
@@ -209,25 +207,25 @@ class AgendaDetails extends StatelessWidget {
                       newData.edited = 1;
                       database
                           .insertOrReplaceAgenda(DatabaseHelper.backup, data!)
-                          .then((value) => database
+                          .then((_) => database
                               .insertOrReplaceAgenda(
                                   DatabaseHelper.agenda, newData)
-                              .then((value) => database
+                              .then((_) => database
                                   .close()
-                                  .then((value) => Navigator.pop(context))));
+                                  .then((_) => Navigator.pop(context))));
                     } else {
                       database
                           .insertOrReplaceAgenda(DatabaseHelper.agenda, newData)
-                          .then((value) => database
+                          .then((_) => database
                               .close()
-                              .then((value) => Navigator.pop(context)));
+                              .then((_) => Navigator.pop(context)));
                     }
                   } else {
                     database
                         .insertOrReplaceAgenda(DatabaseHelper.agenda, newData)
-                        .then((value) => database
+                        .then((_) => database
                             .close()
-                            .then((value) => Navigator.pop(context)));
+                            .then((_) => Navigator.pop(context)));
                   }
                 });
               }
@@ -258,12 +256,12 @@ class AgendaDetails extends StatelessWidget {
                         database
                             .insertOrReplaceAgenda(
                                 DatabaseHelper.agenda, backup)
-                            .then((value) => database
+                            .then((_) => database
                                     .deleteAgenda(DatabaseHelper.backup, backup)
-                                    .then((value) {
+                                    .then((_) {
                                   database
                                       .close()
-                                      .then((value) => Navigator.pop(context));
+                                      .then((_) => Navigator.pop(context));
                                 }));
                       });
                     });

@@ -227,13 +227,11 @@ class _SettingsState extends State<Settings> {
     } else {
       Preferences.sharedPreferences.clear().then((value) {
         DatabaseHelper database = DatabaseHelper();
-        database.open().then((value) => database.deleteAll().then((value) =>
-            database.close().then((value) =>
-                Notifications.cancelAllNotifications().then((value) =>
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Welcome()))))));
+        database.open().then((_) => database.deleteAll().then((_) => database
+            .close()
+            .then((_) => Notifications.cancelAllNotifications().then((_) =>
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const Welcome()))))));
       });
     }
   }
