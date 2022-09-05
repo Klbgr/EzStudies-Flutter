@@ -34,8 +34,10 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    if (!kIsWeb) {
+      await FirebaseCrashlytics.instance
+          .setCrashlyticsCollectionEnabled(!kDebugMode);
+    }
     SystemTheme.accentColor;
     await Preferences.load();
     await Style.load();
