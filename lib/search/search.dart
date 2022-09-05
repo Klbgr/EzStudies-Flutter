@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:diacritic/diacritic.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -136,7 +137,7 @@ class _SearchState extends State<Search> {
         "request": "cyu_search",
         "name": name,
         "password": password,
-        "query": query.replaceAll(" ", "+")
+        "query": Uri.encodeQueryComponent(removeDiacritics(query))
       }).then((value) {
         if (value.statusCode == 200) {
           List<dynamic> results = jsonDecode(value.body)["results"];
