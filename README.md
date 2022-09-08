@@ -29,10 +29,15 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 ## Sécurité
 
 Les identifiants de l'utilisateur sont stockées et utilisées de façon sécurisée. 
+
 Tout d'abord, les identifiants de l'utilisateur sont chiffrés avant d'être stockés dans l'appareil. 
+
 Puis, ceux-ci sont communiqués à l'API via une requête HTTPS POST. 
+
 L'API se charge de déchiffrer ces identifiants avant de les communiquer à l'API de CYU.
+
 L'application ne fonctionne donc uniquement si sa clé de chiffrement est identique à celle de l'API.
+
 ![diagramme sécurité](images/security_diagram.png)
 
 ## Téléchargement
@@ -44,6 +49,7 @@ La version Web est accéssible à [cette adresse](https://ezstudies.alwaysdata.n
 ### iOS
 
 Il n'y aura pas de release pour iOS car Apple ne permet pas d'installer d'applications gratuitement. 
+
 Vous pouvez en revanche compiler vous-même l'application pour votre iPhone si vous avez un Mac récent et héberger vous-même l'API Web (indispensable au fonctionnement de l'application).
 
 ## API
@@ -116,10 +122,15 @@ Compared to the previous version, this one has many differences. The main differ
 ## Security
 
 User's credentials are stored and used securely. 
+
 First, user credentials are encrypted before being stored in the device. 
+
 Then, these are communicated to the API via an HTTPS POST request. 
+
 The API takes care of decrypting these credentials before communicating them to the API of CYU.
+
 The application therefore only works if its cipher key is identical to that of the API.
+
 ![security diagram](images/security_diagram.png)
 
 ## Download
@@ -131,6 +142,7 @@ The Web version is available at [this address](https://ezstudies.alwaysdata.net/
 ### iOS
 
 There will be no release for iOS because Apple does not allow installing apps for free.
+
 You can however compile the application yourself for your iPhone if you have a recent Mac and host the Web API yourself (required to make the application work).
 
 ## API
