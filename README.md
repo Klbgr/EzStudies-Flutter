@@ -10,7 +10,7 @@ Ease your studies
 
 Ce projet une évolution de [EzStudies](https://github.com/Klbgr/EzStudies) et à pour but de simplifier le quotidien des étudiants de CY Cergy Paris Université.
 
-Comparé à la version précédente, cette version comporte de nombreuses différences. Les pricipales sont que celle-ci est une application Flutter, donc réalisée en Dart, et qu'elle est disponible sur Android, iOS et Web.
+Comparé à la version précédente, cette version comporte de nombreuses différences. Les principales sont que celle-ci est une application Flutter, donc réalisée en Dart, et qu'elle est disponible sur Android, iOS et Web.
 
 ## Fonctionnalités
 
@@ -28,7 +28,11 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 
 ## Sécurité
 
-Les identifiants de l'utilisateur sont stockées et utilisées de façon sécurisée. Tout d'abord, les identifiants de l'utilisateur sont chiffrés avant d'être stockés dans l'appareil. Puis, ceux-ci sont communiqués à l'API via une requête HTTPS POST. L'API se charge de déchiffrer ces identifiants avant de les communiquer à l'API de CYU.
+Les identifiants de l'utilisateur sont stockées et utilisées de façon sécurisée. 
+Tout d'abord, les identifiants de l'utilisateur sont chiffrés avant d'être stockés dans l'appareil. 
+Puis, ceux-ci sont communiqués à l'API via une requête HTTPS POST. 
+L'API se charge de déchiffrer ces identifiants avant de les communiquer à l'API de CYU.
+L'application ne fonctionne donc uniquement si sa clé de chiffrement est identique à celle de l'API.
 ![diagramme sécurité](images/security_diagram.png)
 
 ## Téléchargement
@@ -36,6 +40,11 @@ Les identifiants de l'utilisateur sont stockées et utilisées de façon sécuri
 Vous pouvez soit installer vous même les différents fichiers situés dans la section [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases), soit utiliser l'[intallateur en ligne](https://ezstudies.alwaysdata.net/install).
 
 La version Web est accéssible à [cette adresse](https://ezstudies.alwaysdata.net/).
+
+### iOS
+
+Il n'y aura pas de release pour iOS car Apple ne permet pas d'installer d'applications gratuitement. 
+Vous pouvez en revanche compiler vous-même l'application pour votre iPhone si vous avez un Mac récent et héberger vous-même l'API Web (indispensable au fonctionnement de l'application).
 
 ## API
 
@@ -50,7 +59,7 @@ L'API est incluse dans ce projet pour facilliter le déploiement de l'applicatio
 - Flutter SDK
 - FireBase CLI (optionnel)
 
-Note : L'application est liée à FireBase dans l'unique but de profiter de FireBase Crashlitics. FireBase est donc optionnel au fonctionnement de l'application.
+Note : L'application est liée à FireBase dans l'unique but de profiter de FireBase Crashlytics. FireBase est donc optionnel au fonctionnement de l'application.
 
 ### Pour compiler l'application, il faut d'abord :
 - Lier l'application à FireBase ou supprimer l'implémentation de FireBase
@@ -59,7 +68,7 @@ Note : L'application est liée à FireBase dans l'unique but de profiter de Fire
 SERVER_URL = "xxx"  
 CIPHER_KEY = "xxx"  
 ```  
-où `SERVER_URL` est l'URL de l'API personnalisée et `CIPHER_KEY` est la clé de chiffrement utilisée pour chiffrer et déchiffrer les identifiants de l'ENT
+où `SERVER_URL` est l'URL de l'API personnalisée et `CIPHER_KEY` est la clé de chiffrement de 32 caractères utilisée pour chiffrer et déchiffrer les identifiants de l'ENT
 - Renseigner cette même clé de chiffrement dans le fichier `/EzStudies-Flutter/web/api/include/key`
 ```
 xxx  
@@ -106,7 +115,11 @@ Compared to the previous version, this one has many differences. The main differ
 
 ## Security
 
-User's credentials are stored and used securely. First, user credentials are encrypted before being stored in the device. Then, these are communicated to the API via an HTTPS POST request. The API takes care of decrypting these credentials before communicating them to the API of CYU.
+User's credentials are stored and used securely. 
+First, user credentials are encrypted before being stored in the device. 
+Then, these are communicated to the API via an HTTPS POST request. 
+The API takes care of decrypting these credentials before communicating them to the API of CYU.
+The application therefore only works if its cipher key is identical to that of the API.
 ![security diagram](images/security_diagram.png)
 
 ## Download
@@ -114,6 +127,11 @@ User's credentials are stored and used securely. First, user credentials are enc
 You can either download the files in the [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases) section, or use the [online installer](https://ezstudies.alwaysdata.net/install).
 
 The Web version is available at [this address](https://ezstudies.alwaysdata.net/).
+
+### iOS
+
+There will be no release for iOS because Apple does not allow installing apps for free.
+You can however compile the application yourself for your iPhone if you have a recent Mac and host the Web API yourself (required to make the application work).
 
 ## API
 
@@ -137,7 +155,7 @@ Note : The app is linked to FireBase for the sole purpose of using FireBase Cras
 SERVER_URL = "xxx"  
 CIPHER_KEY = "xxx"  
 ```  
-where `SERVER_URL` is the URL of the custom API and `CIPHER_KEY` cipher key used to encrypt and decrypt the credentials of the ENT
+where `SERVER_URL` is the URL of the custom API and `CIPHER_KEY` a 32 characters cipher key used to encrypt and decrypt the credentials of the ENT
 - Type in the same key in the `/EzStudies-Flutter/web/api/include/key` file
 ```
 xxx  

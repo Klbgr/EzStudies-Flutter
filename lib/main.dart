@@ -21,6 +21,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
+import 'package:universal_io/io.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -38,7 +39,9 @@ void main() async {
       await FirebaseCrashlytics.instance
           .setCrashlyticsCollectionEnabled(!kDebugMode);
     }
-    SystemTheme.accentColor;
+    if (!Platform.isIOS) {
+      SystemTheme.accentColor;
+    }
     await Preferences.load();
     await Style.load();
     await Notifications.initNotifications();
