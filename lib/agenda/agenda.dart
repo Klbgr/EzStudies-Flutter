@@ -46,7 +46,7 @@ class _AgendaState extends State<Agenda> {
   Widget build(BuildContext context) {
     if (!initialized) {
       initialized = true;
-      load();
+      load(scroll: true);
     }
     list.sort((a, b) => a.start.compareTo(b.start));
 
@@ -350,10 +350,12 @@ class _AgendaState extends State<Agenda> {
   }
 
   @override
-  void setState(VoidCallback fn) {
+  void setState(VoidCallback fn, {bool scroll = false}) {
     super.setState(fn);
-    Future.delayed(const Duration(milliseconds: 300))
-        .then((value) => scrollToToday());
+    if (scroll) {
+      Future.delayed(const Duration(milliseconds: 300))
+          .then((value) => scrollToToday());
+    }
   }
 
   void scrollToToday() {
@@ -373,7 +375,7 @@ class _AgendaState extends State<Agenda> {
     }
   }
 
-  void load() {
+  void load({bool scroll = false}) {
     if (widget.agenda) {
       String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
@@ -386,9 +388,7 @@ class _AgendaState extends State<Agenda> {
       }).then((value) {
         if (value.statusCode == 200) {
           if (kIsWeb) {
-            setState(() {
-              list = processJson(value.body);
-            });
+            setState(() => list = processJson(value.body), scroll: scroll);
           } else {
             DatabaseHelper database = DatabaseHelper();
             database.open().then((_) => database
@@ -399,7 +399,7 @@ class _AgendaState extends State<Agenda> {
                           scheduleNotifications();
                           list = value;
                           list.removeWhere((element) => element.trashed == 1);
-                        })))));
+                        }, scroll: scroll)))));
           }
         } else {
           showDialog(
@@ -432,7 +432,7 @@ class _AgendaState extends State<Agenda> {
           .then((value) => database.close().then((_) => setState(() {
                 list = value;
                 list.removeWhere((element) => element.trashed == 0);
-              }))));
+              }, scroll: scroll))));
     } else if (widget.search) {
       String url = "${Secret.server_url}api/index.php";
       String name = Preferences.sharedPreferences.getString("name") ?? "";
@@ -444,7 +444,7 @@ class _AgendaState extends State<Agenda> {
         "password": password,
         "id": widget.data!.id
       }).then((value) {
-        setState(() => list = processJson(value.body));
+        setState(() => list = processJson(value.body), scroll: scroll);
       });
     }
   }
