@@ -118,6 +118,7 @@ class _AgendaState extends State<Agenda> {
           margin: const EdgeInsets.only(top: 10),
           child: FloatingActionButton.extended(
               onPressed: () => scrollToToday(),
+              backgroundColor: Style.primary.withOpacity(0.75),
               label: Text(AppLocalizations.of(context)!.scroll_to_today,
                   style: TextStyle(color: Style.text)),
               icon: Icon(Icons.today, color: Style.text))));
@@ -155,7 +156,7 @@ class _AgendaState extends State<Agenda> {
                 heroTag: "add",
                 elevation: 0,
                 onPressed: null,
-                backgroundColor: Style.primary,
+                backgroundColor: Colors.transparent,
                 label: Text(AppLocalizations.of(context)!.add,
                     style: TextStyle(color: Style.text)),
                 icon: Icon(Icons.add, color: Style.text)),
@@ -163,7 +164,7 @@ class _AgendaState extends State<Agenda> {
             onClosed: () => load(),
             radius: const BorderRadius.all(Radius.circular(24)),
             elevation: 6,
-            color: Style.primary,
+            color: Style.primary.withOpacity(0.75),
             trigger: (_) {});
 
         buttons.children.insert(0, add);
@@ -368,10 +369,12 @@ class _AgendaState extends State<Agenda> {
           index++;
         }
       }
-      itemScrollController.scrollTo(
-          index: index,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut);
+      if (itemScrollController.isAttached) {
+        itemScrollController.scrollTo(
+            index: index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+      }
     }
   }
 

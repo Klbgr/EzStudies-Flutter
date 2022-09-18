@@ -78,7 +78,7 @@ class _HomeworksState extends State<Homeworks> {
           FloatingActionButton.extended(
               elevation: 0,
               onPressed: null,
-              backgroundColor: Style.primary,
+              backgroundColor: Colors.transparent,
               label: Text(AppLocalizations.of(context)!.add,
                   style: TextStyle(color: Style.text)),
               icon: Icon(Icons.add, color: Style.text)),
@@ -86,7 +86,7 @@ class _HomeworksState extends State<Homeworks> {
           onClosed: () => load(),
           radius: const BorderRadius.all(Radius.circular(24)),
           elevation: 6,
-          color: Style.primary,
+          color: Style.primary.withOpacity(0.75),
           trigger: (_) {})
     ]);
 
@@ -120,6 +120,7 @@ class _HomeworksState extends State<Homeworks> {
               onPressed: () => scrollToToday(),
               label: Text(AppLocalizations.of(context)!.scroll_to_today,
                   style: TextStyle(color: Style.text)),
+              backgroundColor: Style.primary.withOpacity(0.75),
               icon: Icon(Icons.today, color: Style.text))));
     }
 
@@ -166,10 +167,12 @@ class _HomeworksState extends State<Homeworks> {
           index++;
         }
       }
-      itemScrollController.scrollTo(
-          index: index,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut);
+      if (itemScrollController.isAttached) {
+        itemScrollController.scrollTo(
+            index: index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+      }
     }
   }
 
