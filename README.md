@@ -8,9 +8,9 @@ Ease your studies
 
 ## Introduction
 
-Ce projet une évolution de [EzStudies](https://github.com/Klbgr/EzStudies) et à pour but de simplifier le quotidien des étudiants de CY Cergy Paris Université.
+Ce projet une évolution de [EzStudies](https://github.com/Klbgr/EzStudies) et a pour but de simplifier le quotidien des étudiants de CY Cergy Paris Université.
 
-Comparé à la version précédente, cette version comporte de nombreuses différences. Les principales sont que celle-ci est une application Flutter, donc réalisée en Dart, et qu'elle est disponible sur Android, iOS et Web.
+Comparé à la version précédente, cette version comporte de nombreuses différences. La principale est que celle-ci est une application Flutter, donc réalisée en Dart, et qu'elle est compatible Android, iOS et Web.
 
 ## Fonctionnalités
 
@@ -103,7 +103,7 @@ Ease your studies
 
 This project is an evolution of [EzStudies](https://github.com/Klbgr/EzStudies) and aims to simplify the daily lives of students of CY Cergy Paris Université.
 
-Compared to the previous version, this one has many differences. The main differences are that this is a Flutter app, written in Dart, and that it's available for Android, iOS and Web.
+Compared to the previous version, this one has many differences. The main difference is that this is a Flutter app, written in Dart, and that it's compatible with Android, iOS and Web.
 
 ## Features
 
