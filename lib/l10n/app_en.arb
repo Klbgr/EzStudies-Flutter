@@ -65,7 +65,16 @@
   "error_empty": "At least one field is empty",
   "help_homeworks": " - Check or uncheck a homework to mark it done or not done\n - Tap on a homework to see or edit its details\n - Swipe an homework to the left or to the right to delete it",
   "time": "Time",
-  "banner": "Click here to install the app (Android and iOS)",
+  "banner": "Click here to install the app (Android)",
   "update": "Update",
-  "update_desc": "An update is available"
+  "update_desc": "An update is available",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "saturday": "Saturday",
+  "sunday": "Sunday",
+  "week_view": "Week view",
+  "week_of": "Week of"
 }

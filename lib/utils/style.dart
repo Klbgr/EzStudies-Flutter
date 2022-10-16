@@ -16,13 +16,15 @@ class Style {
   static late Color ripple;
 
   static Future<void> load() async {
-    MaterialColor color =
-        Colors.primaries[Preferences.sharedPreferences.getInt("accent") ?? 5];
-    if ((Preferences.sharedPreferences.getBool("use_system_accent") ?? true) &&
+    MaterialColor color = Colors.primaries[
+        Preferences.sharedPreferences.getInt(Preferences.accent) ?? 5];
+    if ((Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
+            true) &&
         (kIsWeb || Platform.isAndroid)) {
-      color = generateMaterialColor(color: SystemTheme.accentColor.accent);
+      color = generateMaterialColor(
+          color: SystemTheme.accentColor.defaultAccentColor);
     }
-    switch (Preferences.sharedPreferences.getInt("theme") ?? 0) {
+    switch (Preferences.sharedPreferences.getInt(Preferences.theme) ?? 0) {
       case 0:
         (SchedulerBinding.instance.window.platformBrightness ==
                 Brightness.light)

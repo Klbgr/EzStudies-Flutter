@@ -65,7 +65,16 @@
   "error_empty": "Au moins un des champs est vide",
   "help_homeworks": " - Coche ou décoche un devoir pour le marquer comme fait ou pas fait\n - Appuie sur un devoir pour voir ou modifier ses détails\n - Glisse un devoir vers la gauche ou la droite pour le supprimer",
   "time": "Heure",
-  "banner": "Clique ici pour installer l'application (Android et iOS)",
+  "banner": "Clique ici pour installer l'application (Android)",
   "update": "Mettre à jour",
-  "update_desc": "Une mise à jour est disponible"
+  "update_desc": "Une mise à jour est disponible",
+  "monday": "Lundi",
+  "tuesday": "Mardi",
+  "wednesday": "Mercredi",
+  "thursday": "Jeudi",
+  "friday": "Vendredi",
+  "saturday": "Samedi",
+  "sunday": "Dimanche",
+  "week_view": "Vue hebdomadaire",
+  "week_of": "Semaine du"
 }

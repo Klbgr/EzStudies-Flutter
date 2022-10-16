@@ -25,41 +25,46 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    if (!(Preferences.sharedPreferences.getBool("help_search") ?? false)) {
-      Preferences.sharedPreferences.setBool("help_search", true).then((value) =>
-          showDialog(
+    if (!(Preferences.sharedPreferences.getBool(Preferences.helpSearch) ??
+        false)) {
+      Preferences.sharedPreferences.setBool(Preferences.helpSearch, true).then(
+          (value) => showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                      AppLocalizations.of(context)!.help,
-                      AppLocalizations.of(context)!.help_search, [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.ok,
-                            style: TextStyle(color: Style.primary)))
-                  ])));
+                      title: AppLocalizations.of(context)!.help,
+                      content: AppLocalizations.of(context)!.help_search,
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.ok,
+                                style: TextStyle(color: Style.primary)))
+                      ])));
     }
 
-    Widget menu = MenuTemplate(<PopupMenuItem<String>>[
-      PopupMenuItem<String>(
-          value: "help",
-          child: Text(AppLocalizations.of(context)!.help,
-              style: TextStyle(color: Style.text)))
-    ], (value) {
-      switch (value) {
-        case "help":
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                      AppLocalizations.of(context)!.help,
-                      AppLocalizations.of(context)!.help_search, [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.ok,
-                            style: TextStyle(color: Style.primary)))
-                  ]));
-          break;
-      }
-    });
+    Widget menu = MenuTemplate(
+        items: <PopupMenuItem<String>>[
+          PopupMenuItem<String>(
+              value: "help",
+              child: Text(AppLocalizations.of(context)!.help,
+                  style: TextStyle(color: Style.text)))
+        ],
+        onSelected: (value) {
+          switch (value) {
+            case "help":
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialogTemplate(
+                          title: AppLocalizations.of(context)!.help,
+                          content: AppLocalizations.of(context)!.help_search,
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(AppLocalizations.of(context)!.ok,
+                                    style: TextStyle(color: Style.primary)))
+                          ]));
+              break;
+          }
+        });
 
     Widget child = Container(
         margin: const EdgeInsets.only(left: 20, right: 20),
@@ -124,15 +129,17 @@ class _SearchState extends State<Search> {
           ],
         ));
 
-    return Template(AppLocalizations.of(context)!.search, child, menu: menu);
+    return Template(
+        title: AppLocalizations.of(context)!.search, menu: menu, child: child);
   }
 
   void search() {
     if (query.length >= 3) {
       String url = "${Secret.server_url}api/index.php";
-      String name = Preferences.sharedPreferences.getString("name") ?? "";
+      String name =
+          Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
-          Preferences.sharedPreferences.getString("password") ?? "";
+          Preferences.sharedPreferences.getString(Preferences.password) ?? "";
       http.post(Uri.parse(url), body: <String, String>{
         "request": "cyu_search",
         "name": name,
@@ -153,24 +160,26 @@ class _SearchState extends State<Search> {
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
-                AppLocalizations.of(context)!.error,
-                AppLocalizations.of(context)!.error_internet, [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.ok))
-            ]),
+                title: AppLocalizations.of(context)!.error,
+                content: AppLocalizations.of(context)!.error_internet,
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok))
+                ]),
           );
         }
       }).catchError((_) {
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
-              AppLocalizations.of(context)!.error,
-              AppLocalizations.of(context)!.error_internet, [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(AppLocalizations.of(context)!.ok))
-          ]),
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
         );
       });
     } else {
@@ -194,9 +203,9 @@ class _SearchCell extends StatelessWidget {
 
     Widget child2 = Agenda(search: true, data: data);
 
-    return OpenContainerTemplate(child1, child2,
-        onClosed: () {},
-        trigger: (_) {},
+    return OpenContainerTemplate(
+        child1: child1,
+        child2: child2,
         color: Style.secondary,
         radius: BorderRadius.only(
             bottomLeft: Radius.circular(last ? 16 : 0),

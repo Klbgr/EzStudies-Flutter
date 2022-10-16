@@ -8,8 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:ms_undraw/ms_undraw.dart';
 
 class Template extends StatelessWidget {
-  const Template(this.title, this.child,
-      {this.menu, this.back = false, Key? key})
+  const Template(
+      {required this.title,
+      required this.child,
+      this.menu,
+      this.back = false,
+      Key? key})
       : super(key: key);
   final String title;
   final Widget child;
@@ -61,9 +65,10 @@ class Template extends StatelessWidget {
 }
 
 class MenuTemplate extends StatelessWidget {
-  const MenuTemplate(this.items, this.onSelected, {Key? key}) : super(key: key);
+  const MenuTemplate({required this.items, this.onSelected, Key? key})
+      : super(key: key);
   final List<PopupMenuItem<String>> items;
-  final Function(String) onSelected;
+  final Function(String)? onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -76,25 +81,29 @@ class MenuTemplate extends StatelessWidget {
         return items;
       },
       onSelected: (value) {
-        onSelected(value);
+        if (onSelected != null) {
+          onSelected!(value);
+        }
       },
     );
   }
 }
 
 class OpenContainerTemplate extends StatelessWidget {
-  const OpenContainerTemplate(this.child1, this.child2,
-      {required this.onClosed,
+  const OpenContainerTemplate(
+      {required this.child1,
+      required this.child2,
+      this.onClosed,
       this.color,
       this.radius = BorderRadius.zero,
       this.elevation = 0,
-      required this.trigger,
+      this.trigger,
       Key? key})
       : super(key: key);
   final Widget child1;
   final Widget child2;
-  final Function onClosed;
-  final Function(Function) trigger;
+  final Function? onClosed;
+  final Function(Function)? trigger;
   final Color? color;
   final BorderRadiusGeometry radius;
   final double elevation;
@@ -108,21 +117,28 @@ class OpenContainerTemplate extends StatelessWidget {
       closedElevation: elevation,
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, action) {
-        trigger(action);
+        if (trigger != null) {
+          trigger!(action);
+        }
         return child1;
       },
       openBuilder: (context, action) => child2,
-      onClosed: (_) => onClosed(),
+      onClosed: (_) {
+        if (onClosed != null) {
+          onClosed!();
+        }
+      },
     );
   }
 }
 
 class AlertDialogTemplate extends StatelessWidget {
-  const AlertDialogTemplate(this.title, this.content, this.actions, {Key? key})
+  const AlertDialogTemplate(
+      {required this.title, required this.content, this.actions, Key? key})
       : super(key: key);
   final String title;
   final String content;
-  final List<Widget> actions;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +148,10 @@ class AlertDialogTemplate extends StatelessWidget {
 }
 
 class TextFormFieldTemplate extends StatefulWidget {
-  const TextFormFieldTemplate(this.label, this.icon,
-      {this.enabled = true,
+  const TextFormFieldTemplate(
+      {required this.label,
+      required this.icon,
+      this.enabled = true,
       this.initialValue,
       this.onChanged,
       this.onTapped,
@@ -198,7 +216,7 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
                       widget.time ? "HH:mm" : "EEEE, d MMMM y", getLocale())
                   .format(dateTime)),
       onChanged: (value) {
-        if (!(widget.date && widget.time)) {
+        if (widget.onChanged != null && !(widget.date && widget.time)) {
           widget.onChanged!(value);
         }
       },
@@ -213,7 +231,9 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
                 dateTime = DateTime(dateTime.year, dateTime.month, dateTime.day,
                     value.hour, value.minute, 0, 0, 0);
               });
-              widget.onTapped!(dateTime.millisecondsSinceEpoch);
+              if (widget.onTapped != null) {
+                widget.onTapped!(dateTime.millisecondsSinceEpoch);
+              }
             }
           });
         } else if (widget.date) {
@@ -228,7 +248,9 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
                 dateTime = DateTime(value.year, value.month, value.day,
                     dateTime.hour, dateTime.minute, 0, 0, 0);
               });
-              widget.onTapped!(dateTime.millisecondsSinceEpoch);
+              if (widget.onTapped != null) {
+                widget.onTapped!(dateTime.millisecondsSinceEpoch);
+              }
             }
           });
         }
@@ -277,7 +299,8 @@ class WelcomeFABTemplate extends StatelessWidget {
 }
 
 class WelcomePageTemplate extends StatelessWidget {
-  const WelcomePageTemplate(this.content, this.illustration, {Key? key})
+  const WelcomePageTemplate(
+      {required this.content, required this.illustration, Key? key})
       : super(key: key);
   final Widget content;
   final UnDrawIllustration illustration;

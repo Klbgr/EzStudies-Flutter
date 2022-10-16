@@ -23,111 +23,112 @@ class Homeworks extends StatefulWidget {
 class _HomeworksState extends State<Homeworks> {
   List<HomeworksCellData> list = [];
   ItemScrollController itemScrollController = ItemScrollController();
-  bool initialized = false;
 
   @override
   Widget build(BuildContext context) {
-    if (!(Preferences.sharedPreferences.getBool("help_homeworks") ?? false)) {
-      Preferences.sharedPreferences.setBool("help_homeworks", true).then(
-          (value) => showDialog(
+    if (!(Preferences.sharedPreferences.getBool(Preferences.helpHomeworks) ??
+        false)) {
+      Preferences.sharedPreferences
+          .setBool(Preferences.helpHomeworks, true)
+          .then((value) => showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                      AppLocalizations.of(context)!.help,
-                      AppLocalizations.of(context)!.help_homeworks, [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.ok,
-                            style: TextStyle(color: Style.primary)))
-                  ])));
+                      title: AppLocalizations.of(context)!.help,
+                      content: AppLocalizations.of(context)!.help_homeworks,
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.ok,
+                                style: TextStyle(color: Style.primary)))
+                      ])));
     }
 
-    if (!initialized) {
-      initialized = true;
-      load();
-    }
     list.sort((a, b) => a.date.compareTo(b.date));
 
-    Widget menu = MenuTemplate(<PopupMenuItem<String>>[
-      PopupMenuItem<String>(
-          value: "help",
-          child: Text(AppLocalizations.of(context)!.help,
-              style: TextStyle(color: Style.text)))
-    ], (value) {
-      switch (value) {
-        case "help":
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                      AppLocalizations.of(context)!.help,
-                      AppLocalizations.of(context)!.help_homeworks, [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.ok,
-                            style: TextStyle(color: Style.primary)))
-                  ]));
-          break;
-      }
-    });
+    Widget menu = MenuTemplate(
+        items: <PopupMenuItem<String>>[
+          PopupMenuItem<String>(
+              value: "help",
+              child: Text(AppLocalizations.of(context)!.help,
+                  style: TextStyle(color: Style.text)))
+        ],
+        onSelected: (value) {
+          switch (value) {
+            case "help":
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialogTemplate(
+                          title: AppLocalizations.of(context)!.help,
+                          content: AppLocalizations.of(context)!.help_homeworks,
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(AppLocalizations.of(context)!.ok,
+                                    style: TextStyle(color: Style.primary)))
+                          ]));
+              break;
+          }
+        });
 
-    Widget child =
-        Center(child: Text(AppLocalizations.of(context)!.nothing_to_show));
-
-    Column buttons =
-        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      OpenContainerTemplate(
-          FloatingActionButton.extended(
-              elevation: 0,
-              onPressed: null,
-              backgroundColor: Colors.transparent,
-              label: Text(AppLocalizations.of(context)!.add,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.add, color: Style.text)),
-          const HomeworksDetails(add: true),
-          onClosed: () => load(),
-          radius: const BorderRadius.all(Radius.circular(24)),
-          elevation: 6,
-          color: Style.primary.withOpacity(0.75),
-          trigger: (_) {})
+    Widget child = Stack(children: [
+      list.isEmpty
+          ? Center(child: Text(AppLocalizations.of(context)!.nothing_to_show))
+          : ScrollablePositionedList.builder(
+              itemCount: list.length,
+              itemBuilder: (context, index) => Dismissible(
+                key: UniqueKey(),
+                onDismissed: (direction) {
+                  remove(list[index]);
+                },
+                background: Container(
+                    color: Colors.red,
+                    child: Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.delete, color: Style.text),
+                              Icon(Icons.delete, color: Style.text)
+                            ]))),
+                child: _HomeworksCell(list[index],
+                    onClosed: () => load(),
+                    onChanged: () => scheduleNotifications()),
+              ),
+              itemScrollController: itemScrollController,
+            ),
+      Positioned(
+          bottom: 20,
+          right: 20,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            OpenContainerTemplate(
+                child1: FloatingActionButton.extended(
+                    elevation: 0,
+                    onPressed: null,
+                    backgroundColor: Colors.transparent,
+                    label: Text(AppLocalizations.of(context)!.add,
+                        style: TextStyle(color: Style.text)),
+                    icon: Icon(Icons.add, color: Style.text)),
+                child2: const HomeworksDetails(add: true),
+                onClosed: () => load(),
+                radius: const BorderRadius.all(Radius.circular(24)),
+                elevation: 6,
+                color: Style.primary.withOpacity(0.75)),
+            if (list.isNotEmpty)
+              Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: FloatingActionButton.extended(
+                      onPressed: () => scrollToToday(),
+                      label: Text(AppLocalizations.of(context)!.scroll_to_today,
+                          style: TextStyle(color: Style.text)),
+                      backgroundColor: Style.primary.withOpacity(0.75),
+                      icon: Icon(Icons.today, color: Style.text)))
+          ]))
     ]);
 
-    if (list.isNotEmpty) {
-      child = ScrollablePositionedList.builder(
-        itemCount: list.length,
-        itemBuilder: (context, index) => Dismissible(
-          key: UniqueKey(),
-          onDismissed: (direction) {
-            remove(list[index]);
-          },
-          background: Container(
-              color: Colors.red,
-              child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(Icons.delete, color: Style.text),
-                        Icon(Icons.delete, color: Style.text)
-                      ]))),
-          child: _HomeworksCell(list[index],
-              onClosed: () => load(), onChanged: () => scheduleNotifications()),
-        ),
-        itemScrollController: itemScrollController,
-      );
-
-      buttons.children.add(Container(
-          margin: const EdgeInsets.only(top: 10),
-          child: FloatingActionButton.extended(
-              onPressed: () => scrollToToday(),
-              label: Text(AppLocalizations.of(context)!.scroll_to_today,
-                  style: TextStyle(color: Style.text)),
-              backgroundColor: Style.primary.withOpacity(0.75),
-              icon: Icon(Icons.today, color: Style.text))));
-    }
-
-    child = Stack(
-        children: [child, Positioned(bottom: 20, right: 20, child: buttons)]);
-
-    return Template(AppLocalizations.of(context)!.homeworks, child, menu: menu);
+    return Template(
+        title: AppLocalizations.of(context)!.homeworks,
+        menu: menu,
+        child: child);
   }
 
   @override
@@ -176,8 +177,15 @@ class _HomeworksState extends State<Homeworks> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
   void scheduleNotifications() {
-    if (Preferences.sharedPreferences.getBool("notifications_homeworks") ??
+    if (Preferences.sharedPreferences
+            .getBool(Preferences.notificationsHomeworks) ??
         true) {
       Notifications.cancelNotificationsHomeworks().then(
           (value) => Notifications.scheduleNotificationsHomeworks(context));
@@ -247,9 +255,9 @@ class _HomeworksCellState extends State<_HomeworksCell> {
                 )),
             Expanded(
                 child: OpenContainerTemplate(
-                    child, HomeworksDetails(data: widget.data),
+                    child1: child,
+                    child2: HomeworksDetails(data: widget.data),
                     onClosed: () => widget.onClosed(),
-                    trigger: (_) {},
                     radius: const BorderRadius.all(Radius.circular(16)),
                     color: widget.data.getColor()))
           ],

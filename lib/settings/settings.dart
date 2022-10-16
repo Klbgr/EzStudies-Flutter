@@ -32,7 +32,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     String theme = "";
-    switch (Preferences.sharedPreferences.getInt("theme") ?? 0) {
+    switch (Preferences.sharedPreferences.getInt(Preferences.theme) ?? 0) {
       case 0:
         theme = AppLocalizations.of(context)!.automatic;
         break;
@@ -42,84 +42,6 @@ class _SettingsState extends State<Settings> {
       case 2:
         theme = AppLocalizations.of(context)!.dark;
         break;
-    }
-
-    List<SettingsTile> tiles;
-    if (kIsWeb) {
-      tiles = <SettingsTile>[
-        SettingsTile(
-          leading: const Icon(Icons.format_paint),
-          title: Text(AppLocalizations.of(context)!.theme, style: font),
-          value: Text(theme, style: GoogleFonts.openSans()),
-          onPressed: (context) => showDialog(
-              context: context,
-              builder: (context) => ThemeDialog(onClosed: () => reloadTheme())),
-        ),
-        SettingsTile(
-            leading: const Icon(Icons.color_lens),
-            title:
-                Text(AppLocalizations.of(context)!.accent_color, style: font),
-            value: Icon(Icons.circle, color: Style.primary),
-            onPressed: (context) => showDialog(
-                context: context,
-                builder: (context) =>
-                    ColorDialog(onClosed: () => reloadTheme())))
-      ];
-    } else {
-      tiles = <SettingsTile>[
-        SettingsTile(
-          leading: const Icon(Icons.format_paint),
-          title: Text(AppLocalizations.of(context)!.theme, style: font),
-          value: Text(theme, style: GoogleFonts.openSans()),
-          onPressed: (context) => showDialog(
-              context: context,
-              builder: (context) => ThemeDialog(onClosed: () => reloadTheme())),
-        ),
-        SettingsTile(
-            leading: const Icon(Icons.color_lens),
-            title:
-                Text(AppLocalizations.of(context)!.accent_color, style: font),
-            value: Icon(Icons.circle, color: Style.primary),
-            onPressed: (context) => showDialog(
-                context: context,
-                builder: (context) =>
-                    ColorDialog(onClosed: () => reloadTheme()))),
-        SettingsTile.switchTile(
-            leading: const Icon(Icons.notifications),
-            initialValue:
-                Preferences.sharedPreferences.getBool("notifications") ?? true,
-            onToggle: (value) {
-              Preferences.sharedPreferences
-                  .setBool("notifications", value)
-                  .then((value) => setState(() {}));
-              if (!value) {
-                Notifications.cancelNotificationsAgenda();
-              }
-            },
-            title: Text(AppLocalizations.of(context)!.notifications_agenda,
-                style: font),
-            description: Text(
-                AppLocalizations.of(context)!.notifications_agenda_desc,
-                style: GoogleFonts.openSans())),
-        SettingsTile.switchTile(
-            leading: const Icon(Icons.notifications),
-            initialValue: Preferences.sharedPreferences
-                    .getBool("notifications_homeworks") ??
-                true,
-            onToggle: (value) {
-              Preferences.sharedPreferences
-                  .setBool("notifications_homeworks", value)
-                  .then((value) => setState(() {}));
-              if (!value) {
-                Notifications.cancelNotificationsHomeworks();
-              }
-            },
-            title: Text(AppLocalizations.of(context)!.notifications_homeworks,
-                style: font),
-            description: Text(
-                AppLocalizations.of(context)!.notifications_homeworks_desc,
-                style: GoogleFonts.openSans()))
-      ];
     }
 
     Widget child = SettingsList(
@@ -135,7 +57,67 @@ class _SettingsState extends State<Settings> {
       sections: [
         SettingsSection(
           title: Text(AppLocalizations.of(context)!.general, style: font),
-          tiles: tiles,
+          tiles: [
+            SettingsTile(
+              leading: const Icon(Icons.format_paint),
+              title: Text(AppLocalizations.of(context)!.theme, style: font),
+              value: Text(theme, style: GoogleFonts.openSans()),
+              onPressed: (context) => showDialog(
+                  context: context,
+                  builder: (context) =>
+                      ThemeDialog(onClosed: () => reloadTheme())),
+            ),
+            SettingsTile(
+                leading: const Icon(Icons.color_lens),
+                title: Text(AppLocalizations.of(context)!.accent_color,
+                    style: font),
+                value: Icon(Icons.circle, color: Style.primary),
+                onPressed: (context) => showDialog(
+                    context: context,
+                    builder: (context) =>
+                        ColorDialog(onClosed: () => reloadTheme()))),
+            if (!kIsWeb)
+              SettingsTile.switchTile(
+                  leading: const Icon(Icons.notifications),
+                  initialValue: Preferences.sharedPreferences
+                          .getBool(Preferences.notifications) ??
+                      true,
+                  onToggle: (value) {
+                    Preferences.sharedPreferences
+                        .setBool(Preferences.notifications, value)
+                        .then((value) => setState(() {}));
+                    if (!value) {
+                      Notifications.cancelNotificationsAgenda();
+                    }
+                  },
+                  title: Text(
+                      AppLocalizations.of(context)!.notifications_agenda,
+                      style: font),
+                  description: Text(
+                      AppLocalizations.of(context)!.notifications_agenda_desc,
+                      style: GoogleFonts.openSans())),
+            if (!kIsWeb)
+              SettingsTile.switchTile(
+                  leading: const Icon(Icons.notifications),
+                  initialValue: Preferences.sharedPreferences
+                          .getBool(Preferences.notificationsHomeworks) ??
+                      true,
+                  onToggle: (value) {
+                    Preferences.sharedPreferences
+                        .setBool(Preferences.notificationsHomeworks, value)
+                        .then((value) => setState(() {}));
+                    if (!value) {
+                      Notifications.cancelNotificationsHomeworks();
+                    }
+                  },
+                  title: Text(
+                      AppLocalizations.of(context)!.notifications_homeworks,
+                      style: font),
+                  description: Text(
+                      AppLocalizations.of(context)!
+                          .notifications_homeworks_desc,
+                      style: GoogleFonts.openSans()))
+          ],
         ),
         SettingsSection(
             title: Text(AppLocalizations.of(context)!.account, style: font),
@@ -146,7 +128,9 @@ class _SettingsState extends State<Settings> {
                       Text(AppLocalizations.of(context)!.account, style: font),
                   value: Text(
                       decrypt(
-                          Preferences.sharedPreferences.getString("name") ?? "",
+                          Preferences.sharedPreferences
+                                  .getString(Preferences.name) ??
+                              "",
                           Secret.cipher_key),
                       style: font)),
               SettingsTile(
@@ -210,7 +194,10 @@ class _SettingsState extends State<Settings> {
       ],
     );
 
-    return Template(AppLocalizations.of(context)!.settings, child, back: false);
+    return Template(
+        title: AppLocalizations.of(context)!.settings,
+        back: false,
+        child: child);
   }
 
   void reloadTheme() {

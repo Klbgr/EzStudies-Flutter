@@ -8,8 +8,11 @@ import 'agenda_cell_data.dart';
 import 'agenda_details.dart';
 
 class AgendaCell extends StatelessWidget {
-  const AgendaCell(this.data, this.firstOfDay, this.firstOfMonth,
-      {required this.onClosed,
+  const AgendaCell(
+      {required this.data,
+      this.firstOfDay = false,
+      this.firstOfMonth = false,
+      required this.onClosed,
       this.editable = true,
       this.search = false,
       Key? key})
@@ -27,76 +30,73 @@ class AgendaCell extends StatelessWidget {
 
     String start = timestampToTime(data.start);
     String end = timestampToTime(data.end);
-    String description = data.description;
-    if (description != "") {
-      description = "($description)";
-    }
+    bool today = isSameDay(data.start, DateTime.now().millisecondsSinceEpoch);
 
-    List<Widget> date = <Text>[];
-    if (firstOfDay) {
-      bool today = isSameDay(data.start, DateTime.now().millisecondsSinceEpoch);
-
-      date = [
-        Text(timestampToWeekDay(data.start),
-            style: TextStyle(color: (today) ? Style.primary : Style.text)),
-        ClipOval(
-            child: AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                    alignment: Alignment.center,
-                    color: (today) ? Style.primary : Colors.transparent,
-                    child: Text(timestampToDayOfMonth(data.start).toString(),
-                        style: TextStyle(fontSize: 20, color: Style.text))))),
-      ];
-    }
-    List<Widget> children = [
-      Flexible(
-          child: Text(
-        data.description,
-        style: TextStyle(color: Style.text),
-        maxLines: null,
-        overflow: TextOverflow.ellipsis,
-      ))
-    ];
-
-    if (data.added == 0 && data.edited == 1) {
-      children.add(Icon(Icons.edit, size: 16, color: Style.text));
-    } else if (data.added == 1) {
-      children.add(Icon(Icons.person, size: 16, color: Style.text));
-    }
+    Color color = data.getColor();
 
     Widget child = Row(children: [
       Container(
         margin: const EdgeInsets.only(right: 20),
         alignment: Alignment.center,
         width: 35,
-        child: Column(children: date),
+        child: Column(
+            children: (firstOfDay)
+                ? [
+                    Text(timestampToWeekDay(data.start),
+                        style: TextStyle(
+                            color: (today) ? Style.primary : Style.text)),
+                    ClipOval(
+                        child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Container(
+                                alignment: Alignment.center,
+                                color: (today)
+                                    ? Style.primary
+                                    : Colors.transparent,
+                                child: Text(
+                                    timestampToDayOfMonth(data.start)
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 20, color: Style.text))))),
+                  ]
+                : List.empty()),
       ),
       Expanded(
           child: OpenContainerTemplate(
-              Container(
+              child1: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: data.getColor(),
+                      color: color,
                       borderRadius:
                           const BorderRadius.all(Radius.circular(16))),
                   child: Column(children: [
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: children),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: Text("$start - $end",
-                          style: TextStyle(color: Style.text)),
+                          style: TextStyle(
+                              color: Style.text, fontWeight: FontWeight.bold)),
                     ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                              child: Text(
+                            data.description,
+                            style: TextStyle(color: Style.text),
+                            maxLines: null,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          if (data.added == 0 && data.edited == 1)
+                            Icon(Icons.edit, size: 16, color: Style.text)
+                          else if (data.added == 1)
+                            Icon(Icons.person, size: 16, color: Style.text)
+                        ])
                   ])),
-              AgendaDetails(data: data, editable: editable, search: search),
-              onClosed: () {
-        onClosed();
-      },
+              child2:
+                  AgendaDetails(data: data, editable: editable, search: search),
+              onClosed: () => onClosed(),
               radius: const BorderRadius.all(Radius.circular(16)),
-              color: data.getColor(),
-              trigger: (_) {}))
+              color: color))
     ]);
 
     if (firstOfMonth) {
@@ -113,15 +113,12 @@ class AgendaCell extends StatelessWidget {
       ]);
     }
 
-    double margin = 0;
-    if (firstOfMonth) {
-      margin = 5;
-    } else if (firstOfDay) {
-      margin = 5;
-    }
-
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: margin),
+      margin: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          bottom: 5,
+          top: (firstOfMonth || firstOfDay) ? 10 : 0),
       child: child,
     );
   }

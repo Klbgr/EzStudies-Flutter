@@ -96,7 +96,6 @@ class _EzStudiesState extends State<EzStudies> {
             toggleableActiveColor: Style.primary,
             splashColor: Style.ripple,
             highlightColor: Style.ripple),
-        debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -108,9 +107,11 @@ class _EzStudiesState extends State<EzStudies> {
           Locale('fr', ''),
         ],
         title: "EzStudies",
-        home: ((Preferences.sharedPreferences.getString("name") ?? "")
+        home: ((Preferences.sharedPreferences.getString(Preferences.name) ?? "")
                     .isNotEmpty &&
-                (Preferences.sharedPreferences.getString("password") ?? "")
+                (Preferences.sharedPreferences
+                            .getString(Preferences.password) ??
+                        "")
                     .isNotEmpty)
             ? Main(
                 reloadTheme: () => setState(() {}),
@@ -129,8 +130,7 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   int selectedIndex = 0;
-  PageController pageController = PageController(initialPage: 0);
-  bool banner = true;
+  bool showBanner = true;
 
   @override
   Widget build(BuildContext context) {
@@ -194,10 +194,8 @@ class _MainState extends State<Main> {
         iconSize: 24,
         unselectedFontSize: 16,
         selectedFontSize: 16,
-        onTap: (value) => pageController.animateToPage(value,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut));
-    if (kIsWeb && banner) {
+        onTap: (value) => setState(() => selectedIndex = value));
+    if (kIsWeb && showBanner) {
       bottomNavigationBar = Column(mainAxisSize: MainAxisSize.min, children: [
         GestureDetector(
             child: Container(
@@ -209,7 +207,7 @@ class _MainState extends State<Main> {
                       Text(AppLocalizations.of(context)!.banner,
                           style: TextStyle(color: Style.text)),
                       IconButton(
-                          onPressed: () => setState(() => banner = false),
+                          onPressed: () => setState(() => showBanner = false),
                           icon: Icon(Icons.close, color: Style.text))
                     ])),
             onTap: () => launchUrl(Uri.parse("${Secret.server_url}install"),
@@ -219,13 +217,7 @@ class _MainState extends State<Main> {
     }
 
     return Scaffold(
-        body: PageView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: pageController,
-          onPageChanged: (index) => setState(() => selectedIndex = index),
-          children: widgets,
-        ),
-        bottomNavigationBar: bottomNavigationBar);
+        body: widgets[selectedIndex], bottomNavigationBar: bottomNavigationBar);
   }
 
   @override

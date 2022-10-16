@@ -16,20 +16,25 @@ class ColorDialog extends StatefulWidget {
 
 class _ColorDialogState extends State<ColorDialog> {
   final int itemsPerLine = 4;
-  int selectedIndex = Preferences.sharedPreferences.getInt("accent") ?? 5;
+  int selectedIndex =
+      Preferences.sharedPreferences.getInt(Preferences.accent) ?? 5;
   bool useSystemAccent =
-      Preferences.sharedPreferences.getBool("use_system_accent") ?? true;
+      Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
+          true;
 
   @override
   Widget build(BuildContext context) {
-    Column column = Column(mainAxisSize: MainAxisSize.min, children: []);
-    Row row =
-        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: []);
+    Column column = Column(
+        mainAxisSize: MainAxisSize.min, children: List.empty(growable: true));
+    Row row = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.empty(growable: true));
     for (int i = 0; i < Colors.primaries.length; i++) {
       if (i != 0 && i % itemsPerLine == 0) {
         column.children.add(row);
-        row =
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: []);
+        row = Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.empty(growable: true));
       } else if (i == Colors.primaries.length - 1) {
         column.children.add(row);
       }
@@ -77,9 +82,9 @@ class _ColorDialogState extends State<ColorDialog> {
             child: Text(AppLocalizations.of(context)!.ok,
                 style: TextStyle(color: Style.primary)),
             onPressed: () => Preferences.sharedPreferences
-                .setInt("accent", selectedIndex)
+                .setInt(Preferences.accent, selectedIndex)
                 .then((value) => Preferences.sharedPreferences
-                        .setBool("use_system_accent", useSystemAccent)
+                        .setBool(Preferences.useSystemAccent, useSystemAccent)
                         .then((value) {
                       Navigator.pop(context);
                       widget.onClosed();

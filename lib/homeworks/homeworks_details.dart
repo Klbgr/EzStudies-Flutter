@@ -30,43 +30,6 @@ class HomeworksDetails extends StatelessWidget {
           done: data!.done);
     }
 
-    List<Widget> form = <Widget>[
-      Container(
-          alignment: Alignment.centerLeft,
-          margin: margin,
-          child: TextFormFieldTemplate(
-              AppLocalizations.of(context)!.description, Icons.description,
-              initialValue: newData.description,
-              onChanged: (value) => newData.description = value,
-              multiline: true)),
-      Container(
-          alignment: Alignment.centerLeft,
-          margin: margin,
-          child: TextFormFieldTemplate(
-              AppLocalizations.of(context)!.date, Icons.calendar_month,
-              dateTime: DateTime.fromMillisecondsSinceEpoch(newData.date),
-              date: true, onTapped: (value) {
-            DateTime date = DateTime.fromMillisecondsSinceEpoch(newData.date);
-            DateTime newDate = DateTime.fromMillisecondsSinceEpoch(value);
-            newData.date = DateTime(newDate.year, newDate.month, newDate.day,
-                    date.hour, date.minute, 0, 0, 0)
-                .millisecondsSinceEpoch;
-          })),
-      Container(
-          alignment: Alignment.centerLeft,
-          margin: margin,
-          child: TextFormFieldTemplate(
-              AppLocalizations.of(context)!.time, Icons.access_time,
-              dateTime: DateTime.fromMillisecondsSinceEpoch(newData.date),
-              time: true, onTapped: (value) {
-            DateTime date = DateTime.fromMillisecondsSinceEpoch(newData.date);
-            DateTime time = DateTime.fromMillisecondsSinceEpoch(value);
-            newData.date = DateTime(date.year, date.month, date.day, time.hour,
-                    time.minute, 0, 0, 0)
-                .millisecondsSinceEpoch;
-          })),
-    ];
-
     Widget child = Column(children: [
       Expanded(
           child: SingleChildScrollView(
@@ -74,7 +37,62 @@ class HomeworksDetails extends StatelessWidget {
               child: Container(
                   alignment: Alignment.centerLeft,
                   margin: const EdgeInsets.only(left: 20, right: 20),
-                  child: Column(children: form)))),
+                  child: Column(children: [
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        margin: margin,
+                        child: TextFormFieldTemplate(
+                            label: AppLocalizations.of(context)!.description,
+                            icon: Icons.description,
+                            initialValue: newData.description,
+                            onChanged: (value) => newData.description = value,
+                            multiline: true)),
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        margin: margin,
+                        child: TextFormFieldTemplate(
+                            label: AppLocalizations.of(context)!.date,
+                            icon: Icons.calendar_month,
+                            dateTime: DateTime.fromMillisecondsSinceEpoch(
+                                newData.date),
+                            date: true,
+                            onTapped: (value) {
+                              DateTime date =
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      newData.date);
+                              DateTime newDate =
+                                  DateTime.fromMillisecondsSinceEpoch(value);
+                              newData.date = DateTime(
+                                      newDate.year,
+                                      newDate.month,
+                                      newDate.day,
+                                      date.hour,
+                                      date.minute,
+                                      0,
+                                      0,
+                                      0)
+                                  .millisecondsSinceEpoch;
+                            })),
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        margin: margin,
+                        child: TextFormFieldTemplate(
+                            label: AppLocalizations.of(context)!.time,
+                            icon: Icons.access_time,
+                            dateTime: DateTime.fromMillisecondsSinceEpoch(
+                                newData.date),
+                            time: true,
+                            onTapped: (value) {
+                              DateTime date =
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      newData.date);
+                              DateTime time =
+                                  DateTime.fromMillisecondsSinceEpoch(value);
+                              newData.date = DateTime(date.year, date.month,
+                                      date.day, time.hour, time.minute, 0, 0, 0)
+                                  .millisecondsSinceEpoch;
+                            })),
+                  ])))),
       Container(
           margin: const EdgeInsets.only(bottom: 20),
           child: FloatingActionButton.extended(
@@ -90,12 +108,15 @@ class HomeworksDetails extends StatelessWidget {
                   showDialog(
                       context: context,
                       builder: (context) => AlertDialogTemplate(
-                              AppLocalizations.of(context)!.error,
-                              AppLocalizations.of(context)!.error_empty, [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(AppLocalizations.of(context)!.ok))
-                          ]));
+                              title: AppLocalizations.of(context)!.error,
+                              content:
+                                  AppLocalizations.of(context)!.error_empty,
+                              actions: [
+                                TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child:
+                                        Text(AppLocalizations.of(context)!.ok))
+                              ]));
                 } else if (add) {
                   newData.id = newData.description + newData.date.toString();
                   DatabaseHelper database = DatabaseHelper();
@@ -106,10 +127,11 @@ class HomeworksDetails extends StatelessWidget {
                               showDialog(
                                   context: context,
                                   builder: (context) => AlertDialogTemplate(
-                                          AppLocalizations.of(context)!.error,
-                                          AppLocalizations.of(context)!
+                                          title: AppLocalizations.of(context)!
+                                              .error,
+                                          content: AppLocalizations.of(context)!
                                               .error_conflict,
-                                          [
+                                          actions: [
                                             TextButton(
                                                 onPressed: () =>
                                                     Navigator.pop(context),
@@ -137,6 +159,7 @@ class HomeworksDetails extends StatelessWidget {
                   style: TextStyle(color: Style.text))))
     ]);
 
-    return Template(AppLocalizations.of(context)!.details, child, back: true);
+    return Template(
+        title: AppLocalizations.of(context)!.details, back: true, child: child);
   }
 }

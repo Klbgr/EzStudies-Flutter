@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ezstudies/agenda/agenda_details.dart';
+import 'package:ezstudies/agenda/agenda_week_view.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -37,92 +38,208 @@ class Agenda extends StatefulWidget {
 }
 
 class _AgendaState extends State<Agenda> {
-  bool initialized = false;
   List<AgendaCellData> list = [];
   bool pop = true;
   ItemScrollController itemScrollController = ItemScrollController();
 
   @override
   Widget build(BuildContext context) {
-    if (!initialized) {
-      initialized = true;
-      load(scroll: true);
-    }
     list.sort((a, b) => a.start.compareTo(b.start));
 
-    Widget content = Center(
-        child: widget.trash
-            ? Text(AppLocalizations.of(context)!.nothing_to_show)
-            : TextButton(
-                onPressed: () => refresh(),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        child: const Icon(Icons.refresh, size: 16),
-                      ),
-                      Text(AppLocalizations.of(context)!.refresh)
-                    ])));
+    Function trashTrigger = () {};
+    Function weekViewTrigger = () {};
+    Widget menu = MenuTemplate(
+        items: [
+          if (widget.agenda || widget.search)
+            PopupMenuItem<String>(
+                value: "week_view",
+                child: OpenContainerTemplate(
+                    child1: Text(AppLocalizations.of(context)!.week_view,
+                        style: TextStyle(fontSize: 16, color: Style.text)),
+                    child2: AgendaWeekView(data: list),
+                    onClosed: () {
+                      if (pop) {
+                        Navigator.pop(context);
+                      }
+                      pop = true;
+                    },
+                    color: Colors.transparent,
+                    trigger: (value) => weekViewTrigger = value)),
+          if (widget.agenda && !kIsWeb)
+            PopupMenuItem<String>(
+                value: "trash",
+                child: OpenContainerTemplate(
+                    child1: Text(AppLocalizations.of(context)!.trash,
+                        style: TextStyle(fontSize: 16, color: Style.text)),
+                    child2: const Agenda(trash: true),
+                    onClosed: () {
+                      if (pop) {
+                        Navigator.pop(context);
+                      }
+                      pop = true;
+                      load();
+                    },
+                    color: Colors.transparent,
+                    trigger: (value) => trashTrigger = value)),
+          if (widget.agenda && !kIsWeb)
+            PopupMenuItem<String>(
+                value: "reset",
+                child: Text(AppLocalizations.of(context)!.reset,
+                    style: TextStyle(color: Style.text))),
+          if (widget.agenda)
+            PopupMenuItem<String>(
+                value: "help_agenda",
+                child: Text(AppLocalizations.of(context)!.help,
+                    style: TextStyle(color: Style.text))),
+          if (widget.trash)
+            PopupMenuItem(
+                value: "help_trash",
+                child: Text(AppLocalizations.of(context)!.help,
+                    style: TextStyle(color: Style.text))),
+          if (widget.search)
+            PopupMenuItem<String>(
+                value: "help_search",
+                child: Text(AppLocalizations.of(context)!.help,
+                    style: TextStyle(color: Style.text)))
+        ],
+        onSelected: (value) {
+          switch (value) {
+            case "help_agenda":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    title: AppLocalizations.of(context)!.help,
+                    content: AppLocalizations.of(context)!.help_agenda,
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary))),
+                    ]),
+              );
+              break;
+            case "trash":
+              pop = false;
+              trashTrigger.call();
+              break;
+            case "week_view":
+              pop = false;
+              weekViewTrigger.call();
+              break;
+            case "reset":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    title: AppLocalizations.of(context)!.reset,
+                    content: AppLocalizations.of(context)!.reset_desc,
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.cancel,
+                              style: TextStyle(color: Style.primary))),
+                      TextButton(
+                          onPressed: () {
+                            reset();
+                            Navigator.pop(context);
+                          },
+                          child: Text(AppLocalizations.of(context)!.reset,
+                              style: TextStyle(color: Style.primary)))
+                    ]),
+              );
+              break;
+            case "help_trash":
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialogTemplate(
+                          title: AppLocalizations.of(context)!.help,
+                          content: AppLocalizations.of(context)!.help_trash,
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(AppLocalizations.of(context)!.ok,
+                                    style: TextStyle(color: Style.primary)))
+                          ]));
+              break;
+            case "help_search":
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    title: AppLocalizations.of(context)!.help,
+                    content: AppLocalizations.of(context)!.help_search_agenda,
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok,
+                              style: TextStyle(color: Style.primary))),
+                    ]),
+              );
+              break;
+          }
+        });
 
-    Column buttons =
-        Column(crossAxisAlignment: CrossAxisAlignment.end, children: []);
-
-    if (list.isNotEmpty) {
-      content = ScrollablePositionedList.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemScrollController: itemScrollController,
-        scrollDirection: Axis.vertical,
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          var data = list[index];
-          Widget cell = AgendaCell(
-              data,
-              index == 0 || !isSameDay(data.start, list[index - 1].start),
-              index == 0 || !isSameMonth(data.start, list[index - 1].start),
-              onClosed: () => load(),
-              editable: widget.agenda,
-              search: widget.search);
-          return widget.search || kIsWeb
-              ? cell
-              : Dismissible(
-                  key: UniqueKey(),
-                  onDismissed: (direction) {
-                    remove(data);
-                  },
-                  background: Container(
-                      color: widget.agenda ? Colors.red : Colors.green,
-                      child: Container(
-                          margin: const EdgeInsets.only(left: 20, right: 20),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(
-                                    widget.agenda
-                                        ? Icons.delete
-                                        : Icons.restore_from_trash,
-                                    color: Style.text),
-                                Icon(
-                                    widget.agenda
-                                        ? Icons.delete
-                                        : Icons.restore_from_trash,
-                                    color: Style.text)
-                              ]))),
-                  child: cell,
-                );
-        },
-      );
-
-      buttons.children.add(Container(
-          margin: const EdgeInsets.only(top: 10),
-          child: FloatingActionButton.extended(
-              onPressed: () => scrollToToday(),
-              backgroundColor: Style.primary.withOpacity(0.75),
-              label: Text(AppLocalizations.of(context)!.scroll_to_today,
-                  style: TextStyle(color: Style.text)),
-              icon: Icon(Icons.today, color: Style.text))));
-    }
+    Widget content = list.isEmpty
+        ? Center(
+            child: widget.trash
+                ? Text(AppLocalizations.of(context)!.nothing_to_show)
+                : TextButton(
+                    onPressed: () => refresh(),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            child: const Icon(Icons.refresh, size: 16),
+                          ),
+                          Text(AppLocalizations.of(context)!.refresh)
+                        ])))
+        : ScrollablePositionedList.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemScrollController: itemScrollController,
+            scrollDirection: Axis.vertical,
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              var data = list[index];
+              Widget cell = AgendaCell(
+                  data: data,
+                  firstOfDay: index == 0 ||
+                      !isSameDay(data.start, list[index - 1].start),
+                  firstOfMonth: index == 0 ||
+                      !isSameMonth(data.start, list[index - 1].start),
+                  onClosed: () => load(),
+                  editable: widget.agenda,
+                  search: widget.search);
+              return widget.search || kIsWeb
+                  ? cell
+                  : Dismissible(
+                      key: UniqueKey(),
+                      onDismissed: (direction) {
+                        remove(data);
+                      },
+                      background: Container(
+                          color: widget.agenda ? Colors.red : Colors.green,
+                          child: Container(
+                              margin:
+                                  const EdgeInsets.only(left: 20, right: 20),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Icon(
+                                        widget.agenda
+                                            ? Icons.delete
+                                            : Icons.restore_from_trash,
+                                        color: Style.text),
+                                    Icon(
+                                        widget.agenda
+                                            ? Icons.delete
+                                            : Icons.restore_from_trash,
+                                        color: Style.text)
+                                  ]))),
+                      child: cell,
+                    );
+            },
+          );
 
     Widget child = Stack(children: [
       widget.trash
@@ -131,211 +248,83 @@ class _AgendaState extends State<Agenda> {
               onRefresh: () => refresh(),
               backgroundColor: Style.background,
               child: content),
-      Positioned(bottom: 20, right: 20, child: buttons)
+      Positioned(
+          bottom: 20,
+          right: 20,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            if (!kIsWeb && widget.agenda)
+              OpenContainerTemplate(
+                  child1: FloatingActionButton.extended(
+                      heroTag: "add",
+                      elevation: 0,
+                      onPressed: null,
+                      backgroundColor: Colors.transparent,
+                      label: Text(AppLocalizations.of(context)!.add,
+                          style: TextStyle(color: Style.text)),
+                      icon: Icon(Icons.add, color: Style.text)),
+                  child2: const AgendaDetails(add: true),
+                  onClosed: () => load(),
+                  radius: const BorderRadius.all(Radius.circular(24)),
+                  elevation: 6,
+                  color: Style.primary.withOpacity(0.75)),
+            if (list.isNotEmpty)
+              Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: FloatingActionButton.extended(
+                      onPressed: () => scrollToToday(),
+                      backgroundColor: Style.primary.withOpacity(0.75),
+                      label: Text(AppLocalizations.of(context)!.scroll_to_today,
+                          style: TextStyle(color: Style.text)),
+                      icon: Icon(Icons.today, color: Style.text)))
+          ]))
     ]);
 
-    Widget? menu;
-    if (widget.agenda) {
-      if (!(Preferences.sharedPreferences.getBool("help_agenda") ?? false)) {
-        Preferences.sharedPreferences.setBool("help_agenda", true).then(
-            (value) => showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                        AppLocalizations.of(context)!.help,
-                        AppLocalizations.of(context)!.help_agenda, [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary)))
-                    ])));
-      }
-
-      if (!kIsWeb) {
-        OpenContainerTemplate add = OpenContainerTemplate(
-            FloatingActionButton.extended(
-                heroTag: "add",
-                elevation: 0,
-                onPressed: null,
-                backgroundColor: Colors.transparent,
-                label: Text(AppLocalizations.of(context)!.add,
-                    style: TextStyle(color: Style.text)),
-                icon: Icon(Icons.add, color: Style.text)),
-            const AgendaDetails(add: true),
-            onClosed: () => load(),
-            radius: const BorderRadius.all(Radius.circular(24)),
-            elevation: 6,
-            color: Style.primary.withOpacity(0.75),
-            trigger: (_) {});
-
-        buttons.children.insert(0, add);
-      }
-
-      Function trashTrigger = () {};
-
-      OpenContainerTemplate trash = OpenContainerTemplate(
-          Text(AppLocalizations.of(context)!.trash,
-              style: TextStyle(fontSize: 16, color: Style.text)),
-          const Agenda(trash: true),
-          onClosed: () {
-            if (pop) {
-              Navigator.pop(context);
-            }
-            pop = true;
-            load();
-          },
-          color: Colors.transparent,
-          trigger: (value) => trashTrigger = value);
-
-      if (kIsWeb) {
-        menu = MenuTemplate(<PopupMenuItem<String>>[
-          PopupMenuItem<String>(
-              value: "help",
-              child: Text(AppLocalizations.of(context)!.help,
-                  style: TextStyle(color: Style.text)))
-        ], (value) {
-          switch (value) {
-            case "help":
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                    AppLocalizations.of(context)!.help,
-                    AppLocalizations.of(context)!.help_agenda, [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok,
-                          style: TextStyle(color: Style.primary))),
-                ]),
-              );
-              break;
-          }
-        });
-      } else {
-        menu = MenuTemplate(<PopupMenuItem<String>>[
-          PopupMenuItem<String>(value: "trash", child: trash),
-          PopupMenuItem<String>(
-              value: "reset",
-              child: Text(AppLocalizations.of(context)!.reset,
-                  style: TextStyle(color: Style.text))),
-          PopupMenuItem<String>(
-              value: "help",
-              child: Text(AppLocalizations.of(context)!.help,
-                  style: TextStyle(color: Style.text)))
-        ], (value) {
-          switch (value) {
-            case "trash":
-              pop = false;
-              trashTrigger.call();
-              break;
-            case "reset":
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                    AppLocalizations.of(context)!.reset,
-                    AppLocalizations.of(context)!.reset_desc, [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.cancel,
-                          style: TextStyle(color: Style.primary))),
-                  TextButton(
-                      onPressed: () {
-                        reset();
-                        Navigator.pop(context);
-                      },
-                      child: Text(AppLocalizations.of(context)!.reset,
-                          style: TextStyle(color: Style.primary)))
-                ]),
-              );
-              break;
-            case "help":
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                    AppLocalizations.of(context)!.help,
-                    AppLocalizations.of(context)!.help_agenda, [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok,
-                          style: TextStyle(color: Style.primary))),
-                ]),
-              );
-              break;
-          }
-        });
-      }
-    } else if (widget.trash) {
-      if (!(Preferences.sharedPreferences.getBool("help_trash") ?? false)) {
-        Preferences.sharedPreferences.setBool("help_trash", true).then(
-            (value) => showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                        AppLocalizations.of(context)!.help,
-                        AppLocalizations.of(context)!.help_trash, [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary)))
-                    ])));
-      }
-
-      menu = MenuTemplate(<PopupMenuItem<String>>[
-        PopupMenuItem(
-            value: "help",
-            child: Text(AppLocalizations.of(context)!.help,
-                style: TextStyle(color: Style.text)))
-      ], (value) {
-        switch (value) {
-          case "help":
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                        AppLocalizations.of(context)!.help,
-                        AppLocalizations.of(context)!.help_trash, [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary)))
-                    ]));
-            break;
-        }
-      });
-    } else if (widget.search) {
-      if (!(Preferences.sharedPreferences.getBool("help_search_agenda") ??
-          false)) {
-        Preferences.sharedPreferences.setBool("help_search_agenda", true).then(
-            (value) => showDialog(
-                context: context,
-                builder: (context) => AlertDialogTemplate(
-                        AppLocalizations.of(context)!.help,
-                        AppLocalizations.of(context)!.help_search_agenda, [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary)))
-                    ])));
-      }
-
-      menu = MenuTemplate(<PopupMenuItem<String>>[
-        PopupMenuItem<String>(
-            value: "help",
-            child: Text(AppLocalizations.of(context)!.help,
-                style: TextStyle(color: Style.text)))
-      ], (value) {
-        switch (value) {
-          case "help":
-            showDialog(
+    if (widget.agenda &&
+        !(Preferences.sharedPreferences.getBool(Preferences.helpAgenda) ??
+            false)) {
+      Preferences.sharedPreferences.setBool(Preferences.helpAgenda, true).then(
+          (value) => showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.help,
-                  AppLocalizations.of(context)!.help_search_agenda, [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok,
-                        style: TextStyle(color: Style.primary))),
-              ]),
-            );
-            break;
-        }
-      });
+                      title: AppLocalizations.of(context)!.help,
+                      content: AppLocalizations.of(context)!.help_agenda,
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.ok,
+                                style: TextStyle(color: Style.primary)))
+                      ])));
+    } else if (widget.trash &&
+        !(Preferences.sharedPreferences.getBool(Preferences.helpTrash) ??
+            false)) {
+      Preferences.sharedPreferences.setBool(Preferences.helpTrash, true).then(
+          (value) => showDialog(
+              context: context,
+              builder: (context) => AlertDialogTemplate(
+                      title: AppLocalizations.of(context)!.help,
+                      content: AppLocalizations.of(context)!.help_trash,
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.ok,
+                                style: TextStyle(color: Style.primary)))
+                      ])));
+    } else if (widget.search &&
+        !(Preferences.sharedPreferences.getBool(Preferences.helpSearchAgenda) ??
+            false)) {
+      Preferences.sharedPreferences
+          .setBool(Preferences.helpSearchAgenda, true)
+          .then((value) => showDialog(
+              context: context,
+              builder: (context) => AlertDialogTemplate(
+                      title: AppLocalizations.of(context)!.help,
+                      content: AppLocalizations.of(context)!.help_search_agenda,
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.ok,
+                                style: TextStyle(color: Style.primary)))
+                      ])));
     }
 
     String title = "";
@@ -347,7 +336,8 @@ class _AgendaState extends State<Agenda> {
       title = widget.data!.name;
     }
 
-    return Template(title, child, menu: menu, back: !widget.agenda);
+    return Template(
+        title: title, menu: menu, back: !widget.agenda, child: child);
   }
 
   @override
@@ -381,9 +371,10 @@ class _AgendaState extends State<Agenda> {
   void load({bool scroll = false}) {
     if (widget.agenda) {
       String url = "${Secret.server_url}api/index.php";
-      String name = Preferences.sharedPreferences.getString("name") ?? "";
+      String name =
+          Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
-          Preferences.sharedPreferences.getString("password") ?? "";
+          Preferences.sharedPreferences.getString(Preferences.password) ?? "";
       http.post(Uri.parse(url), body: <String, String>{
         "request": "cyu",
         "name": name,
@@ -408,24 +399,26 @@ class _AgendaState extends State<Agenda> {
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
-                AppLocalizations.of(context)!.error,
-                AppLocalizations.of(context)!.error_internet, [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.ok))
-            ]),
+                title: AppLocalizations.of(context)!.error,
+                content: AppLocalizations.of(context)!.error_internet,
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok))
+                ]),
           );
         }
       }).catchError((_) {
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
-              AppLocalizations.of(context)!.error,
-              AppLocalizations.of(context)!.error_internet, [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(AppLocalizations.of(context)!.ok))
-          ]),
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
         );
       });
     } else if (widget.trash) {
@@ -438,9 +431,10 @@ class _AgendaState extends State<Agenda> {
               }, scroll: scroll))));
     } else if (widget.search) {
       String url = "${Secret.server_url}api/index.php";
-      String name = Preferences.sharedPreferences.getString("name") ?? "";
+      String name =
+          Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
-          Preferences.sharedPreferences.getString("password") ?? "";
+          Preferences.sharedPreferences.getString(Preferences.password) ?? "";
       http.post(Uri.parse(url), body: <String, String>{
         "request": "cyu",
         "name": name,
@@ -479,7 +473,8 @@ class _AgendaState extends State<Agenda> {
   }
 
   void scheduleNotifications() {
-    if (Preferences.sharedPreferences.getBool("notifications") ?? true) {
+    if (Preferences.sharedPreferences.getBool(Preferences.notifications) ??
+        true) {
       Notifications.cancelNotificationsAgenda()
           .then((_) => Notifications.scheduleNotificationsAgenda(context));
     }
@@ -525,6 +520,12 @@ class _AgendaState extends State<Agenda> {
       }
     }
     return list;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    load(scroll: true);
   }
 
   Future<void> refresh() async {

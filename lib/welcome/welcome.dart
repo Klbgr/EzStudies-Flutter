@@ -28,32 +28,34 @@ class _WelcomeState extends State<Welcome> {
 
   @override
   Widget build(BuildContext context) {
-    Widget page1 = WelcomePageTemplate(
-        Text(AppLocalizations.of(context)!.welcome_welcome,
-            style: textStyle, textAlign: TextAlign.center),
-        UnDrawIllustration.welcoming);
-
-    Widget page2 = WelcomePageTemplate(
-        Text(AppLocalizations.of(context)!.welcome_features,
-            style: textStyle, textAlign: TextAlign.center),
-        UnDrawIllustration.features_overview);
-
-    Widget page3 = WelcomePageTemplate(
-        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(AppLocalizations.of(context)!.welcome_login,
+    List<Widget> pages = [
+      WelcomePageTemplate(
+          content: Text(AppLocalizations.of(context)!.welcome_welcome,
               style: textStyle, textAlign: TextAlign.center),
-          Container(
-              margin: const EdgeInsets.only(bottom: 10, top: 20),
-              child: TextFormFieldTemplate(
-                  AppLocalizations.of(context)!.name, Icons.person,
-                  onChanged: (value) => name = value)),
-          TextFormFieldTemplate(
-              AppLocalizations.of(context)!.password, Icons.password,
-              onChanged: (value) => password = value, hidden: true)
-        ]),
-        UnDrawIllustration.login);
-
-    List<Widget> pages = [page1, page2, page3];
+          illustration: UnDrawIllustration.welcoming),
+      WelcomePageTemplate(
+          content: Text(AppLocalizations.of(context)!.welcome_features,
+              style: textStyle, textAlign: TextAlign.center),
+          illustration: UnDrawIllustration.features_overview),
+      WelcomePageTemplate(
+          content:
+              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(AppLocalizations.of(context)!.welcome_login,
+                style: textStyle, textAlign: TextAlign.center),
+            Container(
+                margin: const EdgeInsets.only(bottom: 10, top: 20),
+                child: TextFormFieldTemplate(
+                    label: AppLocalizations.of(context)!.name,
+                    icon: Icons.person,
+                    onChanged: (value) => name = value)),
+            TextFormFieldTemplate(
+                label: AppLocalizations.of(context)!.password,
+                icon: Icons.password,
+                onChanged: (value) => password = value,
+                hidden: true)
+          ]),
+          illustration: UnDrawIllustration.login)
+    ];
 
     Widget child = Stack(children: [
       PageView(
@@ -73,7 +75,10 @@ class _WelcomeState extends State<Welcome> {
               children: buildDots(pages.length)))
     ]);
 
-    return Template(AppLocalizations.of(context)!.welcome, child, back: false);
+    return Template(
+        title: AppLocalizations.of(context)!.welcome,
+        back: false,
+        child: child);
   }
 
   void next() {
@@ -90,13 +95,14 @@ class _WelcomeState extends State<Welcome> {
       showDialog(
         context: context,
         builder: (context) => AlertDialogTemplate(
-            AppLocalizations.of(context)!.error,
-            AppLocalizations.of(context)!.error_empty, [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.ok,
-                  style: TextStyle(color: Style.primary)))
-        ]),
+            title: AppLocalizations.of(context)!.error,
+            content: AppLocalizations.of(context)!.error_empty,
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok,
+                      style: TextStyle(color: Style.primary)))
+            ]),
       );
     } else {
       String encryptedName = encrypt(name, Secret.cipher_key);
@@ -109,9 +115,10 @@ class _WelcomeState extends State<Welcome> {
           }).then((value) {
         if (value.statusCode == 200) {
           if (value.body == "1") {
-            Preferences.sharedPreferences.setString("name", encryptedName).then(
-                (value) => Preferences.sharedPreferences
-                    .setString("password", encryptedPassword)
+            Preferences.sharedPreferences
+                .setString(Preferences.name, encryptedName)
+                .then((value) => Preferences.sharedPreferences
+                    .setString(Preferences.password, encryptedPassword)
                     .then((value) => Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -120,36 +127,39 @@ class _WelcomeState extends State<Welcome> {
             showDialog(
               context: context,
               builder: (context) => AlertDialogTemplate(
-                  AppLocalizations.of(context)!.error,
-                  AppLocalizations.of(context)!.error_credentials, [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
+                  title: AppLocalizations.of(context)!.error,
+                  content: AppLocalizations.of(context)!.error_credentials,
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(AppLocalizations.of(context)!.ok))
+                  ]),
             );
           }
         } else {
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
-                AppLocalizations.of(context)!.error,
-                AppLocalizations.of(context)!.error_internet, [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.ok))
-            ]),
+                title: AppLocalizations.of(context)!.error,
+                content: AppLocalizations.of(context)!.error_internet,
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok))
+                ]),
           );
         }
       }).catchError((e) {
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
-              AppLocalizations.of(context)!.error,
-              AppLocalizations.of(context)!.error_internet, [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(AppLocalizations.of(context)!.ok))
-          ]),
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
         );
       });
     }
