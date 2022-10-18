@@ -78,6 +78,7 @@ class AgendaCell extends StatelessWidget {
                     ),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Flexible(
                               child: Text(

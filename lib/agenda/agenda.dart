@@ -485,38 +485,47 @@ class _AgendaState extends State<Agenda> {
     if (json.isNotEmpty) {
       List<dynamic> data = jsonDecode(json);
       for (int i = 0; i < data.length; i++) {
-        var item = data[i];
-        List<String> start = item["start"].toString().split("T");
-        List<int> startDate =
-            start[0].split("-").map((element) => int.parse(element)).toList();
-        List<int> startTime =
-            start[1].split(":").map((element) => int.parse(element)).toList();
-        int startTimestamp = DateTime(startDate[0], startDate[1], startDate[2],
-                startTime[0], startTime[1], startTime[2], 0, 0)
-            .millisecondsSinceEpoch;
-        List<String> end = item["end"].toString().split("T");
-        List<int> endDate =
-            end[0].split("-").map((element) => int.parse(element)).toList();
-        List<int> endTime =
-            end[1].split(":").map((element) => int.parse(element)).toList();
-        int endTimestamp = DateTime(endDate[0], endDate[1], endDate[2],
-                endTime[0], endTime[1], endTime[2], 0, 0)
-            .millisecondsSinceEpoch;
+        try {
+          var item = data[i];
+          List<String> start = item["start"].toString().split("T");
+          List<int> startDate =
+              start[0].split("-").map((element) => int.parse(element)).toList();
+          List<int> startTime =
+              start[1].split(":").map((element) => int.parse(element)).toList();
+          DateTime startDateTime = DateTime(startDate[0], startDate[1],
+              startDate[2], startTime[0], startTime[1], startTime[2], 0, 0);
+          int startTimestamp = startDateTime.millisecondsSinceEpoch;
+          int endTimestamp = 0;
+          if (item["end"].toString() != "null") {
+            List<String> end = item["end"].toString().split("T");
+            List<int> endDate =
+                end[0].split("-").map((element) => int.parse(element)).toList();
+            List<int> endTime =
+                end[1].split(":").map((element) => int.parse(element)).toList();
+            endTimestamp = DateTime(endDate[0], endDate[1], endDate[2],
+                    endTime[0], endTime[1], endTime[2], 0, 0)
+                .millisecondsSinceEpoch;
+          } else {
+            endTimestamp = startDateTime
+                .add(Duration(hours: 21 - startTime[0]))
+                .millisecondsSinceEpoch;
+          }
 
-        String description = item["description"]
-            .toString()
-            .replaceAll("\n", "")
-            .replaceAll("\r", "")
-            .replaceAll("<br />", "\n");
-        description = HtmlUnescape().convert(description);
-        list.add(AgendaCellData(
-            id: item["id"],
-            description: description,
-            start: startTimestamp,
-            end: endTimestamp,
-            added: 0,
-            trashed: 0,
-            edited: 0));
+          String description = item["description"]
+              .toString()
+              .replaceAll("\n", "")
+              .replaceAll("\r", "")
+              .replaceAll("<br />", "\n");
+          description = HtmlUnescape().convert(description);
+          list.add(AgendaCellData(
+              id: item["id"],
+              description: description,
+              start: startTimestamp,
+              end: endTimestamp,
+              added: 0,
+              trashed: 0,
+              edited: 0));
+        } catch (_) {}
       }
     }
     return list;
