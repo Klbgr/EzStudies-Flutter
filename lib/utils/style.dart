@@ -16,31 +16,46 @@ class Style {
   static late Color ripple;
 
   static Future<void> load() async {
+    switch (Preferences.sharedPreferences.getInt(Preferences.theme) ?? 0) {
+      case 0:
+        (SchedulerBinding.instance.window.platformBrightness ==
+                Brightness.light)
+            ? _setLightTheme()
+            : _setDarkTheme();
+        break;
+      case 1:
+        _setLightTheme();
+        break;
+      case 2:
+        _setDarkTheme();
+        break;
+    }
+  }
+
+  static MaterialColor _getColor(double ratio) {
     MaterialColor color = Colors.primaries[
         Preferences.sharedPreferences.getInt(Preferences.accent) ?? 5];
     if ((Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
             true) &&
         (kIsWeb || Platform.isAndroid)) {
-      color = generateMaterialColor(
-          color: SystemTheme.accentColor.defaultAccentColor);
+      Color accent = SystemTheme.accentColor.accent;
+      if (Platform.isAndroid) {
+        accent = _editColor(accent, ratio);
+      }
+      color = generateMaterialColor(color: accent);
     }
-    switch (Preferences.sharedPreferences.getInt(Preferences.theme) ?? 0) {
-      case 0:
-        (SchedulerBinding.instance.window.platformBrightness ==
-                Brightness.light)
-            ? _setLightTheme(color)
-            : _setDarkTheme(color);
-        break;
-      case 1:
-        _setLightTheme(color);
-        break;
-      case 2:
-        _setDarkTheme(color);
-        break;
-    }
+    return color;
   }
 
-  static _setLightTheme(MaterialColor color) {
+  static Color _editColor(Color color, double ratio) {
+    color = color.withRed((color.red * ratio).toInt());
+    color = color.withGreen((color.green * ratio).toInt());
+    color = color.withBlue((color.blue * ratio).toInt());
+    return color;
+  }
+
+  static _setLightTheme() {
+    MaterialColor color = _getColor(0.8);
     theme = 0;
     primary = color;
     secondary = color.shade100;
@@ -50,11 +65,12 @@ class Style {
     ripple = primary.withAlpha(50);
   }
 
-  static _setDarkTheme(MaterialColor color) {
+  static _setDarkTheme() {
+    MaterialColor color = _getColor(0.9);
     theme = 1;
     primary = color.shade700;
-    secondary = const Color(0xFF161616);
-    background = const Color(0xFF121212);
+    secondary = _editColor(color, 0.125); //const Color(0xFF161616);
+    background = _editColor(color, 0.1); //const Color(0xFF121212);
     text = color.shade50;
     hint = Colors.grey;
     ripple = primary.withAlpha(50);

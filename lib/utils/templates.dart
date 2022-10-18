@@ -13,12 +13,14 @@ class Template extends StatelessWidget {
       required this.child,
       this.menu,
       this.back = false,
+      this.compact = false,
       Key? key})
       : super(key: key);
   final String title;
   final Widget child;
   final Widget? menu;
   final bool back;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,9 @@ class Template extends StatelessWidget {
     return Scaffold(
         backgroundColor: Style.background,
         appBar: AppBar(
+          title: compact
+              ? Text(title, style: TextStyle(color: Style.text))
+              : Container(),
           systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
               statusBarIconBrightness:
@@ -48,14 +53,15 @@ class Template extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Container(
-              alignment: Alignment.centerLeft,
-              margin: const EdgeInsets.only(left: 20, bottom: 20),
-              child: Text(
-                title,
-                style: TextStyle(fontSize: 28, color: Style.text),
+            if (!compact)
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: const EdgeInsets.only(left: 20, bottom: 20),
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 28, color: Style.text),
+                ),
               ),
-            ),
             Expanded(
               child: child,
             )

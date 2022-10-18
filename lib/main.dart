@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:animations/animations.dart';
 import 'package:ezstudies/agenda/agenda.dart';
 import 'package:ezstudies/homeworks/homeworks.dart';
 import 'package:ezstudies/search/search.dart';
@@ -217,7 +218,23 @@ class _MainState extends State<Main> {
     }
 
     return Scaffold(
-        body: widgets[selectedIndex], bottomNavigationBar: bottomNavigationBar);
+        body: PageTransitionSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (
+            child,
+            animation,
+            secondaryAnimation,
+          ) {
+            return FadeThroughTransition(
+              animation: animation,
+              secondaryAnimation: secondaryAnimation,
+              fillColor: Style.background,
+              child: child,
+            );
+          },
+          child: widgets[selectedIndex],
+        ),
+        bottomNavigationBar: bottomNavigationBar);
   }
 
   @override

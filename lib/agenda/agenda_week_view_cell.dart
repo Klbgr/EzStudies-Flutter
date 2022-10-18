@@ -6,17 +6,26 @@ import 'package:flutter/material.dart';
 import '../utils/style.dart';
 import '../utils/timestamp_utils.dart';
 
-class AgendaWeekViewCell extends StatelessWidget {
-  const AgendaWeekViewCell({required this.data, Key? key}) : super(key: key);
+class AgendaWeekViewCell extends StatefulWidget {
+  const AgendaWeekViewCell(
+      {required this.data, this.onClosed, this.onOpened, Key? key})
+      : super(key: key);
   final AgendaCellData data;
+  final Function? onClosed;
+  final Function? onOpened;
 
   @override
+  State<AgendaWeekViewCell> createState() => _AgendaWeekViewCellState();
+}
+
+class _AgendaWeekViewCellState extends State<AgendaWeekViewCell> {
+  @override
   Widget build(BuildContext context) {
-    String start = timestampToTime(data.start);
-    String end = timestampToTime(data.end);
-    Color color = data.getColor();
+    String start = timestampToTime(widget.data.start);
+    String end = timestampToTime(widget.data.end);
+    Color color = widget.data.getColor();
     return Container(
-        margin: const EdgeInsets.all(1),
+        margin: const EdgeInsets.only(left: 1, right: 1, bottom: 1),
         child: OpenContainerTemplate(
             child1: Container(
                 padding: const EdgeInsets.all(10),
@@ -28,15 +37,21 @@ class AgendaWeekViewCell extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text("$start - $end",
                           style: TextStyle(
-                              color: Style.text, fontWeight: FontWeight.bold))),
+                              color: Style.text,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10))),
                   Container(
                       alignment: Alignment.centerLeft,
-                      child: Text(data.description,
-                          style: TextStyle(color: Style.text),
+                      child: Text(widget.data.description,
+                          style: TextStyle(color: Style.text, fontSize: 10),
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis))
                 ])),
-            child2: AgendaDetails(data: data, editable: false),
+            child2: AgendaDetails(
+                data: widget.data,
+                editable: false,
+                onClosed: widget.onClosed,
+                onOpened: widget.onOpened),
             color: color,
             elevation: 0,
             radius: const BorderRadius.all(Radius.circular(16))));

@@ -7,24 +7,50 @@ import '../utils/style.dart';
 import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 
-class AgendaDetails extends StatelessWidget {
+class AgendaDetails extends StatefulWidget {
   const AgendaDetails(
       {this.add = false,
       this.data,
       this.editable = true,
       this.search = false,
+      this.onClosed,
+      this.onOpened,
       Key? key})
       : super(key: key);
   final bool add;
   final AgendaCellData? data;
   final bool editable;
   final bool search;
+  final Function? onClosed;
+  final Function? onOpened;
+
+  @override
+  State<AgendaDetails> createState() => _AgendaDetailsState();
+}
+
+class _AgendaDetailsState extends State<AgendaDetails> {
   final EdgeInsetsGeometry margin = const EdgeInsets.only(top: 10, bottom: 10);
+
+  @override
+  void dispose() {
+    if (widget.onClosed != null) {
+      widget.onClosed!();
+    }
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    if (widget.onOpened != null) {
+      widget.onOpened!();
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     AgendaCellData newData;
-    if (add) {
+    if (widget.add) {
       newData = AgendaCellData(
         id: "",
         description: "",
@@ -38,13 +64,13 @@ class AgendaDetails extends StatelessWidget {
       );
     } else {
       newData = AgendaCellData(
-          id: data!.id,
-          description: data!.description,
-          start: data!.start,
-          end: data!.end,
-          added: data!.added,
-          edited: data!.edited,
-          trashed: data!.trashed);
+          id: widget.data!.id,
+          description: widget.data!.description,
+          start: widget.data!.start,
+          end: widget.data!.end,
+          added: widget.data!.added,
+          edited: widget.data!.edited,
+          trashed: widget.data!.trashed);
     }
 
     Widget child = Column(
@@ -64,7 +90,7 @@ class AgendaDetails extends StatelessWidget {
                               icon: Icons.description,
                               initialValue: newData.description,
                               onChanged: (value) => newData.description = value,
-                              enabled: kIsWeb ? false : editable,
+                              enabled: kIsWeb ? false : widget.editable,
                               multiline: true)),
                       Container(
                           alignment: Alignment.centerLeft,
@@ -92,7 +118,7 @@ class AgendaDetails extends StatelessWidget {
                                         0)
                                     .millisecondsSinceEpoch;
                               },
-                              enabled: kIsWeb ? false : editable)),
+                              enabled: kIsWeb ? false : widget.editable)),
                       Container(
                           alignment: Alignment.centerLeft,
                           margin: margin,
@@ -119,7 +145,7 @@ class AgendaDetails extends StatelessWidget {
                                         0)
                                     .millisecondsSinceEpoch;
                               },
-                              enabled: kIsWeb ? false : editable)),
+                              enabled: kIsWeb ? false : widget.editable)),
                       Container(
                           alignment: Alignment.centerLeft,
                           margin: margin,
@@ -146,8 +172,8 @@ class AgendaDetails extends StatelessWidget {
                                         0)
                                     .millisecondsSinceEpoch;
                               },
-                              enabled: kIsWeb ? false : editable)),
-                      if (!add && !search)
+                              enabled: kIsWeb ? false : widget.editable)),
+                      if (!widget.add && !widget.search)
                         Container(
                             alignment: Alignment.centerLeft,
                             margin: margin,
@@ -159,7 +185,7 @@ class AgendaDetails extends StatelessWidget {
                                     : AppLocalizations.of(context)!.internet,
                                 onChanged: (_) {},
                                 enabled: false)),
-                      if (!add && !search && newData.added == 0)
+                      if (!widget.add && !widget.search && newData.added == 0)
                         Container(
                             alignment: Alignment.centerLeft,
                             margin: margin,
@@ -172,17 +198,17 @@ class AgendaDetails extends StatelessWidget {
                                 onChanged: (_) {},
                                 enabled: false))
                     ])))),
-        if (!kIsWeb && (editable || add))
+        if (!kIsWeb && (widget.editable || widget.add))
           Container(
             margin: const EdgeInsets.only(bottom: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (!kIsWeb &&
-                    editable &&
+                    widget.editable &&
                     newData.added == 0 &&
                     newData.edited == 1 &&
-                    !add)
+                    !widget.add)
                   Container(
                     margin: const EdgeInsets.only(right: 20),
                     child: FloatingActionButton.extended(
@@ -213,11 +239,11 @@ class AgendaDetails extends StatelessWidget {
                         label: Text(AppLocalizations.of(context)!.reset,
                             style: TextStyle(color: Style.text))),
                   ),
-                if (!kIsWeb && (editable || add))
+                if (!kIsWeb && (widget.editable || widget.add))
                   FloatingActionButton.extended(
                       backgroundColor: Colors.green,
-                      icon:
-                          Icon(add ? Icons.add : Icons.save, color: Style.text),
+                      icon: Icon(widget.add ? Icons.add : Icons.save,
+                          color: Style.text),
                       onPressed: () {
                         DateTime start =
                             DateTime.fromMillisecondsSinceEpoch(newData.start);
@@ -261,7 +287,7 @@ class AgendaDetails extends StatelessWidget {
                                                 AppLocalizations.of(context)!
                                                     .ok))
                                       ]));
-                        } else if (add) {
+                        } else if (widget.add) {
                           DateTime start = DateTime.fromMillisecondsSinceEpoch(
                               newData.start);
                           DateTime end =
@@ -308,7 +334,7 @@ class AgendaDetails extends StatelessWidget {
                                 newData.edited = 1;
                                 database
                                     .insertOrReplaceAgenda(
-                                        DatabaseHelper.backup, data!)
+                                        DatabaseHelper.backup, widget.data!)
                                     .then((_) => database
                                         .insertOrReplaceAgenda(
                                             DatabaseHelper.agenda, newData)
@@ -334,7 +360,7 @@ class AgendaDetails extends StatelessWidget {
                         }
                       },
                       label: Text(
-                          add
+                          widget.add
                               ? AppLocalizations.of(context)!.add
                               : AppLocalizations.of(context)!.save,
                           style: TextStyle(color: Style.text)))
@@ -345,7 +371,7 @@ class AgendaDetails extends StatelessWidget {
     );
 
     return Template(
-        title: add
+        title: widget.add
             ? AppLocalizations.of(context)!.add
             : AppLocalizations.of(context)!.details,
         back: true,

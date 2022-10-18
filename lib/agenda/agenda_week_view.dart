@@ -69,6 +69,7 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
     return Template(
         title: AppLocalizations.of(context)!.week_view,
         back: true,
+        compact: true,
         child: child);
   }
 
@@ -95,11 +96,6 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
 
   @override
   void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.portraitUp,
-    ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
     super.dispose();
@@ -108,10 +104,6 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
 
@@ -140,28 +132,40 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
                             alignment: Alignment.center,
                             child: Text(
                                 "${dayNames[i]}\n${timestampToDayMonth(firstDayOfWeek.add(Duration(days: i)).millisecondsSinceEpoch)}",
-                                textAlign: TextAlign.center)))
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 12))))
                 ])),
-            SingleChildScrollView(
-                child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  for (int i = 0; i < dayNames.length; i++)
-                    Expanded(
-                        child: Column(children: List.empty(growable: true)))
-                ]))
+            Expanded(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (int i = 0; i < dayNames.length; i++)
+                            Expanded(
+                                child: Column(
+                                    children: List.empty(growable: true)))
+                        ])))
           ],
         ));
         index++;
       }
 
       if (weekDay <= dayNames.length) {
-        (((((pages[index] as Column).children[1] as SingleChildScrollView).child
-                        as Row)
+        ((((((pages[index] as Column).children[1] as Expanded).child
+                            as SingleChildScrollView)
+                        .child as Row)
                     .children[weekDay - 1] as Expanded)
                 .child as Column)
             .children
-            .add(AgendaWeekViewCell(data: widget.data[i]));
+            .add(AgendaWeekViewCell(
+                data: widget.data[i],
+                onOpened: () => SystemChrome.setEnabledSystemUIMode(
+                    SystemUiMode.manual,
+                    overlays: SystemUiOverlay.values),
+                onClosed: () => SystemChrome.setEnabledSystemUIMode(
+                    SystemUiMode.manual,
+                    overlays: [])));
       }
     }
   }
