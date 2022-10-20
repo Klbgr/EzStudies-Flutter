@@ -60,7 +60,7 @@ class Style {
     primary = color;
     secondary = color.shade100;
     background = color.shade50;
-    text = Colors.black;
+    text = _editColor(color, 0.2);
     hint = Colors.grey;
     ripple = primary.withAlpha(50);
   }
@@ -69,8 +69,8 @@ class Style {
     MaterialColor color = _getColor(0.9);
     theme = 1;
     primary = color.shade700;
-    secondary = _editColor(color, 0.125); //const Color(0xFF161616);
-    background = _editColor(color, 0.1); //const Color(0xFF121212);
+    secondary = _editColor(color, 0.15);
+    background = _editColor(color, 0.1);
     text = color.shade50;
     hint = Colors.grey;
     ripple = primary.withAlpha(50);

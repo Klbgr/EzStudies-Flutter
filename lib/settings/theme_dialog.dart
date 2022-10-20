@@ -26,15 +26,16 @@ class _ThemeDialogState extends State<ThemeDialog> {
 
     Column column = Column(mainAxisSize: MainAxisSize.min, children: [
       for (int i = 0; i < 3; i++)
-        ListTile(
-            title: GestureDetector(
-                child: Text(names[i]),
-                onTap: () => setState(() => selectedIndex = i)),
-            leading: Radio<int>(
-                activeColor: Style.primary,
-                value: i,
-                groupValue: selectedIndex,
-                onChanged: (value) => setState(() => selectedIndex = value!)))
+        InkWell(
+            onTap: () => setState(() => selectedIndex = i),
+            child: ListTile(
+                title: Text(names[i]),
+                leading: Radio<int>(
+                    activeColor: Style.primary,
+                    value: i,
+                    groupValue: selectedIndex,
+                    onChanged: (value) =>
+                        setState(() => selectedIndex = value!))))
     ]);
 
     return AlertDialog(
