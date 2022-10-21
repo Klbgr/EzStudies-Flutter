@@ -22,6 +22,7 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   String query = "";
   List<SearchCellData> list = [];
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,34 +83,24 @@ class _SearchState extends State<Search> {
                         borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
-                            bottomLeft:
-                                Radius.circular(list.isNotEmpty ? 0 : 16),
-                            bottomRight:
-                                Radius.circular(list.isNotEmpty ? 0 : 16)),
+                            bottomLeft: Radius.circular(
+                                list.isNotEmpty || loading ? 0 : 16),
+                            bottomRight: Radius.circular(
+                                list.isNotEmpty || loading ? 0 : 16)),
                         borderSide:
                             const BorderSide(color: Colors.transparent)),
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
-                            bottomLeft:
-                                Radius.circular(list.isNotEmpty ? 0 : 16),
-                            bottomRight:
-                                Radius.circular(list.isNotEmpty ? 0 : 16)),
+                            bottomLeft: Radius.circular(
+                                list.isNotEmpty || loading ? 0 : 16),
+                            bottomRight: Radius.circular(
+                                list.isNotEmpty || loading ? 0 : 16)),
                         borderSide:
                             const BorderSide(color: Colors.transparent)),
-                    disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(16),
-                            topRight: const Radius.circular(16),
-                            bottomLeft:
-                                Radius.circular(list.isNotEmpty ? 0 : 16),
-                            bottomRight:
-                                Radius.circular(list.isNotEmpty ? 0 : 16)),
-                        borderSide:
-                            const BorderSide(color: Colors.transparent)),
-                    hintText:
-                        AppLocalizations.of(context)!.search.toLowerCase(),
+                    disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.only(topLeft: const Radius.circular(16), topRight: const Radius.circular(16), bottomLeft: Radius.circular(list.isNotEmpty || loading ? 0 : 16), bottomRight: Radius.circular(list.isNotEmpty || loading ? 0 : 16)), borderSide: const BorderSide(color: Colors.transparent)),
+                    hintText: AppLocalizations.of(context)!.search.toLowerCase(),
                     hintStyle: TextStyle(color: Style.hint)),
                 onSubmitted: (value) => search(),
                 onChanged: (value) {
@@ -122,9 +113,19 @@ class _SearchState extends State<Search> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: list.length,
-                      itemBuilder: (context, index) => _SearchCell(list[index],
-                          last: index == list.length - 1),
+                      itemCount: loading ? 1 : list.length,
+                      itemBuilder: (context, index) => loading
+                          ? Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Style.secondary,
+                                  borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(16),
+                                      bottomRight: Radius.circular(16))),
+                              child: const CircularProgressIndicator())
+                          : _SearchCell(list[index],
+                              last: index == list.length - 1),
                     )))
           ],
         ));
@@ -135,6 +136,7 @@ class _SearchState extends State<Search> {
 
   void search() {
     if (query.length >= 3) {
+      setState(() => loading = true);
       String url = "${Secret.server_url}api/index.php";
       String name =
           Preferences.sharedPreferences.getString(Preferences.name) ?? "";
@@ -155,8 +157,12 @@ class _SearchState extends State<Search> {
                 name: element["text"],
                 dept: element["dept"]));
           }
-          setState(() => list = newList);
+          setState(() {
+            list = newList;
+            loading = false;
+          });
         } else {
+          setState(() => loading = false);
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
@@ -170,6 +176,7 @@ class _SearchState extends State<Search> {
           );
         }
       }).catchError((_) {
+        setState(() => loading = false);
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(

@@ -23,6 +23,7 @@ class Homeworks extends StatefulWidget {
 class _HomeworksState extends State<Homeworks> {
   List<HomeworksCellData> list = [];
   ItemScrollController itemScrollController = ItemScrollController();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +123,12 @@ class _HomeworksState extends State<Homeworks> {
                           style: TextStyle(color: Style.text)),
                       backgroundColor: Style.primary.withOpacity(0.75),
                       icon: Icon(Icons.today, color: Style.text)))
-          ]))
+          ])),
+      if (loading)
+        Container(
+            color: Style.background,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator())
     ]);
 
     return Template(
@@ -149,12 +155,14 @@ class _HomeworksState extends State<Homeworks> {
   }
 
   void load() {
+    setState(() => loading = true);
     DatabaseHelper database = DatabaseHelper();
     database.open().then((_) => database
         .getHomeworks()
         .then((value) => database.close().then((_) => setState(() {
               scheduleNotifications();
               list = value;
+              loading = false;
             }))));
   }
 

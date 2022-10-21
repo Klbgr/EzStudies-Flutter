@@ -41,6 +41,7 @@ class _AgendaState extends State<Agenda> {
   List<AgendaCellData> list = [];
   bool pop = true;
   ItemScrollController itemScrollController = ItemScrollController();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +277,12 @@ class _AgendaState extends State<Agenda> {
                       label: Text(AppLocalizations.of(context)!.scroll_to_today,
                           style: TextStyle(color: Style.text)),
                       icon: Icon(Icons.today, color: Style.text)))
-          ]))
+          ])),
+      if (loading)
+        Container(
+            color: Style.background,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator())
     ]);
 
     if (widget.agenda &&
@@ -369,6 +375,7 @@ class _AgendaState extends State<Agenda> {
   }
 
   void load({bool scroll = false}) {
+    setState(() => loading = true);
     if (widget.agenda) {
       String url = "${Secret.server_url}api/index.php";
       String name =
@@ -382,7 +389,10 @@ class _AgendaState extends State<Agenda> {
       }).then((value) {
         if (value.statusCode == 200) {
           if (kIsWeb) {
-            setState(() => list = processJson(value.body), scroll: scroll);
+            setState(() {
+              list = processJson(value.body);
+              loading = false;
+            }, scroll: scroll);
           } else {
             DatabaseHelper database = DatabaseHelper();
             database.open().then((_) => database
@@ -393,9 +403,11 @@ class _AgendaState extends State<Agenda> {
                           scheduleNotifications();
                           list = value;
                           list.removeWhere((element) => element.trashed == 1);
+                          loading = false;
                         }, scroll: scroll)))));
           }
         } else {
+          setState(() => loading = false);
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
@@ -409,6 +421,7 @@ class _AgendaState extends State<Agenda> {
           );
         }
       }).catchError((_) {
+        setState(() => loading = false);
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
@@ -428,6 +441,7 @@ class _AgendaState extends State<Agenda> {
           .then((value) => database.close().then((_) => setState(() {
                 list = value;
                 list.removeWhere((element) => element.trashed == 0);
+                loading = false;
               }, scroll: scroll))));
     } else if (widget.search) {
       String url = "${Secret.server_url}api/index.php";
@@ -441,7 +455,23 @@ class _AgendaState extends State<Agenda> {
         "password": password,
         "id": widget.data!.id
       }).then((value) {
-        setState(() => list = processJson(value.body), scroll: scroll);
+        setState(() {
+          list = processJson(value.body);
+          loading = false;
+        }, scroll: scroll);
+      }).catchError((_) {
+        setState(() => loading = false);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
+        );
       });
     }
   }
