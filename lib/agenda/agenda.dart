@@ -207,7 +207,11 @@ class _AgendaState extends State<Agenda> {
                       !isSameDay(data.start, list[index - 1].start),
                   firstOfMonth: index == 0 ||
                       !isSameMonth(data.start, list[index - 1].start),
-                  onClosed: () => load(),
+                  onClosed: () {
+                    if (widget.agenda) {
+                      load(showLoading: false);
+                    }
+                  },
                   editable: widget.agenda,
                   search: widget.search);
               return widget.search || kIsWeb
@@ -374,8 +378,10 @@ class _AgendaState extends State<Agenda> {
     }
   }
 
-  void load({bool scroll = false}) {
-    setState(() => loading = true);
+  void load({bool scroll = false, bool showLoading = true}) {
+    if (showLoading) {
+      setState(() => loading = true);
+    }
     if (widget.agenda) {
       String url = "${Secret.server_url}api/index.php";
       String name =
@@ -407,7 +413,14 @@ class _AgendaState extends State<Agenda> {
                         }, scroll: scroll)))));
           }
         } else {
-          setState(() => loading = false);
+          DatabaseHelper database = DatabaseHelper();
+          database.open().then((_) => database
+              .getAgenda(DatabaseHelper.agenda)
+              .then((value) => database.close().then((_) => setState(() {
+                    list = value;
+                    list.removeWhere((element) => element.trashed == 1);
+                    loading = false;
+                  }, scroll: scroll))));
           showDialog(
             context: context,
             builder: (context) => AlertDialogTemplate(
@@ -421,7 +434,14 @@ class _AgendaState extends State<Agenda> {
           );
         }
       }).catchError((_) {
-        setState(() => loading = false);
+        DatabaseHelper database = DatabaseHelper();
+        database.open().then((_) => database
+            .getAgenda(DatabaseHelper.agenda)
+            .then((value) => database.close().then((_) => setState(() {
+                  list = value;
+                  list.removeWhere((element) => element.trashed == 1);
+                  loading = false;
+                }, scroll: scroll))));
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
