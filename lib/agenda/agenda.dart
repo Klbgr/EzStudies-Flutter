@@ -401,8 +401,7 @@ class _AgendaState extends State<Agenda> {
             body: <String, String>{
               "request": "cyu",
               "name": name,
-              "password": password,
-              "id": "21907896"
+              "password": password
             }).catchError((_) => http.Response("", 404));
         if (response.statusCode == 200 && response.body.isNotEmpty) {
           if (kIsWeb) {
