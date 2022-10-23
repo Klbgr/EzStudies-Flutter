@@ -28,7 +28,7 @@ class _AgendaWeekViewCellState extends State<AgendaWeekViewCell> {
         margin: const EdgeInsets.only(left: 1, right: 1, bottom: 1),
         child: OpenContainerTemplate(
             child1: Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(7.5),
                 decoration: BoxDecoration(
                     color: color,
                     borderRadius: const BorderRadius.all(Radius.circular(16))),

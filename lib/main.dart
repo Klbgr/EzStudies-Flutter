@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:animations/animations.dart';
 import 'package:ezstudies/agenda/agenda.dart';
+import 'package:ezstudies/agenda/agenda_view_model.dart';
 import 'package:ezstudies/homeworks/homeworks.dart';
 import 'package:ezstudies/search/search.dart';
 import 'package:ezstudies/settings/Settings.dart';
@@ -129,11 +130,12 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int selectedIndex = 0;
   bool showBanner = true;
+  AgendaViewModel agendaViewModel = AgendaViewModel();
 
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = <Widget>[
-      const Agenda(agenda: true),
+      Agenda(agenda: true, agendaViewModel: agendaViewModel),
       const Search(),
       if (!kIsWeb) const Homeworks(),
       Settings(
@@ -158,7 +160,7 @@ class _MainState extends State<Main> {
           label: AppLocalizations.of(context)!.homeworks,
         ),
       BottomNavigationBarItem(
-        icon: getIcon(3),
+        icon: getIcon(kIsWeb ? 2 : 3),
         label: AppLocalizations.of(context)!.settings,
       ),
     ];
@@ -226,14 +228,14 @@ class _MainState extends State<Main> {
     const List<IconData> icons = <IconData>[
       Icons.view_agenda_outlined,
       Icons.search_outlined,
-      Icons.library_books_outlined,
+      if (!kIsWeb) Icons.library_books_outlined,
       Icons.settings_outlined
     ];
 
     const List<IconData> iconsSelected = <IconData>[
       Icons.view_agenda,
       Icons.search,
-      Icons.library_books,
+      if (!kIsWeb) Icons.library_books,
       Icons.settings
     ];
 
@@ -282,27 +284,31 @@ class _MainState extends State<Main> {
   }
 
   bool tagIsGreater(String tag1, String tag2) {
-    List<int> t1 =
-        tag1.split(".").map((element) => int.parse(element)).toList();
-    List<int> t2 =
-        tag2.split(".").map((element) => int.parse(element)).toList();
-    if (t1[0] > t2[0]) {
-      return true;
-    } else if (t1[0] == t2[0]) {
-      if (t1[1] > t2[1]) {
+    try {
+      List<int> t1 =
+          tag1.split(".").map((element) => int.parse(element)).toList();
+      List<int> t2 =
+          tag2.split(".").map((element) => int.parse(element)).toList();
+      if (t1[0] > t2[0]) {
         return true;
-      } else if (t1[1] == t2[1]) {
-        if (t1[2] > t2[2]) {
+      } else if (t1[0] == t2[0]) {
+        if (t1[1] > t2[1]) {
           return true;
-        } else if (t1[2] == t2[2]) {
-          return false;
+        } else if (t1[1] == t2[1]) {
+          if (t1[2] > t2[2]) {
+            return true;
+          } else if (t1[2] == t2[2]) {
+            return false;
+          } else {
+            return false;
+          }
         } else {
           return false;
         }
       } else {
         return false;
       }
-    } else {
+    } catch (_) {
       return false;
     }
   }

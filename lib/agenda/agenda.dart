@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ezstudies/agenda/agenda_details.dart';
+import 'package:ezstudies/agenda/agenda_view_model.dart';
 import 'package:ezstudies/agenda/agenda_week_view.dart';
 import 'package:ezstudies/search/search_cell_data.dart';
 import 'package:ezstudies/utils/database_helper.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:stacked/stacked.dart';
 
 import '../config/env.dart';
 import '../utils/notifications.dart';
@@ -26,12 +28,16 @@ class Agenda extends StatefulWidget {
       this.trash = false,
       this.search = false,
       this.data,
+      this.onClosed,
+      this.agendaViewModel,
       Key? key})
       : super(key: key);
   final bool agenda;
   final bool trash;
   final bool search;
   final SearchCellData? data;
+  final Function? onClosed;
+  final AgendaViewModel? agendaViewModel;
 
   @override
   State<Agenda> createState() => _AgendaState();
@@ -99,7 +105,8 @@ class _AgendaState extends State<Agenda> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const Agenda(trash: true)));
+                      builder: (context) =>
+                          Agenda(trash: true, onClosed: () => load())));
               break;
             case "week_view":
               Navigator.push(
@@ -325,9 +332,14 @@ class _AgendaState extends State<Agenda> {
     } else if (widget.search) {
       title = widget.data!.name;
     }
-
-    return Template(
-        title: title, menu: menu, back: !widget.agenda, child: child);
+    Template template =
+        Template(title: title, menu: menu, back: !widget.agenda, child: child);
+    return widget.agenda
+        ? ViewModelBuilder<AgendaViewModel>.nonReactive(
+            disposeViewModel: false,
+            viewModelBuilder: () => widget.agendaViewModel!,
+            builder: (context, model, child) => template)
+        : template;
   }
 
   @override
@@ -338,6 +350,14 @@ class _AgendaState extends State<Agenda> {
         Future.delayed(const Duration(milliseconds: 300))
             .then((value) => scrollToToday());
       }
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (widget.onClosed != null) {
+      Future.delayed(const Duration(), () => widget.onClosed!());
     }
   }
 
@@ -360,60 +380,75 @@ class _AgendaState extends State<Agenda> {
     }
   }
 
-  Future<void> load({bool scroll = false, bool showLoading = true}) async {
+  Future<void> load(
+      {bool scroll = false, bool showLoading = true, bool force = true}) async {
     if (showLoading) {
       setState(() => loading = true);
     }
     if (widget.agenda) {
-      String url = "${Secret.server_url}api/index.php";
-      String name =
-          Preferences.sharedPreferences.getString(Preferences.name) ?? "";
-      String password =
-          Preferences.sharedPreferences.getString(Preferences.password) ?? "";
-      http.Response response =
-          await http.post(Uri.parse(url), body: <String, String>{
-        "request": "cyu",
-        "name": name,
-        "password": password,
-      }).catchError((_) => http.Response("", 404));
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        if (kIsWeb) {
-          setState(() {
-            list = processJson(response.body);
-            loading = false;
-          }, scroll: scroll);
+      if (widget.agendaViewModel!.initialized && !force) {
+        setState(() {
+          list = widget.agendaViewModel!.list;
+          loading = false;
+        }, scroll: scroll);
+      } else {
+        String url = "${Secret.server_url}api/index.php";
+        String name =
+            Preferences.sharedPreferences.getString(Preferences.name) ?? "";
+        String password =
+            Preferences.sharedPreferences.getString(Preferences.password) ?? "";
+        http.Response response = await http.post(Uri.parse(url),
+            body: <String, String>{
+              "request": "cyu",
+              "name": name,
+              "password": password,
+              "id": "21907896"
+            }).catchError((_) => http.Response("", 404));
+        if (response.statusCode == 200 && response.body.isNotEmpty) {
+          if (kIsWeb) {
+            setState(() {
+              list = processJson(response.body);
+              widget.agendaViewModel!.list = list;
+              widget.agendaViewModel!.initialized = true;
+              loading = false;
+            }, scroll: scroll);
+          } else {
+            DatabaseHelper database = DatabaseHelper();
+            await database.open();
+            await database.insertAll(processJson(response.body));
+            list = await database.getAgenda(DatabaseHelper.agenda);
+            await database.close();
+            setState(() {
+              scheduleNotifications();
+              list.removeWhere((element) => element.trashed == 1);
+              widget.agendaViewModel!.list = list;
+              widget.agendaViewModel!.initialized = true;
+              loading = false;
+            }, scroll: scroll);
+          }
         } else {
           DatabaseHelper database = DatabaseHelper();
           await database.open();
-          await database.insertAll(processJson(response.body));
           list = await database.getAgenda(DatabaseHelper.agenda);
           await database.close();
           setState(() {
-            scheduleNotifications();
             list.removeWhere((element) => element.trashed == 1);
+            widget.agendaViewModel!.list = list;
+            widget.agendaViewModel!.initialized = true;
             loading = false;
           }, scroll: scroll);
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialogTemplate(
+                title: AppLocalizations.of(context)!.error,
+                content: AppLocalizations.of(context)!.error_internet,
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok))
+                ]),
+          );
         }
-      } else {
-        DatabaseHelper database = DatabaseHelper();
-        await database.open();
-        list = await database.getAgenda(DatabaseHelper.agenda);
-        await database.close();
-        setState(() {
-          list.removeWhere((element) => element.trashed == 1);
-          loading = false;
-        }, scroll: scroll);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialogTemplate(
-              title: AppLocalizations.of(context)!.error,
-              content: AppLocalizations.of(context)!.error_internet,
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-        );
       }
     } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
@@ -550,7 +585,7 @@ class _AgendaState extends State<Agenda> {
   @override
   void initState() {
     super.initState();
-    load(scroll: true);
+    load(scroll: true, force: false);
   }
 
   Future<void> refresh() async {

@@ -19,7 +19,7 @@ class Notifications {
         const InitializationSettings(
             android: AndroidInitializationSettings(
                 "@drawable/ic_launcher_foreground"),
-            iOS: IOSInitializationSettings()));
+            iOS: DarwinInitializationSettings()));
   }
 
   static Future<void> _scheduleNotification(int id, BuildContext context,
@@ -34,7 +34,7 @@ class Notifications {
             "reminder", AppLocalizations.of(context)!.reminder,
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority),
-        iOS: const IOSNotificationDetails(
+        iOS: const DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,

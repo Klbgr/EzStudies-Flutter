@@ -142,7 +142,7 @@ class _SearchState extends State<Search> {
   }
 
   Future<void> search() async {
-    if (query.length >= 3) {
+    if (query.length >= 2) {
       setState(() => loading = true);
       String url = "${Secret.server_url}api/index.php";
       String name =
