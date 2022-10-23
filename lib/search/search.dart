@@ -134,7 +134,14 @@ class _SearchState extends State<Search> {
         title: AppLocalizations.of(context)!.search, menu: menu, child: child);
   }
 
-  void search() {
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  Future<void> search() async {
     if (query.length >= 3) {
       setState(() => loading = true);
       String url = "${Secret.server_url}api/index.php";
@@ -142,39 +149,12 @@ class _SearchState extends State<Search> {
           Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
           Preferences.sharedPreferences.getString(Preferences.password) ?? "";
-      http.post(Uri.parse(url), body: <String, String>{
+      http.Response response =
+          await http.post(Uri.parse(url), body: <String, String>{
         "request": "cyu_search",
         "name": name,
         "password": password,
         "query": Uri.encodeQueryComponent(removeDiacritics(query))
-      }).then((value) {
-        if (value.statusCode == 200) {
-          List<dynamic> results = jsonDecode(value.body)["results"];
-          List<SearchCellData> newList = [];
-          for (var element in results) {
-            newList.add(SearchCellData(
-                id: element["id"],
-                name: element["text"],
-                dept: element["dept"]));
-          }
-          setState(() {
-            list = newList;
-            loading = false;
-          });
-        } else {
-          setState(() => loading = false);
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialogTemplate(
-                title: AppLocalizations.of(context)!.error,
-                content: AppLocalizations.of(context)!.error_internet,
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok))
-                ]),
-          );
-        }
       }).catchError((_) {
         setState(() => loading = false);
         showDialog(
@@ -189,6 +169,31 @@ class _SearchState extends State<Search> {
               ]),
         );
       });
+      if (response.statusCode == 200) {
+        List<dynamic> results = jsonDecode(response.body)["results"];
+        List<SearchCellData> newList = [];
+        for (var element in results) {
+          newList.add(SearchCellData(
+              id: element["id"], name: element["text"], dept: element["dept"]));
+        }
+        setState(() {
+          list = newList;
+          loading = false;
+        });
+      } else {
+        setState(() => loading = false);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
+        );
+      }
     } else {
       setState(() => list = []);
     }

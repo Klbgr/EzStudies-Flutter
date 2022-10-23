@@ -1,6 +1,3 @@
-//TODO widget
-//TODO comments
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -135,54 +132,31 @@ class _MainState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgets;
-    List<BottomNavigationBarItem> items;
-    if (kIsWeb) {
-      widgets = <Widget>[
-        const Agenda(agenda: true),
-        const Search(),
-        Settings(reloadTheme: () => setState(() => widget.reloadTheme())),
-      ];
-      items = <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: getIcon(0),
-          label: AppLocalizations.of(context)!.agenda,
-        ),
-        BottomNavigationBarItem(
-          icon: getIcon(1),
-          label: AppLocalizations.of(context)!.search,
-        ),
-        BottomNavigationBarItem(
-          icon: getIcon(3),
-          label: AppLocalizations.of(context)!.settings,
-        ),
-      ];
-    } else {
-      widgets = <Widget>[
-        const Agenda(agenda: true),
-        const Search(),
-        const Homeworks(),
-        Settings(reloadTheme: () => setState(() => widget.reloadTheme())),
-      ];
-      items = <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: getIcon(0),
-          label: AppLocalizations.of(context)!.agenda,
-        ),
-        BottomNavigationBarItem(
-          icon: getIcon(1),
-          label: AppLocalizations.of(context)!.search,
-        ),
+    List<Widget> widgets = <Widget>[
+      const Agenda(agenda: true),
+      const Search(),
+      if (!kIsWeb) const Homeworks(),
+      Settings(reloadTheme: () => setState(() => widget.reloadTheme())),
+    ];
+    List<BottomNavigationBarItem> items = <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: getIcon(0),
+        label: AppLocalizations.of(context)!.agenda,
+      ),
+      BottomNavigationBarItem(
+        icon: getIcon(1),
+        label: AppLocalizations.of(context)!.search,
+      ),
+      if (!kIsWeb)
         BottomNavigationBarItem(
           icon: getIcon(2),
           label: AppLocalizations.of(context)!.homeworks,
         ),
-        BottomNavigationBarItem(
-          icon: getIcon(3),
-          label: AppLocalizations.of(context)!.settings,
-        ),
-      ];
-    }
+      BottomNavigationBarItem(
+        icon: getIcon(3),
+        label: AppLocalizations.of(context)!.settings,
+      ),
+    ];
 
     Widget bottomNavigationBar = BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

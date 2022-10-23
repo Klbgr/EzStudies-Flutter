@@ -103,13 +103,11 @@ class OpenContainerTemplate extends StatelessWidget {
       this.color,
       this.radius = BorderRadius.zero,
       this.elevation = 0,
-      this.trigger,
       Key? key})
       : super(key: key);
   final Widget child1;
   final Widget child2;
   final Function? onClosed;
-  final Function(Function)? trigger;
   final Color? color;
   final BorderRadiusGeometry radius;
   final double elevation;
@@ -122,12 +120,7 @@ class OpenContainerTemplate extends StatelessWidget {
       openColor: Style.background,
       closedElevation: elevation,
       transitionType: ContainerTransitionType.fadeThrough,
-      closedBuilder: (context, action) {
-        if (trigger != null) {
-          trigger!(action);
-        }
-        return child1;
-      },
+      closedBuilder: (context, action) => child1,
       openBuilder: (context, action) => child2,
       onClosed: (_) {
         if (onClosed != null) {

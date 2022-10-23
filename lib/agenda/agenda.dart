@@ -39,7 +39,6 @@ class Agenda extends StatefulWidget {
 
 class _AgendaState extends State<Agenda> {
   List<AgendaCellData> list = [];
-  bool pop = true;
   ItemScrollController itemScrollController = ItemScrollController();
   bool loading = false;
 
@@ -47,41 +46,18 @@ class _AgendaState extends State<Agenda> {
   Widget build(BuildContext context) {
     list.sort((a, b) => a.start.compareTo(b.start));
 
-    Function trashTrigger = () {};
-    Function weekViewTrigger = () {};
     Widget menu = MenuTemplate(
         items: [
           if (widget.agenda || widget.search)
             PopupMenuItem<String>(
                 value: "week_view",
-                child: OpenContainerTemplate(
-                    child1: Text(AppLocalizations.of(context)!.week_view,
-                        style: TextStyle(fontSize: 16, color: Style.text)),
-                    child2: AgendaWeekView(data: list),
-                    onClosed: () {
-                      if (pop) {
-                        Navigator.pop(context);
-                      }
-                      pop = true;
-                    },
-                    color: Colors.transparent,
-                    trigger: (value) => weekViewTrigger = value)),
+                child: Text(AppLocalizations.of(context)!.week_view,
+                    style: TextStyle(color: Style.text))),
           if (widget.agenda && !kIsWeb)
             PopupMenuItem<String>(
                 value: "trash",
-                child: OpenContainerTemplate(
-                    child1: Text(AppLocalizations.of(context)!.trash,
-                        style: TextStyle(fontSize: 16, color: Style.text)),
-                    child2: const Agenda(trash: true),
-                    onClosed: () {
-                      if (pop) {
-                        Navigator.pop(context);
-                      }
-                      pop = true;
-                      load();
-                    },
-                    color: Colors.transparent,
-                    trigger: (value) => trashTrigger = value)),
+                child: Text(AppLocalizations.of(context)!.trash,
+                    style: TextStyle(color: Style.text))),
           if (widget.agenda && !kIsWeb)
             PopupMenuItem<String>(
                 value: "reset",
@@ -120,12 +96,16 @@ class _AgendaState extends State<Agenda> {
               );
               break;
             case "trash":
-              pop = false;
-              trashTrigger.call();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Agenda(trash: true)));
               break;
             case "week_view":
-              pop = false;
-              weekViewTrigger.call();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AgendaWeekView(data: list)));
               break;
             case "reset":
               showDialog(
@@ -352,10 +332,12 @@ class _AgendaState extends State<Agenda> {
 
   @override
   void setState(VoidCallback fn, {bool scroll = false}) {
-    super.setState(fn);
-    if (scroll) {
-      Future.delayed(const Duration(milliseconds: 300))
-          .then((value) => scrollToToday());
+    if (mounted) {
+      super.setState(fn);
+      if (scroll) {
+        Future.delayed(const Duration(milliseconds: 300))
+            .then((value) => scrollToToday());
+      }
     }
   }
 
@@ -378,7 +360,7 @@ class _AgendaState extends State<Agenda> {
     }
   }
 
-  void load({bool scroll = false, bool showLoading = true}) {
+  Future<void> load({bool scroll = false, bool showLoading = true}) async {
     if (showLoading) {
       setState(() => loading = true);
     }
@@ -388,60 +370,20 @@ class _AgendaState extends State<Agenda> {
           Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
           Preferences.sharedPreferences.getString(Preferences.password) ?? "";
-      http.post(Uri.parse(url), body: <String, String>{
+      http.Response response =
+          await http.post(Uri.parse(url), body: <String, String>{
         "request": "cyu",
         "name": name,
         "password": password,
-      }).then((value) {
-        if (value.statusCode == 200) {
-          if (kIsWeb) {
-            setState(() {
-              list = processJson(value.body);
-              loading = false;
-            }, scroll: scroll);
-          } else {
-            DatabaseHelper database = DatabaseHelper();
-            database.open().then((_) => database
-                .insertAll(processJson(value.body))
-                .then((_) => database
-                    .getAgenda(DatabaseHelper.agenda)
-                    .then((value) => database.close().then((_) => setState(() {
-                          scheduleNotifications();
-                          list = value;
-                          list.removeWhere((element) => element.trashed == 1);
-                          loading = false;
-                        }, scroll: scroll)))));
-          }
-        } else {
-          DatabaseHelper database = DatabaseHelper();
-          database.open().then((_) => database
-              .getAgenda(DatabaseHelper.agenda)
-              .then((value) => database.close().then((_) => setState(() {
-                    list = value;
-                    list.removeWhere((element) => element.trashed == 1);
-                    loading = false;
-                  }, scroll: scroll))));
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialogTemplate(
-                title: AppLocalizations.of(context)!.error,
-                content: AppLocalizations.of(context)!.error_internet,
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok))
-                ]),
-          );
-        }
-      }).catchError((_) {
+      }).catchError((_) async {
         DatabaseHelper database = DatabaseHelper();
-        database.open().then((_) => database
-            .getAgenda(DatabaseHelper.agenda)
-            .then((value) => database.close().then((_) => setState(() {
-                  list = value;
-                  list.removeWhere((element) => element.trashed == 1);
-                  loading = false;
-                }, scroll: scroll))));
+        await database.open();
+        list = await database.getAgenda(DatabaseHelper.agenda);
+        await database.close();
+        setState(() {
+          list.removeWhere((element) => element.trashed == 1);
+          loading = false;
+        }, scroll: scroll);
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
@@ -454,32 +396,67 @@ class _AgendaState extends State<Agenda> {
               ]),
         );
       });
+      if (response.statusCode == 200) {
+        if (kIsWeb) {
+          setState(() {
+            list = processJson(response.body);
+            loading = false;
+          }, scroll: scroll);
+        } else {
+          DatabaseHelper database = DatabaseHelper();
+          await database.open();
+          await database.insertAll(processJson(response.body));
+          list = await database.getAgenda(DatabaseHelper.agenda);
+          await database.close();
+          setState(() {
+            scheduleNotifications();
+            list.removeWhere((element) => element.trashed == 1);
+            loading = false;
+          }, scroll: scroll);
+        }
+      } else {
+        DatabaseHelper database = DatabaseHelper();
+        await database.open();
+        list = await database.getAgenda(DatabaseHelper.agenda);
+        await database.close();
+        setState(() {
+          list.removeWhere((element) => element.trashed == 1);
+          loading = false;
+        }, scroll: scroll);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
+        );
+      }
     } else if (widget.trash) {
       DatabaseHelper database = DatabaseHelper();
-      database.open().then((_) => database
-          .getAgenda(DatabaseHelper.agenda)
-          .then((value) => database.close().then((_) => setState(() {
-                list = value;
-                list.removeWhere((element) => element.trashed == 0);
-                loading = false;
-              }, scroll: scroll))));
+      await database.open();
+      list = await database.getAgenda(DatabaseHelper.agenda);
+      await database.close();
+      setState(() {
+        list.removeWhere((element) => element.trashed == 0);
+        loading = false;
+      }, scroll: scroll);
     } else if (widget.search) {
       String url = "${Secret.server_url}api/index.php";
       String name =
           Preferences.sharedPreferences.getString(Preferences.name) ?? "";
       String password =
           Preferences.sharedPreferences.getString(Preferences.password) ?? "";
-      http.post(Uri.parse(url), body: <String, String>{
-        "request": "cyu",
-        "name": name,
-        "password": password,
-        "id": widget.data!.id
-      }).then((value) {
-        setState(() {
-          list = processJson(value.body);
-          loading = false;
-        }, scroll: scroll);
-      }).catchError((_) {
+      http.Response response = await http.post(Uri.parse(url),
+          body: <String, String>{
+            "request": "cyu",
+            "name": name,
+            "password": password,
+            "id": widget.data!.id
+          }).catchError((_) {
         setState(() => loading = false);
         showDialog(
           context: context,
@@ -493,33 +470,55 @@ class _AgendaState extends State<Agenda> {
               ]),
         );
       });
+      if (response.statusCode == 200) {
+        setState(() {
+          list = processJson(response.body);
+          loading = false;
+        }, scroll: scroll);
+      } else {
+        setState(() => loading = false);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialogTemplate(
+              title: AppLocalizations.of(context)!.error,
+              content: AppLocalizations.of(context)!.error_internet,
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok))
+              ]),
+        );
+      }
     }
   }
 
-  void remove(AgendaCellData data) {
+  Future<void> remove(AgendaCellData data) async {
     if (widget.agenda) {
       data.trashed = 1;
       DatabaseHelper database = DatabaseHelper();
-      database.open().then((_) => database
-          .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
-          .then((_) => database.close().then((_) => setState(() {
-                scheduleNotifications();
-                list.remove(data);
-              }))));
+      await database.open();
+      await database.insertOrReplaceAgenda(DatabaseHelper.agenda, data);
+      await database.close();
+      setState(() {
+        scheduleNotifications();
+        list.remove(data);
+      });
     } else if (widget.trash) {
       data.trashed = 0;
       DatabaseHelper database = DatabaseHelper();
-      database.open().then((_) => database
-          .insertOrReplaceAgenda(DatabaseHelper.agenda, data)
-          .then((_) =>
-              database.close().then((_) => setState(() => list.remove(data)))));
+      await database.open();
+      await database.insertOrReplaceAgenda(DatabaseHelper.agenda, data);
+      await database.close();
+      setState(() => list.remove(data));
     }
   }
 
-  void reset() {
+  Future<void> reset() async {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((_) =>
-        database.reset().then((_) => database.close().then((_) => load())));
+    await database.open();
+    await database.reset();
+    await database.close();
+    load();
   }
 
   void scheduleNotifications() {
@@ -588,6 +587,6 @@ class _AgendaState extends State<Agenda> {
   }
 
   Future<void> refresh() async {
-    load();
+    await load();
   }
 }

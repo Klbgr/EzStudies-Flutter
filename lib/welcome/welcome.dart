@@ -25,6 +25,7 @@ class _WelcomeState extends State<Welcome> {
   final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 16);
   String name = "";
   String password = "";
+  ScrollController controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,24 +38,28 @@ class _WelcomeState extends State<Welcome> {
           content: Text(AppLocalizations.of(context)!.welcome_features,
               style: textStyle, textAlign: TextAlign.center),
           illustration: UnDrawIllustration.features_overview),
-      WelcomePageTemplate(
-          content:
-              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(AppLocalizations.of(context)!.welcome_login,
-                style: textStyle, textAlign: TextAlign.center),
-            Container(
-                margin: const EdgeInsets.only(bottom: 10, top: 20),
-                child: TextFormFieldTemplate(
-                    label: AppLocalizations.of(context)!.name,
-                    icon: Icons.person,
-                    onChanged: (value) => name = value)),
-            TextFormFieldTemplate(
-                label: AppLocalizations.of(context)!.password,
-                icon: Icons.password,
-                onChanged: (value) => password = value,
-                hidden: true)
-          ]),
-          illustration: UnDrawIllustration.login)
+      SingleChildScrollView(
+          reverse: true,
+          controller: controller,
+          child: WelcomePageTemplate(
+              content: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(AppLocalizations.of(context)!.welcome_login,
+                        style: textStyle, textAlign: TextAlign.center),
+                    Container(
+                        margin: const EdgeInsets.only(bottom: 10, top: 20),
+                        child: TextFormFieldTemplate(
+                            label: AppLocalizations.of(context)!.name,
+                            icon: Icons.person,
+                            onChanged: (value) => name = value)),
+                    TextFormFieldTemplate(
+                        label: AppLocalizations.of(context)!.password,
+                        icon: Icons.password,
+                        onChanged: (value) => password = value,
+                        hidden: true)
+                  ]),
+              illustration: UnDrawIllustration.login))
     ];
 
     Widget child = Stack(children: [

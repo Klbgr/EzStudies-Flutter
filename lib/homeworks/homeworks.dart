@@ -139,31 +139,34 @@ class _HomeworksState extends State<Homeworks> {
 
   @override
   void setState(VoidCallback fn) {
-    super.setState(fn);
-    Future.delayed(const Duration(milliseconds: 300))
-        .then((value) => scrollToToday());
+    if (mounted) {
+      super.setState(fn);
+      Future.delayed(const Duration(milliseconds: 300))
+          .then((value) => scrollToToday());
+    }
   }
 
-  void remove(HomeworksCellData data) {
+  Future<void> remove(HomeworksCellData data) async {
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((_) => database
-        .deleteHomeworks(data)
-        .then((_) => database.close().then((_) => setState(() {
-              scheduleNotifications();
-              list.remove(data);
-            }))));
+    await database.open();
+    await database.deleteHomeworks(data);
+    await database.close();
+    setState(() {
+      scheduleNotifications();
+      list.remove(data);
+    });
   }
 
-  void load() {
+  Future<void> load() async {
     setState(() => loading = true);
     DatabaseHelper database = DatabaseHelper();
-    database.open().then((_) => database
-        .getHomeworks()
-        .then((value) => database.close().then((_) => setState(() {
-              scheduleNotifications();
-              list = value;
-              loading = false;
-            }))));
+    await database.open();
+    list = await database.getHomeworks();
+    await database.close();
+    setState(() {
+      scheduleNotifications();
+      loading = false;
+    });
   }
 
   void scrollToToday() {

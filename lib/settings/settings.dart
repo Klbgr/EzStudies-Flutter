@@ -200,10 +200,9 @@ class _SettingsState extends State<Settings> {
         child: child);
   }
 
-  void reloadTheme() {
-    Style.load().then((value) {
-      setState(() => widget.reloadTheme());
-    });
+  Future<void> reloadTheme() async {
+    await Style.load();
+    setState(() => widget.reloadTheme());
   }
 
   void disconnect() {
