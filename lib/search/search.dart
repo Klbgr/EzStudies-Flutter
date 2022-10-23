@@ -155,21 +155,8 @@ class _SearchState extends State<Search> {
         "name": name,
         "password": password,
         "query": Uri.encodeQueryComponent(removeDiacritics(query))
-      }).catchError((_) {
-        setState(() => loading = false);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialogTemplate(
-              title: AppLocalizations.of(context)!.error,
-              content: AppLocalizations.of(context)!.error_internet,
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-        );
-      });
-      if (response.statusCode == 200) {
+      }).catchError((_) => http.Response("", 404));
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
         List<dynamic> results = jsonDecode(response.body)["results"];
         List<SearchCellData> newList = [];
         for (var element in results) {

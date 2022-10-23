@@ -119,8 +119,8 @@ class _EzStudiesState extends State<EzStudies> {
 }
 
 class Main extends StatefulWidget {
-  const Main({required this.reloadTheme, Key? key}) : super(key: key);
-  final Function reloadTheme;
+  const Main({this.reloadTheme, Key? key}) : super(key: key);
+  final Function? reloadTheme;
 
   @override
   State<Main> createState() => _MainState();
@@ -136,7 +136,12 @@ class _MainState extends State<Main> {
       const Agenda(agenda: true),
       const Search(),
       if (!kIsWeb) const Homeworks(),
-      Settings(reloadTheme: () => setState(() => widget.reloadTheme())),
+      Settings(
+          reloadTheme: () => setState(() {
+                if (widget.reloadTheme != null) {
+                  widget.reloadTheme!();
+                }
+              })),
     ];
     List<BottomNavigationBarItem> items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
@@ -244,39 +249,35 @@ class _MainState extends State<Main> {
             color: Style.text));
   }
 
-  void checkUpdate() {
+  Future<void> checkUpdate() async {
     if (!kIsWeb) {
-      http
+      http.Response response = await http
           .get(Uri.parse(
               "https://api.github.com/repos/Klbgr/EzStudies-Flutter/releases/latest"))
-          .then((value) {
-        if (value.statusCode == 200 && value.body.isNotEmpty) {
-          String tag = jsonDecode(value.body)["tag_name"];
-          if ((tagIsGreater(tag, Preferences.packageInfo.version))) {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                        title: Text(AppLocalizations.of(context)!.update),
-                        content:
-                            Text(AppLocalizations.of(context)!.update_desc),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child:
-                                  Text(AppLocalizations.of(context)!.cancel)),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                launchUrl(
-                                    Uri.parse("${Secret.server_url}install"),
-                                    mode: LaunchMode.externalApplication);
-                              },
-                              child:
-                                  Text(AppLocalizations.of(context)!.update)),
-                        ]));
-          }
+          .catchError((_) => http.Response("", 404));
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        String tag = jsonDecode(response.body)["tag_name"];
+        if ((tagIsGreater(tag, Preferences.packageInfo.version))) {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                      title: Text(AppLocalizations.of(context)!.update),
+                      content: Text(AppLocalizations.of(context)!.update_desc),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(AppLocalizations.of(context)!.cancel)),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              launchUrl(
+                                  Uri.parse("${Secret.server_url}install"),
+                                  mode: LaunchMode.externalApplication);
+                            },
+                            child: Text(AppLocalizations.of(context)!.update)),
+                      ]));
         }
-      }).catchError((_) {});
+      }
     }
   }
 

@@ -308,6 +308,7 @@ class WelcomePageTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 0.3;
     return SingleChildScrollView(
+        reverse: true,
         scrollDirection: Axis.vertical,
         child: Container(
           margin: const EdgeInsets.only(left: 20, right: 20, bottom: 80),

@@ -25,7 +25,7 @@ class _WelcomeState extends State<Welcome> {
   final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 16);
   String name = "";
   String password = "";
-  ScrollController controller = ScrollController();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,28 +38,33 @@ class _WelcomeState extends State<Welcome> {
           content: Text(AppLocalizations.of(context)!.welcome_features,
               style: textStyle, textAlign: TextAlign.center),
           illustration: UnDrawIllustration.features_overview),
-      SingleChildScrollView(
-          reverse: true,
-          controller: controller,
-          child: WelcomePageTemplate(
-              content: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(AppLocalizations.of(context)!.welcome_login,
-                        style: textStyle, textAlign: TextAlign.center),
-                    Container(
-                        margin: const EdgeInsets.only(bottom: 10, top: 20),
-                        child: TextFormFieldTemplate(
-                            label: AppLocalizations.of(context)!.name,
-                            icon: Icons.person,
-                            onChanged: (value) => name = value)),
-                    TextFormFieldTemplate(
-                        label: AppLocalizations.of(context)!.password,
-                        icon: Icons.password,
-                        onChanged: (value) => password = value,
-                        hidden: true)
-                  ]),
-              illustration: UnDrawIllustration.login))
+      Stack(children: [
+        WelcomePageTemplate(
+            content:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(AppLocalizations.of(context)!.welcome_login,
+                  style: textStyle, textAlign: TextAlign.center),
+              Container(
+                  margin: const EdgeInsets.only(bottom: 10, top: 20),
+                  child: TextFormFieldTemplate(
+                      initialValue: name,
+                      label: AppLocalizations.of(context)!.name,
+                      icon: Icons.person,
+                      onChanged: (value) => name = value)),
+              TextFormFieldTemplate(
+                  initialValue: password,
+                  label: AppLocalizations.of(context)!.password,
+                  icon: Icons.password,
+                  onChanged: (value) => password = value,
+                  hidden: true)
+            ]),
+            illustration: UnDrawIllustration.login),
+        if (loading)
+          Container(
+              color: Style.background.withOpacity(0.5),
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator())
+      ])
     ];
 
     Widget child = Stack(children: [
@@ -95,8 +100,17 @@ class _WelcomeState extends State<Welcome> {
         duration: animationDuration, curve: animationCurve);
   }
 
-  void start() {
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  Future<void> start() async {
+    setState(() => loading = true);
     if (name.isEmpty || password.isEmpty) {
+      setState(() => loading = false);
       showDialog(
         context: context,
         builder: (context) => AlertDialogTemplate(
@@ -112,49 +126,25 @@ class _WelcomeState extends State<Welcome> {
     } else {
       String encryptedName = encrypt(name, Secret.cipher_key);
       String encryptedPassword = encrypt(password, Secret.cipher_key);
-      http.post(Uri.parse("${Secret.server_url}api/index.php"),
+      http.Response response = await http.post(
+          Uri.parse("${Secret.server_url}api/index.php"),
           body: <String, String>{
             "request": "cyu_check",
             "name": encryptedName,
             "password": encryptedPassword
-          }).then((value) {
-        if (value.statusCode == 200) {
-          if (value.body == "1") {
-            Preferences.sharedPreferences
-                .setString(Preferences.name, encryptedName)
-                .then((value) => Preferences.sharedPreferences
+          }).catchError((_) => http.Response("", 404));
+      if (response.statusCode == 200 && response.body == "1") {
+        Preferences.sharedPreferences
+            .setString(Preferences.name, encryptedName)
+            .then((value) => Preferences.sharedPreferences
                     .setString(Preferences.password, encryptedPassword)
-                    .then((value) => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => Main(reloadTheme: () {})))));
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialogTemplate(
-                  title: AppLocalizations.of(context)!.error,
-                  content: AppLocalizations.of(context)!.error_credentials,
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.ok))
-                  ]),
-            );
-          }
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialogTemplate(
-                title: AppLocalizations.of(context)!.error,
-                content: AppLocalizations.of(context)!.error_internet,
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok))
-                ]),
-          );
-        }
-      }).catchError((e) {
+                    .then((value) {
+                  setState(() => loading = false);
+                  Navigator.pushReplacement(
+                      context, MaterialPageRoute(builder: (_) => const Main()));
+                }));
+      } else {
+        setState(() => loading = false);
         showDialog(
           context: context,
           builder: (context) => AlertDialogTemplate(
@@ -166,7 +156,7 @@ class _WelcomeState extends State<Welcome> {
                     child: Text(AppLocalizations.of(context)!.ok))
               ]),
         );
-      });
+      }
     }
   }
 

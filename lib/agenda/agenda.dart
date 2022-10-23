@@ -264,7 +264,7 @@ class _AgendaState extends State<Agenda> {
           ])),
       if (loading)
         Container(
-            color: Style.background,
+            color: Style.background.withOpacity(0.5),
             alignment: Alignment.center,
             child: const CircularProgressIndicator())
     ]);
@@ -375,28 +375,8 @@ class _AgendaState extends State<Agenda> {
         "request": "cyu",
         "name": name,
         "password": password,
-      }).catchError((_) async {
-        DatabaseHelper database = DatabaseHelper();
-        await database.open();
-        list = await database.getAgenda(DatabaseHelper.agenda);
-        await database.close();
-        setState(() {
-          list.removeWhere((element) => element.trashed == 1);
-          loading = false;
-        }, scroll: scroll);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialogTemplate(
-              title: AppLocalizations.of(context)!.error,
-              content: AppLocalizations.of(context)!.error_internet,
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-        );
-      });
-      if (response.statusCode == 200) {
+      }).catchError((_) => http.Response("", 404));
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
         if (kIsWeb) {
           setState(() {
             list = processJson(response.body);
@@ -456,21 +436,8 @@ class _AgendaState extends State<Agenda> {
             "name": name,
             "password": password,
             "id": widget.data!.id
-          }).catchError((_) {
-        setState(() => loading = false);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialogTemplate(
-              title: AppLocalizations.of(context)!.error,
-              content: AppLocalizations.of(context)!.error_internet,
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-        );
-      });
-      if (response.statusCode == 200) {
+          }).catchError((_) => http.Response("", 404));
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
         setState(() {
           list = processJson(response.body);
           loading = false;

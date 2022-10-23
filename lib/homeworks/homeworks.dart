@@ -126,7 +126,7 @@ class _HomeworksState extends State<Homeworks> {
           ])),
       if (loading)
         Container(
-            color: Style.background,
+            color: Style.background.withOpacity(0.5),
             alignment: Alignment.center,
             child: const CircularProgressIndicator())
     ]);
