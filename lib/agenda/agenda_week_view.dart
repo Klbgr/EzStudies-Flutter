@@ -87,7 +87,10 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
     int now = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < firstDayOfWeeks.length; i++) {
       if (firstDayOfWeeks[i].millisecondsSinceEpoch > now) {
-        selectedPage = i - 1;
+        selectedPage = i-1;
+        if (selectedPage < 0) {
+          selectedPage = 0;
+        }
         controller = PageController(initialPage: selectedPage);
         break;
       }
