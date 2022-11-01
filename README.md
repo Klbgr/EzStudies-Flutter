@@ -28,7 +28,7 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 
 ## Sécurité
 
-Les identifiants de l'utilisateur sont stockées et utilisées de façon sécurisée. 
+Les identifiants de l'utilisateur sont stockés et utilisés de façon sécurisée. 
 
 Tout d'abord, les identifiants de l'utilisateur sont chiffrés avant d'être stockés dans l'appareil. 
 
