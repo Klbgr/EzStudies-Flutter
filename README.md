@@ -42,7 +42,7 @@ L'application ne fonctionne donc uniquement si sa clé de chiffrement est identi
 
 ## Téléchargement
 
-Vous pouvez soit installer vous même les différents fichiers situés dans la section [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases), soit utiliser l'[intallateur en ligne](https://ezstudies.alwaysdata.net/install).
+Vous pouvez télécharger l'application dans la section [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases).
 
 La version Web est accéssible à [cette adresse](https://ezstudies.alwaysdata.net/).
 
@@ -135,7 +135,7 @@ The application therefore only works if its cipher key is identical to that of t
 
 ## Download
 
-You can either download the files in the [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases) section, or use the [online installer](https://ezstudies.alwaysdata.net/install).
+You can download the application in the [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases) section.
 
 The Web version is available at [this address](https://ezstudies.alwaysdata.net/).
 
