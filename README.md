@@ -44,7 +44,7 @@ L'application ne fonctionne donc uniquement si sa clé de chiffrement est identi
 
 Vous pouvez télécharger l'application dans la section [Releases](https://github.com/Klbgr/EzStudies-Flutter/releases).
 
-La version Web est accéssible à [cette adresse](https://ezstudies.alwaysdata.net/).
+La version Web est accessible à [cette adresse](https://ezstudies.alwaysdata.net/).
 
 ### iOS
 
@@ -56,7 +56,7 @@ Vous pouvez en revanche compiler vous-même l'application pour votre iPhone si v
 
 Le code source de l'API personnalisée, utilisée pour faire fonctionner cette application, se trouve dans le dossier `EzStudies-Flutter/web/api`.
 
-L'API est incluse dans ce projet pour facilliter le déploiement de l'application Web.
+L'API est incluse dans ce projet pour faciliter le déploiement de l'application Web.
 
 ## Compilation
 
