@@ -15,7 +15,7 @@ function cyuGetCookies($curl, string $name, string $password, string $cookies_fi
     }
     curl_setopt($curl, CURLOPT_COOKIEJAR, $cookies_filename);
     curl_setopt($curl, CURLOPT_COOKIEFILE, $cookies_filename);
-    curl_setopt($curl, CURLOPT_URL, 'https://services-web.u-cergy.fr/calendar/LdapLogin');
+    curl_setopt($curl, CURLOPT_URL, 'https://services-web.cyu.fr/calendar/LdapLogin');
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     if (($result = curl_exec($curl)) == false || $result == false) {
@@ -39,7 +39,7 @@ function cyuGetCookies($curl, string $name, string $password, string $cookies_fi
     }
 
     // Logging in and getting user cookies
-    $url = "https://services-web.u-cergy.fr/calendar/LdapLogin/Logon";
+    $url = "https://services-web.cyu.fr/calendar/LdapLogin/Logon";
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array('Name' => $name, 'Password' => $password, '__RequestVerificationToken' => $token)));
@@ -85,7 +85,7 @@ function cyuGetCalendar(string $name, string $password, string $id = null) : str
             $id = $params['FederationIds'];
         }
         $timestamp = time();
-        curl_setopt($curl, CURLOPT_URL, 'https://services-web.u-cergy.fr/calendar/Home/GetCalendarData');
+        curl_setopt($curl, CURLOPT_URL, 'https://services-web.cyu.fr/calendar/Home/GetCalendarData');
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array('start' => date("Y-m-d", $timestamp - 60 * 60 * 24 * 15), 'end' => date("Y-m-d", $timestamp + 60 * 60 * 24 * 15), 'resType' => "104", "calView" => "listWeek", "federationIds[]" => $id)));
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
         $result = curl_exec($curl);
@@ -113,7 +113,7 @@ function cyuSearch(string $name, string $password, string $query) : string {
 
     if (cyuGetCookies($curl, $name, $password, $cookies_filename)) {
         // Getting calendar data
-        curl_setopt($curl, CURLOPT_URL, 'https://services-web.u-cergy.fr/calendar/Home/ReadResourceListItems?myResources=false&searchTerm=' . $query . '&pageSize=1000&resType=104');
+        curl_setopt($curl, CURLOPT_URL, 'https://services-web.cyu.fr/calendar/Home/ReadResourceListItems?myResources=false&searchTerm=' . $query . '&pageSize=1000&resType=104');
         $result = curl_exec($curl);
     }
 
