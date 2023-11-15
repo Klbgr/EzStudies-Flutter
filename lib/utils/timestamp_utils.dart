@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:ezstudies/main.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_io/io.dart';
 import 'package:week_of_year/date_week_extensions.dart';
@@ -8,9 +11,12 @@ String timestampToTime(int timestamp) {
 }
 
 String timestampToWeekDay(int timestamp) {
-  return DateFormat("E", getLocale())
-      .format(DateTime.fromMillisecondsSinceEpoch(timestamp))
-      .substring(0, 3);
+  String weekday = DateFormat("E", getLocale())
+      .format(DateTime.fromMillisecondsSinceEpoch(timestamp));
+  if (weekday.length <= 3) {
+    return weekday;
+  }
+  return weekday.substring(0, 3);
 }
 
 String timestampToMonthYear(int timestamp) {
@@ -54,5 +60,21 @@ bool isSameWeek(int timestamp1, int timestamp2) {
 }
 
 String getLocale() {
-  return Platform.localeName;
+  String locale = Platform.localeName;
+  if (!EzStudies.supportedLocales.contains(Locale(locale.split("_").first))) {
+    bool found = false;
+    for (Locale supportedLocale in PlatformDispatcher.instance.locales) {
+      if (EzStudies.supportedLocales
+          .contains(Locale(supportedLocale.languageCode))) {
+        locale = supportedLocale.toString();
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      locale = "en";
+    }
+  }
+
+  return locale;
 }

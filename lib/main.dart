@@ -53,6 +53,10 @@ void main() async {
 
 class EzStudies extends StatefulWidget {
   const EzStudies({super.key});
+  static const List<Locale> supportedLocales = [
+    Locale('en', ''),
+    Locale('fr', ''),
+  ];
 
   @override
   State<EzStudies> createState() => _EzStudiesState();
@@ -101,10 +105,7 @@ class _EzStudiesState extends State<EzStudies> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('en', ''),
-          Locale('fr', ''),
-        ],
+        supportedLocales: EzStudies.supportedLocales,
         title: "EzStudies",
         home: ((Preferences.sharedPreferences.getString(Preferences.name) ?? "")
                     .isNotEmpty &&
