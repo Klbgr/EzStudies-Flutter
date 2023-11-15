@@ -17,7 +17,7 @@ import '../utils/style.dart';
 import '../utils/templates.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({required this.reloadTheme, Key? key}) : super(key: key);
+  const Settings({required this.reloadTheme, super.key});
   final Function reloadTheme;
 
   @override

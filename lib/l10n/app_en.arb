@@ -1,4 +1,5 @@
 {
+  "app_name": "EzStudies",
   "agenda": "Agenda",
   "search": "Search",
   "settings": "Settings",
@@ -67,7 +68,14 @@
   "time": "Time",
   "banner": "Click here to install the app (Android)",
   "update": "Update",
-  "update_desc": "An update is available",
+  "update_desc": "An update is available : version {version1} -> {version2}\n\nWhat's new :\n{changelog}",
+  "@update_desc": {
+    "placeholders": {
+      "version1": {},
+      "version2": {},
+      "changelog": {}
+    }
+  },
   "monday": "Monday",
   "tuesday": "Tuesday",
   "wednesday": "Wednesday",
@@ -76,5 +84,7 @@
   "saturday": "Saturday",
   "sunday": "Sunday",
   "week_view": "Week view",
-  "week_of": "Week of"
+  "week_of": "Week of",
+  "open": "Open",
+  "downloading": "Downloading"
 }

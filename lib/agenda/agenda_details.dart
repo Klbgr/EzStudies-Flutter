@@ -15,8 +15,7 @@ class AgendaDetails extends StatefulWidget {
       this.search = false,
       this.onClosed,
       this.onOpened,
-      Key? key})
-      : super(key: key);
+      super.key});
   final bool add;
   final AgendaCellData? data;
   final bool editable;

@@ -14,8 +14,7 @@ class Template extends StatelessWidget {
       this.menu,
       this.back = false,
       this.compact = false,
-      Key? key})
-      : super(key: key);
+      super.key});
   final String title;
   final Widget child;
   final Widget? menu;
@@ -71,8 +70,7 @@ class Template extends StatelessWidget {
 }
 
 class MenuTemplate extends StatelessWidget {
-  const MenuTemplate({required this.items, this.onSelected, Key? key})
-      : super(key: key);
+  const MenuTemplate({required this.items, this.onSelected, super.key});
   final List<PopupMenuItem<String>> items;
   final Function(String)? onSelected;
 
@@ -103,8 +101,7 @@ class OpenContainerTemplate extends StatelessWidget {
       this.color,
       this.radius = BorderRadius.zero,
       this.elevation = 0,
-      Key? key})
-      : super(key: key);
+      super.key});
   final Widget child1;
   final Widget child2;
   final Function? onClosed;
@@ -133,8 +130,7 @@ class OpenContainerTemplate extends StatelessWidget {
 
 class AlertDialogTemplate extends StatelessWidget {
   const AlertDialogTemplate(
-      {required this.title, required this.content, this.actions, Key? key})
-      : super(key: key);
+      {required this.title, required this.content, this.actions, super.key});
   final String title;
   final String content;
   final List<Widget>? actions;
@@ -142,7 +138,10 @@ class AlertDialogTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        title: Text(title), content: Text(content), actions: actions);
+        title: Text(title),
+        content: Text(content),
+        scrollable: true,
+        actions: actions);
   }
 }
 
@@ -159,8 +158,7 @@ class TextFormFieldTemplate extends StatefulWidget {
       this.dateTime,
       this.hidden = false,
       this.multiline = false,
-      Key? key})
-      : super(key: key);
+      super.key});
   final String label;
   final IconData icon;
   final String? initialValue;
@@ -264,8 +262,7 @@ class WelcomeFABTemplate extends StatelessWidget {
       this.previous = false,
       this.begin = false,
       required this.onPressed,
-      Key? key})
-      : super(key: key);
+      super.key});
   final bool next;
   final bool previous;
   final bool begin;
@@ -299,8 +296,7 @@ class WelcomeFABTemplate extends StatelessWidget {
 
 class WelcomePageTemplate extends StatelessWidget {
   const WelcomePageTemplate(
-      {required this.content, required this.illustration, Key? key})
-      : super(key: key);
+      {required this.content, required this.illustration, super.key});
   final Widget content;
   final UnDrawIllustration illustration;
 

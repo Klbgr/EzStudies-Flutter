@@ -9,7 +9,7 @@ import 'agenda_cell_data.dart';
 import 'agenda_week_view_cell.dart';
 
 class AgendaWeekView extends StatefulWidget {
-  const AgendaWeekView({required this.data, Key? key}) : super(key: key);
+  const AgendaWeekView({required this.data, super.key});
   final List<AgendaCellData> data;
 
   @override

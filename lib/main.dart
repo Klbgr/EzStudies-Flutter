@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:animations/animations.dart';
 import 'package:ezstudies/agenda/agenda.dart';
@@ -10,6 +9,7 @@ import 'package:ezstudies/settings/Settings.dart';
 import 'package:ezstudies/utils/notifications.dart';
 import 'package:ezstudies/utils/preferences.dart';
 import 'package:ezstudies/utils/style.dart';
+import 'package:ezstudies/utils/update.dart';
 import 'package:ezstudies/welcome/welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:system_theme/system_theme.dart';
 import 'package:universal_io/io.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,6 +40,7 @@ void main() async {
     if (!Platform.isIOS) {
       SystemTheme.accentColor;
     }
+    await Update.init();
     await Preferences.load();
     await Style.load();
     await Notifications.initNotifications();
@@ -52,7 +52,7 @@ void main() async {
 }
 
 class EzStudies extends StatefulWidget {
-  const EzStudies({Key? key}) : super(key: key);
+  const EzStudies({super.key});
 
   @override
   State<EzStudies> createState() => _EzStudiesState();
@@ -120,7 +120,7 @@ class _EzStudiesState extends State<EzStudies> {
 }
 
 class Main extends StatefulWidget {
-  const Main({this.reloadTheme, Key? key}) : super(key: key);
+  const Main({this.reloadTheme, super.key});
   final Function? reloadTheme;
 
   @override
@@ -221,7 +221,7 @@ class _MainState extends State<Main> {
   @override
   void initState() {
     super.initState();
-    checkUpdate();
+    Update.checkUpdate(context);
   }
 
   Widget getIcon(int index) {
@@ -249,67 +249,5 @@ class _MainState extends State<Main> {
         child: Icon(
             (index == selectedIndex) ? iconsSelected[index] : icons[index],
             color: Style.text));
-  }
-
-  Future<void> checkUpdate() async {
-    if (!kIsWeb) {
-      http.Response response = await http
-          .get(Uri.parse(
-              "https://api.github.com/repos/Klbgr/EzStudies-Flutter/releases/latest"))
-          .catchError((_) => http.Response("", 404));
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        String tag = jsonDecode(response.body)["tag_name"];
-        if ((tagIsGreater(tag, Preferences.packageInfo.version))) {
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                      title: Text(AppLocalizations.of(context)!.update),
-                      content: Text(AppLocalizations.of(context)!.update_desc),
-                      actions: [
-                        TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.cancel)),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              launchUrl(
-                                  Uri.parse("${Secret.server_url}install"),
-                                  mode: LaunchMode.externalApplication);
-                            },
-                            child: Text(AppLocalizations.of(context)!.update)),
-                      ]));
-        }
-      }
-    }
-  }
-
-  bool tagIsGreater(String tag1, String tag2) {
-    try {
-      List<int> t1 =
-          tag1.split(".").map((element) => int.parse(element)).toList();
-      List<int> t2 =
-          tag2.split(".").map((element) => int.parse(element)).toList();
-      if (t1[0] > t2[0]) {
-        return true;
-      } else if (t1[0] == t2[0]) {
-        if (t1[1] > t2[1]) {
-          return true;
-        } else if (t1[1] == t2[1]) {
-          if (t1[2] > t2[2]) {
-            return true;
-          } else if (t1[2] == t2[2]) {
-            return false;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      return false;
-    }
   }
 }

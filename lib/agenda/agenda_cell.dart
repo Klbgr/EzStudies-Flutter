@@ -15,8 +15,7 @@ class AgendaCell extends StatelessWidget {
       required this.onClosed,
       this.editable = true,
       this.search = false,
-      Key? key})
-      : super(key: key);
+      super.key});
   final bool firstOfDay;
   final bool firstOfMonth;
   final AgendaCellData data;

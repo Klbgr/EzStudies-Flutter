@@ -13,7 +13,7 @@ class Notifications {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestPermission();
+        ?.requestNotificationsPermission();
     initializeTimeZones();
     await flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(

@@ -7,7 +7,7 @@ import '../utils/preferences.dart';
 import '../utils/style.dart';
 
 class ColorDialog extends StatefulWidget {
-  const ColorDialog({required this.onClosed, Key? key}) : super(key: key);
+  const ColorDialog({required this.onClosed, super.key});
   final Function onClosed;
 
   @override
@@ -77,6 +77,7 @@ class _ColorDialogState extends State<ColorDialog> {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.accent_color),
       content: column,
+      scrollable: true,
       actions: <Widget>[
         TextButton(
             child: Text(AppLocalizations.of(context)!.ok,

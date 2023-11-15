@@ -7,8 +7,7 @@ import '../utils/style.dart';
 import '../utils/templates.dart';
 
 class HomeworksDetails extends StatelessWidget {
-  const HomeworksDetails({this.data, this.add = false, Key? key})
-      : super(key: key);
+  const HomeworksDetails({this.data, this.add = false, super.key});
   final HomeworksCellData? data;
   final bool add;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(top: 10, bottom: 10);

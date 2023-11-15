@@ -8,8 +8,7 @@ import '../utils/timestamp_utils.dart';
 
 class AgendaWeekViewCell extends StatefulWidget {
   const AgendaWeekViewCell(
-      {required this.data, this.onClosed, this.onOpened, Key? key})
-      : super(key: key);
+      {required this.data, this.onClosed, this.onOpened, super.key});
   final AgendaCellData data;
   final Function? onClosed;
   final Function? onOpened;

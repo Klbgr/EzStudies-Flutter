@@ -5,7 +5,7 @@ import '../utils/preferences.dart';
 import '../utils/style.dart';
 
 class ThemeDialog extends StatefulWidget {
-  const ThemeDialog({required this.onClosed, Key? key}) : super(key: key);
+  const ThemeDialog({required this.onClosed, super.key});
   final Function onClosed;
 
   @override
@@ -42,6 +42,7 @@ class _ThemeDialogState extends State<ThemeDialog> {
       backgroundColor: Style.background,
       title: Text(AppLocalizations.of(context)!.theme),
       content: column,
+      scrollable: true,
       actions: <Widget>[
         TextButton(
             child: Text(AppLocalizations.of(context)!.ok,

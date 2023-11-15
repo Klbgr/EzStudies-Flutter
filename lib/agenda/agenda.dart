@@ -30,8 +30,7 @@ class Agenda extends StatefulWidget {
       this.data,
       this.onClosed,
       this.agendaViewModel,
-      Key? key})
-      : super(key: key);
+      super.key});
   final bool agenda;
   final bool trash;
   final bool search;

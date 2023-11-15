@@ -14,7 +14,7 @@ import '../utils/timestamp_utils.dart';
 import 'homeworks_cell_data.dart';
 
 class Homeworks extends StatefulWidget {
-  const Homeworks({Key? key}) : super(key: key);
+  const Homeworks({super.key});
 
   @override
   State<Homeworks> createState() => _HomeworksState();
@@ -206,8 +206,7 @@ class _HomeworksState extends State<Homeworks> {
 
 class _HomeworksCell extends StatefulWidget {
   const _HomeworksCell(this.data,
-      {required this.onClosed, required this.onChanged, Key? key})
-      : super(key: key);
+      {required this.onClosed, required this.onChanged});
   final HomeworksCellData data;
   final Function onClosed;
   final Function onChanged;

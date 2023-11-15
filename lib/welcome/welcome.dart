@@ -9,9 +9,10 @@ import '../utils/cipher.dart';
 import '../utils/preferences.dart';
 import '../utils/style.dart';
 import '../utils/templates.dart';
+import '../utils/update.dart';
 
 class Welcome extends StatefulWidget {
-  const Welcome({Key? key}) : super(key: key);
+  const Welcome({super.key});
 
   @override
   State<Welcome> createState() => _WelcomeState();
@@ -91,6 +92,12 @@ class _WelcomeState extends State<Welcome> {
         child: child);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    Update.checkUpdate(context);
+  }
+
   void next() {
     pageController.nextPage(duration: animationDuration, curve: animationCurve);
   }
@@ -107,7 +114,7 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
-  Future<void> start() async {
+  void start() {
     setState(() => loading = true);
     if (name.isEmpty || password.isEmpty) {
       setState(() => loading = false);
@@ -126,37 +133,40 @@ class _WelcomeState extends State<Welcome> {
     } else {
       String encryptedName = encrypt(name, Secret.cipher_key);
       String encryptedPassword = encrypt(password, Secret.cipher_key);
-      http.Response response = await http.post(
-          Uri.parse("${Secret.server_url}api/index.php"),
-          body: <String, String>{
-            "request": "cyu_check",
-            "name": encryptedName,
-            "password": encryptedPassword
-          }).catchError((_) => http.Response("", 404));
-      if (response.statusCode == 200 && response.body == "1") {
-        Preferences.sharedPreferences
-            .setString(Preferences.name, encryptedName)
-            .then((value) => Preferences.sharedPreferences
-                    .setString(Preferences.password, encryptedPassword)
-                    .then((value) {
-                  setState(() => loading = false);
-                  Navigator.pushReplacement(
-                      context, MaterialPageRoute(builder: (_) => const Main()));
-                }));
-      } else {
-        setState(() => loading = false);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialogTemplate(
-              title: AppLocalizations.of(context)!.error,
-              content: AppLocalizations.of(context)!.error_internet,
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok))
-              ]),
-        );
-      }
+      http
+          .post(Uri.parse("${Secret.server_url}api/index.php"),
+              body: <String, String>{
+                "request": "cyu_check",
+                "name": encryptedName,
+                "password": encryptedPassword
+              })
+          .catchError((_) => http.Response("", 404))
+          .then((response) {
+            if (response.statusCode == 200 && response.body == "1") {
+              Preferences.sharedPreferences
+                  .setString(Preferences.name, encryptedName)
+                  .then((value) => Preferences.sharedPreferences
+                          .setString(Preferences.password, encryptedPassword)
+                          .then((value) {
+                        setState(() => loading = false);
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (_) => const Main()));
+                      }));
+            } else {
+              setState(() => loading = false);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialogTemplate(
+                    title: AppLocalizations.of(context)!.error,
+                    content: AppLocalizations.of(context)!.error_internet,
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(AppLocalizations.of(context)!.ok))
+                    ]),
+              );
+            }
+          });
     }
   }
 
