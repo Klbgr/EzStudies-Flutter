@@ -10,10 +10,13 @@ class Notifications {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initNotifications() async {
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    if (!await _checkPermission()) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    }
+
     initializeTimeZones();
     await flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(
@@ -22,8 +25,19 @@ class Notifications {
             iOS: DarwinInitializationSettings()));
   }
 
+  static Future<bool> _checkPermission() async {
+    return await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>()
+            ?.areNotificationsEnabled() ??
+        false;
+  }
+
   static Future<void> _scheduleNotification(int id, BuildContext context,
       String title, String body, int timestamp) async {
+    if (!await _checkPermission()) {
+      return;
+    }
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       title,

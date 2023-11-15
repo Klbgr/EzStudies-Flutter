@@ -532,7 +532,7 @@ class _AgendaState extends State<Agenda> {
   List<AgendaCellData> processJson(String json) {
     List<AgendaCellData> list = [];
     if (json.isNotEmpty) {
-      List<dynamic> data = jsonDecode(json);
+      List<dynamic> data = jsonDecode(json) ?? [];
       for (int i = 0; i < data.length; i++) {
         try {
           var item = data[i];
