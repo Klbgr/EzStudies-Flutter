@@ -250,27 +250,27 @@ class _AgendaState extends State<Agenda> {
           right: 20,
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             if (list.isNotEmpty)
-              Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  child: FloatingActionButton(
-                      tooltip: AppLocalizations.of(context)!.scroll_to_today,
-                      onPressed: () => scrollToToday(),
-                      backgroundColor: Style.primary.withOpacity(0.75),
-                      child: Icon(Icons.today, color: Style.text))),
+              FloatingActionButton(
+                  tooltip: AppLocalizations.of(context)!.scroll_to_today,
+                  onPressed: () => scrollToToday(),
+                  backgroundColor: Style.primary,
+                  child: Icon(Icons.today, color: Style.text)),
             if (!kIsWeb && widget.agenda)
-              OpenContainerTemplate(
-                  child1: FloatingActionButton(
-                      tooltip: AppLocalizations.of(context)!.add,
-                      heroTag: "add",
-                      elevation: 0,
-                      onPressed: null,
-                      backgroundColor: Colors.transparent,
-                      child: Icon(Icons.add, color: Style.text)),
-                  child2: const AgendaDetails(add: true),
-                  onClosed: () => load(),
-                  radius: const BorderRadius.all(Radius.circular(32)),
-                  elevation: 6,
-                  color: Style.primary.withOpacity(0.75))
+              Container(
+                  margin: const EdgeInsets.only(top: 15),
+                  child: OpenContainerTemplate(
+                      child1: FloatingActionButton(
+                          tooltip: AppLocalizations.of(context)!.add,
+                          heroTag: "add",
+                          elevation: 0,
+                          onPressed: null,
+                          backgroundColor: Colors.transparent,
+                          child: Icon(Icons.add, color: Style.text)),
+                      child2: const AgendaDetails(add: true),
+                      onClosed: () => load(),
+                      radius: const BorderRadius.all(Radius.circular(32)),
+                      elevation: 6,
+                      color: Style.primary))
           ])),
       if (loading)
         Container(
