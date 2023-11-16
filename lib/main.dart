@@ -11,6 +11,7 @@ import 'package:ezstudies/utils/preferences.dart';
 import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/utils/update.dart';
 import 'package:ezstudies/welcome/welcome.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -32,23 +33,28 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     if (!kIsWeb) {
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
       await FirebaseCrashlytics.instance
           .setCrashlyticsCollectionEnabled(!kDebugMode);
+      await Update.init();
     }
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(!kDebugMode);
+    await FirebaseAnalytics.instance.logAppOpen();
     if (!Platform.isIOS) {
       SystemTheme.accentColor;
     }
-    await Update.init();
     await Preferences.load();
     await Style.load();
     await Notifications.initNotifications();
     setPathUrlStrategy();
     runApp(const EzStudies());
-  },
-      (error, stack) =>
-          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
+  }, (error, stack) {
+    if (!kIsWeb) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
+  });
 }
 
 class EzStudies extends StatefulWidget {

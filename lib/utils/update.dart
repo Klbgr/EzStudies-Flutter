@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Update {
-  static late Directory temp;
+  static Directory? temp;
   static String port = "port";
 
   static Future<void> init() async {
@@ -150,7 +150,7 @@ class Update {
     try {
       FlutterDownloader.enqueue(
               url: url,
-              savedDir: temp.path,
+              savedDir: temp!.path,
               showNotification: false,
               openFileFromNotification: false,
               fileName: downloadFilename)
@@ -186,7 +186,7 @@ class Update {
             FlutterDownloader.remove(taskId: id);
           } catch (_) {}
           Navigator.pop(context);
-          OpenFilex.open("${temp.path}/$downloadFilename",
+          OpenFilex.open("${temp?.path}/$downloadFilename",
               type: "application/vnd.android.package-archive");
         } else if (DownloadTaskStatus.fromInt(status) ==
             DownloadTaskStatus.running) {
