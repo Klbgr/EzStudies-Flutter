@@ -156,19 +156,23 @@ class _MainState extends State<Main> {
       BottomNavigationBarItem(
         icon: getIcon(0),
         label: AppLocalizations.of(context)!.agenda,
+        tooltip: AppLocalizations.of(context)!.agenda
       ),
       BottomNavigationBarItem(
         icon: getIcon(1),
         label: AppLocalizations.of(context)!.search,
+        tooltip: AppLocalizations.of(context)!.search
       ),
       if (!kIsWeb)
         BottomNavigationBarItem(
           icon: getIcon(2),
           label: AppLocalizations.of(context)!.homeworks,
+          tooltip: AppLocalizations.of(context)!.homeworks
         ),
       BottomNavigationBarItem(
         icon: getIcon(kIsWeb ? 2 : 3),
         label: AppLocalizations.of(context)!.settings,
+        tooltip: AppLocalizations.of(context)!.settings
       ),
     ];
 

@@ -102,16 +102,15 @@ class _HomeworksState extends State<Homeworks> {
           right: 20,
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             OpenContainerTemplate(
-                child1: FloatingActionButton.extended(
+                child1: FloatingActionButton(
+                  tooltip: AppLocalizations.of(context)!.add,
                     elevation: 0,
                     onPressed: null,
                     backgroundColor: Colors.transparent,
-                    label: Text(AppLocalizations.of(context)!.add,
-                        style: TextStyle(color: Style.text)),
-                    icon: Icon(Icons.add, color: Style.text)),
+                    child: Icon(Icons.add, color: Style.text)),
                 child2: const HomeworksDetails(add: true),
                 onClosed: () => load(),
-                radius: const BorderRadius.all(Radius.circular(24)),
+                radius: const BorderRadius.all(Radius.circular(32)),
                 elevation: 6,
                 color: Style.primary.withOpacity(0.75)),
             if (list.isNotEmpty)
