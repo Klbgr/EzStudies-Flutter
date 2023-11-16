@@ -51,13 +51,16 @@ class _WelcomeState extends State<Welcome> {
                       initialValue: name,
                       label: AppLocalizations.of(context)!.name,
                       icon: Icons.person,
-                      onChanged: (value) => name = value)),
+                      onChanged: (value) => name = value,
+                      autofillHints: const [AutofillHints.username])),
               TextFormFieldTemplate(
-                  initialValue: password,
-                  label: AppLocalizations.of(context)!.password,
-                  icon: Icons.password,
-                  onChanged: (value) => password = value,
-                  hidden: true)
+                initialValue: password,
+                label: AppLocalizations.of(context)!.password,
+                icon: Icons.password,
+                onChanged: (value) => password = value,
+                hidden: true,
+                autofillHints: const [AutofillHints.password],
+              )
             ]),
             illustration: UnDrawIllustration.login),
         if (loading)

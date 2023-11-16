@@ -158,6 +158,7 @@ class TextFormFieldTemplate extends StatefulWidget {
       this.dateTime,
       this.hidden = false,
       this.multiline = false,
+        this.autofillHints,
       super.key});
   final String label;
   final IconData icon;
@@ -170,6 +171,7 @@ class TextFormFieldTemplate extends StatefulWidget {
   final DateTime? dateTime;
   final bool hidden;
   final bool multiline;
+  final List<String>? autofillHints;
 
   @override
   State<TextFormFieldTemplate> createState() => _TextFormFieldTemplateState();
@@ -181,6 +183,7 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofillHints: widget.autofillHints,
       minLines: 1,
       maxLines: widget.multiline ? null : 1,
       keyboardType: widget.multiline ? TextInputType.multiline : null,
