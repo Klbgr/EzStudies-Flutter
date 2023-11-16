@@ -210,17 +210,23 @@ class _AgendaState extends State<Agenda> {
                       background: Container(
                           color: widget.agenda ? Colors.red : Colors.green,
                           child: Container(
-                              margin:
-                                  const EdgeInsets.only(left: 20, right: 20),
+                              margin: const EdgeInsets.only(left: 20),
                               child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Icon(
                                         widget.agenda
                                             ? Icons.delete
                                             : Icons.restore_from_trash,
-                                        color: Style.text),
+                                        color: Style.text)
+                                  ]))),
+                      secondaryBackground: Container(
+                          color: widget.agenda ? Colors.red : Colors.green,
+                          child: Container(
+                              margin: const EdgeInsets.only(right: 20),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
                                     Icon(
                                         widget.agenda
                                             ? Icons.delete
