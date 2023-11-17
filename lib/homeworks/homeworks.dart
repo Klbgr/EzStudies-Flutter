@@ -101,27 +101,26 @@ class _HomeworksState extends State<Homeworks> {
           bottom: 20,
           right: 20,
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            OpenContainerTemplate(
-                child1: FloatingActionButton(
-                  tooltip: AppLocalizations.of(context)!.add,
-                    elevation: 0,
-                    onPressed: null,
-                    backgroundColor: Colors.transparent,
-                    child: Icon(Icons.add, color: Style.text)),
-                child2: const HomeworksDetails(add: true),
-                onClosed: () => load(),
-                radius: const BorderRadius.all(Radius.circular(32)),
-                elevation: 6,
-                color: Style.primary.withOpacity(0.75)),
             if (list.isNotEmpty)
-              Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: FloatingActionButton.extended(
-                      onPressed: () => scrollToToday(),
-                      label: Text(AppLocalizations.of(context)!.scroll_to_today,
-                          style: TextStyle(color: Style.text)),
-                      backgroundColor: Style.primary.withOpacity(0.75),
-                      icon: Icon(Icons.today, color: Style.text)))
+              FloatingActionButton(
+                  onPressed: () => scrollToToday(),
+                  tooltip: AppLocalizations.of(context)!.scroll_to_today,
+                  backgroundColor: Style.primary,
+                  child: Icon(Icons.today, color: Style.text)),
+            Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: OpenContainerTemplate(
+                    child1: FloatingActionButton(
+                        tooltip: AppLocalizations.of(context)!.add,
+                        elevation: 0,
+                        onPressed: null,
+                        backgroundColor: Colors.transparent,
+                        child: Icon(Icons.add, color: Style.text)),
+                    child2: const HomeworksDetails(add: true),
+                    onClosed: () => load(),
+                    radius: const BorderRadius.all(Radius.circular(32)),
+                    elevation: 6,
+                    color: Style.primary)),
           ])),
       if (loading)
         Container(

@@ -257,7 +257,7 @@ class _AgendaState extends State<Agenda> {
                   child: Icon(Icons.today, color: Style.text)),
             if (!kIsWeb && widget.agenda)
               Container(
-                  margin: const EdgeInsets.only(top: 15),
+                  margin: const EdgeInsets.only(top: 10),
                   child: OpenContainerTemplate(
                       child1: FloatingActionButton(
                           tooltip: AppLocalizations.of(context)!.add,
