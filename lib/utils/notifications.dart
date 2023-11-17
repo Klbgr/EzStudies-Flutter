@@ -15,6 +15,10 @@ class Notifications {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestExactAlarmsPermission();
     }
 
     initializeTimeZones();
@@ -26,11 +30,16 @@ class Notifications {
   }
 
   static Future<bool> _checkPermission() async {
-    return await flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.areNotificationsEnabled() ??
-        false;
+    return (await flutterLocalNotificationsPlugin
+                .resolvePlatformSpecificImplementation<
+                    AndroidFlutterLocalNotificationsPlugin>()
+                ?.areNotificationsEnabled() ??
+            false) &&
+        (await flutterLocalNotificationsPlugin
+                .resolvePlatformSpecificImplementation<
+                    AndroidFlutterLocalNotificationsPlugin>()
+                ?.canScheduleExactNotifications() ??
+            false);
   }
 
   static Future<void> _scheduleNotification(int id, BuildContext context,
@@ -45,7 +54,7 @@ class Notifications {
       TZDateTime.fromMillisecondsSinceEpoch(local, timestamp),
       NotificationDetails(
         android: AndroidNotificationDetails(
-            "reminder", AppLocalizations.of(context)!.reminder,
+            "reminder", AppLocalizations.of(context)!.reminders,
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority),
         iOS: const DarwinNotificationDetails(
@@ -56,7 +65,7 @@ class Notifications {
       ),
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
     );
   }
 
@@ -72,7 +81,7 @@ class Notifications {
                   _scheduleNotification(
                       i,
                       context,
-                      AppLocalizations.of(context)!.reminder,
+                      AppLocalizations.of(context)!.notifications_agenda_title,
                       value[i].description,
                       value[i].start - 15 * 60 * 1000);
                 }
@@ -92,7 +101,8 @@ class Notifications {
                   _scheduleNotification(
                       i + 1000,
                       context,
-                      AppLocalizations.of(context)!.reminder,
+                      AppLocalizations.of(context)!
+                          .notifications_homeworks_title,
                       value[i].description,
                       value[i].date - 24 * 60 * 60 * 1000);
                 }
