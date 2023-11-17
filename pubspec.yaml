@@ -91,6 +91,9 @@ flutter_launcher_icons:
 
   web:
     generate: true
+    image_path: "images/EzStudies_logo.png"
+    background_color: "#000000"
+    theme_color: "#000000"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
