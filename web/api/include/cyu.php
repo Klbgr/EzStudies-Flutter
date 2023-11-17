@@ -1,5 +1,12 @@
 <?php 
 
+// Setting dummy filename according to OS, to keep cookies in memory
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $COOKIES_DUMMY_FILENAME = "NULL";
+} else {
+    $COOKIES_DUMMY_FILENAME = "/dev/null";
+}
+
 /**
  * Get cookies to use Celcat's API
  * @param curl Curl
@@ -10,9 +17,6 @@
  */
 function cyuGetCookies($curl, string $name, string $password, string $cookies_filename) : bool {
     // Getting the cookies and HTML source code
-    if (!file_exists("./cache")) {
-        mkdir("./cache");
-    }
     curl_setopt($curl, CURLOPT_COOKIEJAR, $cookies_filename);
     curl_setopt($curl, CURLOPT_COOKIEFILE, $cookies_filename);
     curl_setopt($curl, CURLOPT_URL, 'https://services-web.cyu.fr/calendar/LdapLogin');
@@ -57,10 +61,10 @@ function cyuGetCookies($curl, string $name, string $password, string $cookies_fi
  * @param password Password of the student
  */
 function cyuCheck(string $name, string $password) : bool {
-    $cookies_filename = "./cache/" . $name;
+    global $COOKIES_DUMMY_FILENAME;
     $curl = curl_init();
-    $result = cyuGetCookies($curl, $name, $password, $cookies_filename);
-    cyuClose($curl, $cookies_filename);
+    $result = cyuGetCookies($curl, $name, $password, $COOKIES_DUMMY_FILENAME);
+    cyuClose($curl);
     return $result;
 }
 
@@ -71,14 +75,14 @@ function cyuCheck(string $name, string $password) : bool {
  * @return string Calendar of the student
  */
 function cyuGetCalendar(string $name, string $password, string $id = null) : string {
+    global $COOKIES_DUMMY_FILENAME;
     if ($name == null || $password == null || $name == "" || $password == "") {
         return "";
     }
-    $cookies_filename = "./cache/" . $name;
     $curl = curl_init();
     $result = "";
 
-    if (cyuGetCookies($curl, $name, $password, $cookies_filename)) {
+    if (cyuGetCookies($curl, $name, $password, $COOKIES_DUMMY_FILENAME)) {
         // Getting calendar data
         if ($id == null) {
             parse_str(parse_url(curl_getinfo($curl, CURLINFO_EFFECTIVE_URL))['query'], $params);
@@ -91,7 +95,7 @@ function cyuGetCalendar(string $name, string $password, string $id = null) : str
         $result = curl_exec($curl);
     }
 
-    cyuClose($curl, $cookies_filename);
+    cyuClose($curl);
 
     return $result;
 }
@@ -104,20 +108,20 @@ function cyuGetCalendar(string $name, string $password, string $id = null) : str
  * @return string Search result
  */
 function cyuSearch(string $name, string $password, string $query) : string {
+    global $COOKIES_DUMMY_FILENAME;
     if ($name == null || $password == null || $name == "" || $password == "") {
         return "";
     }
-    $cookies_filename = "./cache/" . $name;
     $curl = curl_init();
     $result = "";
 
-    if (cyuGetCookies($curl, $name, $password, $cookies_filename)) {
+    if (cyuGetCookies($curl, $name, $password, $COOKIES_DUMMY_FILENAME)) {
         // Getting calendar data
         curl_setopt($curl, CURLOPT_URL, 'https://services-web.cyu.fr/calendar/Home/ReadResourceListItems?myResources=false&searchTerm=' . $query . '&pageSize=1000&resType=104');
         $result = curl_exec($curl);
     }
 
-    cyuClose($curl, $cookies_filename);
+    cyuClose($curl);
 
     return $result;
 }
@@ -125,13 +129,9 @@ function cyuSearch(string $name, string $password, string $query) : string {
 /**
  * Closes the curl session and deletes the cookies file
  * @param curl Curl
- * @param cookies_filename Filename of the cookies file
  */
-function cyuClose($curl, string $cookies_filename) : void {
+function cyuClose($curl) : void {
     curl_close($curl);
-    if (file_exists($cookies_filename)) {
-        unlink($cookies_filename);
-    };
 }
 
 ?>
