@@ -4,7 +4,7 @@
 
 Ease your studies
 
-(English version below)
+[English version below](#ezstudies-english)
 
 ## Introduction
 
