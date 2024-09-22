@@ -32,8 +32,7 @@ class Style {
     if ((Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
             true) &&
         (kIsWeb || Platform.isAndroid)) {
-      Color accent = SystemTheme.accentColor.accent;
-      color = accent;
+      color = SystemTheme.accentColor.accent;
     }
     return color;
   }

@@ -38,7 +38,6 @@ class _ThemeDialogState extends State<ThemeDialog> {
     ]);
 
     return AlertDialog(
-      // backgroundColor: Style.background,
       title: Text(AppLocalizations.of(context)!.theme),
       content: column,
       scrollable: true,

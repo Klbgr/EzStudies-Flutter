@@ -45,6 +45,7 @@ class Template extends StatelessWidget {
           actions: (menu == null) ? null : [menu!],
           backgroundColor: Colors.transparent,
           elevation: 0,
+          scrolledUnderElevation: 0,
           leading: iconButton,
         ),
         body: Column(
@@ -55,7 +56,7 @@ class Template extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 20, bottom: 20),
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 28),
+                  style: const TextStyle(fontSize: 28),
                 ),
               ),
             Expanded(

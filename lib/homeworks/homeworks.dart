@@ -264,7 +264,6 @@ class _HomeworksCellState extends State<_HomeworksCell> {
             Container(
                 margin: const EdgeInsets.only(right: 20),
                 child: Checkbox(
-                  // checkColor: Style.background,
                   value: (newData.done == 1) ? true : false,
                   onChanged: (value) {
                     setState(() =>

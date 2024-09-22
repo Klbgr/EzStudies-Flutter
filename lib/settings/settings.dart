@@ -1,7 +1,7 @@
+import 'package:ezstudies/main.dart';
 import 'package:ezstudies/settings/color_dialog.dart';
 import 'package:ezstudies/settings/theme_dialog.dart';
 import 'package:ezstudies/utils/database_helper.dart';
-import 'package:ezstudies/welcome/welcome.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -69,7 +69,7 @@ class _SettingsState extends State<Settings> {
             SettingsTile(
               leading: const Icon(Icons.format_paint),
               title: Text(AppLocalizations.of(context)!.theme, style: font),
-              value: Text(theme, style: GoogleFonts.openSans()),
+              value: Text(theme, style: font),
               onPressed: (context) => showDialog(
                   context: context,
                   builder: (context) =>
@@ -79,7 +79,12 @@ class _SettingsState extends State<Settings> {
                 leading: const Icon(Icons.color_lens),
                 title: Text(AppLocalizations.of(context)!.accent_color,
                     style: font),
-                value: Icon(Icons.circle, color: Style.primary),
+                value: Icon(Icons.circle,
+                    color: Preferences.sharedPreferences
+                                .getBool(Preferences.useSystemAccent) ??
+                            true
+                        ? Theme.of(context).colorScheme.primary
+                        : Style.primary),
                 onPressed: (context) => showDialog(
                     context: context,
                     builder: (context) =>
@@ -103,7 +108,7 @@ class _SettingsState extends State<Settings> {
                       style: font),
                   description: Text(
                       AppLocalizations.of(context)!.notifications_agenda_desc,
-                      style: GoogleFonts.openSans())),
+                      style: font)),
             if (!kIsWeb)
               SettingsTile.switchTile(
                   leading: const Icon(Icons.notifications),
@@ -124,7 +129,7 @@ class _SettingsState extends State<Settings> {
                   description: Text(
                       AppLocalizations.of(context)!
                           .notifications_homeworks_desc,
-                      style: GoogleFonts.openSans()))
+                      style: font))
           ],
         ),
         SettingsSection(
@@ -217,7 +222,7 @@ class _SettingsState extends State<Settings> {
     if (kIsWeb) {
       Preferences.sharedPreferences.clear().then((value) =>
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const Welcome())));
+              MaterialPageRoute(builder: (context) => const EzStudies())));
     } else {
       Preferences.sharedPreferences.clear().then((value) {
         DatabaseHelper database = DatabaseHelper();
@@ -227,7 +232,7 @@ class _SettingsState extends State<Settings> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const Welcome()))))));
+                        builder: (context) => const EzStudies()))))));
       });
     }
   }

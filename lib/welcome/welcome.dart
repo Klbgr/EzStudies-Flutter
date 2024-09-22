@@ -24,7 +24,7 @@ class _WelcomeState extends State<Welcome> {
   final PageController pageController = PageController(initialPage: 0);
   final Duration animationDuration = const Duration(milliseconds: 300);
   final Curve animationCurve = Curves.easeInOut;
-  final TextStyle textStyle = TextStyle(fontSize: 16);
+  final TextStyle textStyle = const TextStyle(fontSize: 16);
   String name = "";
   String password = "";
   bool loading = false;
@@ -86,7 +86,7 @@ class _WelcomeState extends State<Welcome> {
             illustration: UnDrawIllustration.login),
         if (loading)
           Container(
-              // color: Style.background.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
               alignment: Alignment.center,
               child: const CircularProgressIndicator())
       ])
@@ -172,8 +172,10 @@ class _WelcomeState extends State<Welcome> {
                           .setString(Preferences.password, encryptedPassword)
                           .then((value) {
                         setState(() => loading = false);
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (_) => const Main()));
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const EzStudies()));
                       }));
             } else {
               setState(() => loading = false);

@@ -36,27 +36,25 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
-              onPressed: () => controller.previousPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut),
+              onPressed: (pages.isEmpty || selectedPage == 0)
+                  ? null
+                  : () => controller.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut),
               icon: const Icon(
                 Icons.chevron_left_rounded,
-                // color: (pages.isEmpty || selectedPage == 0)
-                //     ? Style.hint
-                //     : Style.text
               )),
           Text(firstDayOfWeeks.isEmpty
               ? AppLocalizations.of(context)!.nothing_to_show
               : "${AppLocalizations.of(context)!.week_of} ${timestampToDayMonthYear(firstDayOfWeeks[selectedPage].millisecondsSinceEpoch)}"),
           IconButton(
-              onPressed: () => controller.nextPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut),
+              onPressed: (pages.isEmpty || selectedPage == pages.length - 1)
+                  ? null
+                  : () => controller.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut),
               icon: const Icon(
                 Icons.chevron_right_rounded,
-                // color: (pages.isEmpty || selectedPage == pages.length - 1)
-                //     ? Style.hint
-                //     : Style.text
               ))
         ],
       ),
@@ -130,9 +128,10 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
         pages.add(Column(
           children: [
             Container(
-                decoration: const BoxDecoration(
-                    // border: Border(bottom: BorderSide(color: Style.hint))
-                    ),
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: Theme.of(context).colorScheme.onSurface))),
                 child: Row(children: [
                   for (int i = 0; i < dayNames.length; i++)
                     Expanded(

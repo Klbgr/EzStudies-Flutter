@@ -71,7 +71,6 @@ class _ColorDialogState extends State<ColorDialog> {
         title: Text(
           AppLocalizations.of(context)!.use_system_accent_color,
         ),
-        // checkColor: Style.background
       ));
     } else {
       useSystemAccent = false;

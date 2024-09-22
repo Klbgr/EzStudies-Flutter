@@ -232,7 +232,6 @@ class _MainState extends State<Main> {
             return FadeThroughTransition(
               animation: animation,
               secondaryAnimation: secondaryAnimation,
-              // fillColor: Style.background,
               child: child,
             );
           },

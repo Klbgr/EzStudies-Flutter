@@ -252,10 +252,7 @@ class _AgendaState extends State<Agenda> {
     Widget child = Stack(children: [
       widget.trash
           ? content
-          : RefreshIndicator(
-              onRefresh: () => refresh(),
-              // backgroundColor: Style.background,
-              child: content),
+          : RefreshIndicator(onRefresh: () => refresh(), child: content),
       Positioned(
           bottom: 20,
           right: 20,
