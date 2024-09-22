@@ -84,6 +84,7 @@ flutter_launcher_icons:
   android: true
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "images/EzStudies_logo.png"
+  adaptive_icon_monochrome: "images/EzStudies_logo_mono.png"
   ios: true
   image_path: "images/EzStudies.png"
   remove_alpha_ios: true
