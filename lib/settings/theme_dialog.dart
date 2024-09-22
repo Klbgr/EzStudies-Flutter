@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 
 class ThemeDialog extends StatefulWidget {
   const ThemeDialog({required this.onClosed, super.key});
+
   final Function onClosed;
 
   @override
@@ -31,7 +31,6 @@ class _ThemeDialogState extends State<ThemeDialog> {
             child: ListTile(
                 title: Text(names[i]),
                 leading: Radio<int>(
-                    activeColor: Style.primary,
                     value: i,
                     groupValue: selectedIndex,
                     onChanged: (value) =>
@@ -39,14 +38,15 @@ class _ThemeDialogState extends State<ThemeDialog> {
     ]);
 
     return AlertDialog(
-      backgroundColor: Style.background,
+      // backgroundColor: Style.background,
       title: Text(AppLocalizations.of(context)!.theme),
       content: column,
       scrollable: true,
       actions: <Widget>[
         TextButton(
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Style.primary)),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+            ),
             onPressed: () => Preferences.sharedPreferences
                     .setInt(Preferences.theme, selectedIndex)
                     .then((value) {

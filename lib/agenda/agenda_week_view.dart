@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
 import 'agenda_cell_data.dart';
@@ -10,6 +9,7 @@ import 'agenda_week_view_cell.dart';
 
 class AgendaWeekView extends StatefulWidget {
   const AgendaWeekView({required this.data, super.key});
+
   final List<AgendaCellData> data;
 
   @override
@@ -39,10 +39,12 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
               onPressed: () => controller.previousPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut),
-              icon: Icon(Icons.chevron_left_rounded,
-                  color: (pages.isEmpty || selectedPage == 0)
-                      ? Style.hint
-                      : Style.text)),
+              icon: const Icon(
+                Icons.chevron_left_rounded,
+                // color: (pages.isEmpty || selectedPage == 0)
+                //     ? Style.hint
+                //     : Style.text
+              )),
           Text(firstDayOfWeeks.isEmpty
               ? AppLocalizations.of(context)!.nothing_to_show
               : "${AppLocalizations.of(context)!.week_of} ${timestampToDayMonthYear(firstDayOfWeeks[selectedPage].millisecondsSinceEpoch)}"),
@@ -50,10 +52,12 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
               onPressed: () => controller.nextPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut),
-              icon: Icon(Icons.chevron_right_rounded,
-                  color: (pages.isEmpty || selectedPage == pages.length - 1)
-                      ? Style.hint
-                      : Style.text))
+              icon: const Icon(
+                Icons.chevron_right_rounded,
+                // color: (pages.isEmpty || selectedPage == pages.length - 1)
+                //     ? Style.hint
+                //     : Style.text
+              ))
         ],
       ),
       Expanded(
@@ -87,7 +91,7 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
     int now = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < firstDayOfWeeks.length; i++) {
       if (firstDayOfWeeks[i].millisecondsSinceEpoch > now) {
-        selectedPage = i-1;
+        selectedPage = i - 1;
         if (selectedPage < 0) {
           selectedPage = 0;
         }
@@ -126,8 +130,9 @@ class _AgendaWeekViewState extends State<AgendaWeekView> {
         pages.add(Column(
           children: [
             Container(
-                decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Style.hint))),
+                decoration: const BoxDecoration(
+                    // border: Border(bottom: BorderSide(color: Style.hint))
+                    ),
                 child: Row(children: [
                   for (int i = 0; i < dayNames.length; i++)
                     Expanded(

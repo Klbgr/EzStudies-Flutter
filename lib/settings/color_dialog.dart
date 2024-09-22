@@ -8,6 +8,7 @@ import '../utils/style.dart';
 
 class ColorDialog extends StatefulWidget {
   const ColorDialog({required this.onClosed, super.key});
+
   final Function onClosed;
 
   @override
@@ -51,7 +52,7 @@ class _ColorDialogState extends State<ColorDialog> {
               child: Icon(Icons.check_rounded,
                   size: 64,
                   color: (i == selectedIndex && !useSystemAccent)
-                      ? Style.background
+                      ? null
                       : Colors.transparent),
               onTap: () => setState(() {
                     selectedIndex = i;
@@ -63,13 +64,15 @@ class _ColorDialogState extends State<ColorDialog> {
 
     if (kIsWeb || Platform.isAndroid) {
       column.children.add(CheckboxListTile(
-          controlAffinity: ListTileControlAffinity.leading,
-          value: useSystemAccent,
-          onChanged: (value) =>
-              setState(() => useSystemAccent = !useSystemAccent),
-          title: Text(AppLocalizations.of(context)!.use_system_accent_color,
-              style: TextStyle(color: Style.text)),
-          checkColor: Style.background));
+        controlAffinity: ListTileControlAffinity.leading,
+        value: useSystemAccent,
+        onChanged: (value) =>
+            setState(() => useSystemAccent = !useSystemAccent),
+        title: Text(
+          AppLocalizations.of(context)!.use_system_accent_color,
+        ),
+        // checkColor: Style.background
+      ));
     } else {
       useSystemAccent = false;
     }
@@ -80,8 +83,9 @@ class _ColorDialogState extends State<ColorDialog> {
       scrollable: true,
       actions: <Widget>[
         TextButton(
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Style.primary)),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+            ),
             onPressed: () => Preferences.sharedPreferences
                 .setInt(Preferences.accent, selectedIndex)
                 .then((value) => Preferences.sharedPreferences

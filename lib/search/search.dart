@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import '../agenda/agenda.dart';
 import '../config/env.dart';
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 import '../utils/templates.dart';
 
 class Search extends StatefulWidget {
@@ -37,8 +36,9 @@ class _SearchState extends State<Search> {
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.ok,
-                                style: TextStyle(color: Style.primary)))
+                            child: Text(
+                              AppLocalizations.of(context)!.ok,
+                            ))
                       ])));
     }
 
@@ -46,8 +46,9 @@ class _SearchState extends State<Search> {
         items: <PopupMenuItem<String>>[
           PopupMenuItem<String>(
               value: "help",
-              child: Text(AppLocalizations.of(context)!.help,
-                  style: TextStyle(color: Style.text)))
+              child: Text(
+                AppLocalizations.of(context)!.help,
+              ))
         ],
         onSelected: (value) {
           switch (value) {
@@ -60,8 +61,9 @@ class _SearchState extends State<Search> {
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: Text(AppLocalizations.of(context)!.ok,
-                                    style: TextStyle(color: Style.primary)))
+                                child: Text(
+                                  AppLocalizations.of(context)!.ok,
+                                ))
                           ]));
               break;
           }
@@ -73,12 +75,12 @@ class _SearchState extends State<Search> {
           children: [
             TextField(
                 autocorrect: false,
-                cursorColor: Style.primary,
-                style: TextStyle(color: Style.text),
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.search, color: Style.text),
+                    suffixIcon: Icon(Icons.search,
+                        color: Theme.of(context).colorScheme.onSurface),
                     filled: true,
-                    fillColor: Style.secondary,
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
@@ -95,13 +97,12 @@ class _SearchState extends State<Search> {
                             topRight: const Radius.circular(16),
                             bottomLeft: Radius.circular(
                                 list.isNotEmpty || loading ? 0 : 16),
-                            bottomRight: Radius.circular(
-                                list.isNotEmpty || loading ? 0 : 16)),
-                        borderSide:
-                            const BorderSide(color: Colors.transparent)),
+                            bottomRight:
+                                Radius.circular(list.isNotEmpty || loading ? 0 : 16)),
+                        borderSide: const BorderSide(color: Colors.transparent)),
                     disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.only(topLeft: const Radius.circular(16), topRight: const Radius.circular(16), bottomLeft: Radius.circular(list.isNotEmpty || loading ? 0 : 16), bottomRight: Radius.circular(list.isNotEmpty || loading ? 0 : 16)), borderSide: const BorderSide(color: Colors.transparent)),
                     hintText: AppLocalizations.of(context)!.search.toLowerCase(),
-                    hintStyle: TextStyle(color: Style.hint)),
+                    fillColor: Theme.of(context).colorScheme.surfaceContainer),
                 onSubmitted: (value) => search(),
                 onChanged: (value) {
                   query = value;
@@ -119,7 +120,9 @@ class _SearchState extends State<Search> {
                               alignment: Alignment.center,
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                  color: Style.secondary,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainer,
                                   borderRadius: const BorderRadius.only(
                                       bottomLeft: Radius.circular(16),
                                       bottomRight: Radius.circular(16))),
@@ -197,7 +200,8 @@ class _SearchCell extends StatelessWidget {
     Widget child1 = Container(
       padding: const EdgeInsets.all(10),
       child: Text("${data.name} (${data.dept})",
-          overflow: TextOverflow.ellipsis, style: TextStyle(color: Style.text)),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
     );
 
     Widget child2 = Agenda(search: true, data: data);
@@ -205,7 +209,7 @@ class _SearchCell extends StatelessWidget {
     return OpenContainerTemplate(
         child1: child1,
         child2: child2,
-        color: Style.secondary,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         radius: BorderRadius.only(
             bottomLeft: Radius.circular(last ? 16 : 0),
             bottomRight: Radius.circular(last ? 16 : 0)));

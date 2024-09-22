@@ -69,6 +69,7 @@
   "help_homeworks": " - Check or uncheck a homework to mark it done or not done\n - Tap on a homework to see or edit its details\n - Swipe an homework to the left or to the right to delete it",
   "time": "Time",
   "banner": "Click here to install the app (Android)",
+  "banner_message": "EzStudies is deprecated, click here for more details",
   "update": "Update",
   "update_desc": "An update is available : version {version1} -> {version2}\n\nWhat's new :\n{changelog}",
   "@update_desc": {

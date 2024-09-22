@@ -3,11 +3,11 @@ import 'package:ezstudies/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../utils/style.dart';
 import '../utils/templates.dart';
 
 class HomeworksDetails extends StatelessWidget {
   const HomeworksDetails({this.data, this.add = false, super.key});
+
   final HomeworksCellData? data;
   final bool add;
   final EdgeInsetsGeometry margin = const EdgeInsets.only(top: 10, bottom: 10);
@@ -96,7 +96,7 @@ class HomeworksDetails extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 20),
           child: FloatingActionButton.extended(
               backgroundColor: Colors.green,
-              icon: Icon(add ? Icons.add : Icons.save, color: Style.text),
+              icon: Icon(add ? Icons.add : Icons.save),
               onPressed: () {
                 DateTime date =
                     DateTime.fromMillisecondsSinceEpoch(newData.date);
@@ -152,10 +152,10 @@ class HomeworksDetails extends StatelessWidget {
                 }
               },
               label: Text(
-                  add
-                      ? AppLocalizations.of(context)!.add
-                      : AppLocalizations.of(context)!.save,
-                  style: TextStyle(color: Style.text))))
+                add
+                    ? AppLocalizations.of(context)!.add
+                    : AppLocalizations.of(context)!.save,
+              )))
     ]);
 
     return Template(

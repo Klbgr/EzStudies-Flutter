@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
 import 'agenda_cell_data.dart';
@@ -16,6 +15,7 @@ class AgendaCell extends StatelessWidget {
       this.editable = true,
       this.search = false,
       super.key});
+
   final bool firstOfDay;
   final bool firstOfMonth;
   final AgendaCellData data;
@@ -42,21 +42,28 @@ class AgendaCell extends StatelessWidget {
             children: (firstOfDay)
                 ? [
                     Text(timestampToWeekDay(data.start),
-                        style: TextStyle(
-                            color: (today) ? Style.primary : Style.text)),
+                        style: (today)
+                            ? TextStyle(
+                                color: Theme.of(context).colorScheme.primary)
+                            : null),
                     ClipOval(
                         child: AspectRatio(
                             aspectRatio: 1,
                             child: Container(
                                 alignment: Alignment.center,
                                 color: (today)
-                                    ? Style.primary
-                                    : Colors.transparent,
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
                                 child: Text(
                                     timestampToDayOfMonth(data.start)
                                         .toString(),
                                     style: TextStyle(
-                                        fontSize: 20, color: Style.text))))),
+                                        fontSize: 20,
+                                        color: (today)
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .surface
+                                            : null))))),
                   ]
                 : List.empty()),
       ),
@@ -72,8 +79,7 @@ class AgendaCell extends StatelessWidget {
                     Container(
                       alignment: Alignment.centerLeft,
                       child: Text("$start - $end",
-                          style: TextStyle(
-                              color: Style.text, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,14 +88,13 @@ class AgendaCell extends StatelessWidget {
                           Flexible(
                               child: Text(
                             data.description,
-                            style: TextStyle(color: Style.text),
                             maxLines: null,
                             overflow: TextOverflow.ellipsis,
                           )),
                           if (data.added == 0 && data.edited == 1)
-                            Icon(Icons.edit, size: 16, color: Style.text)
+                            const Icon(Icons.edit, size: 16)
                           else if (data.added == 1)
-                            Icon(Icons.person, size: 16, color: Style.text)
+                            const Icon(Icons.person, size: 16)
                         ])
                   ])),
               child2:
@@ -106,7 +111,7 @@ class AgendaCell extends StatelessWidget {
           margin: const EdgeInsets.only(left: 50, top: 15, bottom: 10),
           child: Text(
             timestampToMonthYear(data.start),
-            style: TextStyle(fontSize: 20, color: Style.text),
+            style: const TextStyle(fontSize: 20),
           ),
         ),
         child,

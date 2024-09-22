@@ -1,13 +1,14 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:ms_undraw/ms_undraw.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config/env.dart';
 import '../main.dart';
 import '../utils/cipher.dart';
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/update.dart';
 
@@ -23,7 +24,7 @@ class _WelcomeState extends State<Welcome> {
   final PageController pageController = PageController(initialPage: 0);
   final Duration animationDuration = const Duration(milliseconds: 300);
   final Curve animationCurve = Curves.easeInOut;
-  final TextStyle textStyle = TextStyle(color: Style.text, fontSize: 16);
+  final TextStyle textStyle = TextStyle(fontSize: 16);
   String name = "";
   String password = "";
   bool loading = false;
@@ -32,8 +33,28 @@ class _WelcomeState extends State<Welcome> {
   Widget build(BuildContext context) {
     List<Widget> pages = [
       WelcomePageTemplate(
-          content: Text(AppLocalizations.of(context)!.welcome_welcome,
-              style: textStyle, textAlign: TextAlign.center),
+          content: Column(
+            children: [
+              Text(AppLocalizations.of(context)!.welcome_welcome,
+                  style: textStyle, textAlign: TextAlign.center),
+              Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                        text: AppLocalizations.of(context)!.banner_message,
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.error,
+                            decoration: TextDecoration.underline),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => launchUrl(
+                                Uri.parse(
+                                    "https://github.com/Klbgr/EzStudies-Flutter?tab=readme-ov-file#deprecated"),
+                              )),
+                  ))
+            ],
+          ),
           illustration: UnDrawIllustration.welcoming),
       WelcomePageTemplate(
           content: Text(AppLocalizations.of(context)!.welcome_features,
@@ -65,7 +86,7 @@ class _WelcomeState extends State<Welcome> {
             illustration: UnDrawIllustration.login),
         if (loading)
           Container(
-              color: Style.background.withOpacity(0.5),
+              // color: Style.background.withOpacity(0.5),
               alignment: Alignment.center,
               child: const CircularProgressIndicator())
       ])
@@ -129,8 +150,7 @@ class _WelcomeState extends State<Welcome> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.ok,
-                      style: TextStyle(color: Style.primary)))
+                  child: Text(AppLocalizations.of(context)!.ok))
             ]),
       );
     } else {
@@ -201,8 +221,8 @@ class _WelcomeState extends State<Welcome> {
       dots.add(GestureDetector(
           child: Icon(
               (selectedIndex == i) ? Icons.circle : Icons.circle_outlined,
-              size: 10,
-              color: Style.text),
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 10),
           onTap: () => pageController.animateToPage(i,
               duration: animationDuration, curve: animationCurve)));
     }

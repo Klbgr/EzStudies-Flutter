@@ -18,7 +18,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:universal_io/io.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,6 +58,7 @@ void main() async {
 
 class EzStudies extends StatefulWidget {
   const EzStudies({super.key});
+
   static const List<Locale> supportedLocales = [
     Locale('en', ''),
     Locale('fr', ''),
@@ -73,38 +73,16 @@ class _EzStudiesState extends State<EzStudies> {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-            timePickerTheme: TimePickerThemeData(
-                backgroundColor: Style.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                helpTextStyle: TextStyle(color: Style.text),
-                hourMinuteColor: Style.secondary,
-                dialBackgroundColor: Style.secondary,
-                dialTextColor: Style.text,
-                hourMinuteTextColor: MaterialStateColor.resolveWith((states) =>
-                    states.contains(MaterialState.selected)
-                        ? Style.primary
-                        : Style.text),
-                entryModeIconColor: Style.text),
-            textTheme:
-                GoogleFonts.openSansTextTheme(Theme.of(context).textTheme.apply(
-                      bodyColor: Style.text,
-                      displayColor: Style.text,
-                    )),
-            textSelectionTheme:
-                TextSelectionThemeData(selectionColor: Style.primary),
-            colorScheme: ColorScheme.fromSwatch().copyWith(
-                primary: Style.primary,
-                secondary: Style.primary,
-                onSurface: Style.text),
-            dialogTheme: DialogTheme(
-                backgroundColor: Style.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16))),
-            unselectedWidgetColor: Style.text,
-            toggleableActiveColor: Style.primary,
-            splashColor: Style.ripple,
-            highlightColor: Style.ripple),
+          colorScheme: ColorScheme.fromSeed(
+              brightness: Brightness.light, seedColor: Style.primary),
+          useMaterial3: true,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              brightness: Brightness.dark, seedColor: Style.primary),
+          useMaterial3: true,
+        ),
+        themeMode: (Style.theme == 0) ? ThemeMode.light : ThemeMode.dark,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -128,6 +106,7 @@ class _EzStudiesState extends State<EzStudies> {
 
 class Main extends StatefulWidget {
   const Main({this.reloadTheme, super.key});
+
   final Function? reloadTheme;
 
   @override
@@ -137,6 +116,7 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int selectedIndex = 0;
   bool showBanner = true;
+  bool showBannerMessage = true;
   AgendaViewModel agendaViewModel = AgendaViewModel();
 
   @override
@@ -152,62 +132,94 @@ class _MainState extends State<Main> {
                 }
               })),
     ];
-    List<BottomNavigationBarItem> items = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(
-        icon: getIcon(0),
-        label: AppLocalizations.of(context)!.agenda,
-        tooltip: AppLocalizations.of(context)!.agenda
-      ),
-      BottomNavigationBarItem(
-        icon: getIcon(1),
-        label: AppLocalizations.of(context)!.search,
-        tooltip: AppLocalizations.of(context)!.search
-      ),
-      if (!kIsWeb)
-        BottomNavigationBarItem(
-          icon: getIcon(2),
-          label: AppLocalizations.of(context)!.homeworks,
-          tooltip: AppLocalizations.of(context)!.homeworks
+    List<Widget> items = [
+      NavigationDestination(
+        icon: const Icon(
+          Icons.view_agenda_outlined,
         ),
-      BottomNavigationBarItem(
-        icon: getIcon(kIsWeb ? 2 : 3),
-        label: AppLocalizations.of(context)!.settings,
-        tooltip: AppLocalizations.of(context)!.settings
+        label: AppLocalizations.of(context)!.agenda,
+        tooltip: AppLocalizations.of(context)!.agenda,
+        selectedIcon: const Icon(Icons.view_agenda),
       ),
+      NavigationDestination(
+          icon: const Icon(Icons.search_outlined),
+          label: AppLocalizations.of(context)!.search,
+          tooltip: AppLocalizations.of(context)!.search,
+          selectedIcon: const Icon(
+            Icons.search_outlined,
+          )),
+      if (!kIsWeb)
+        NavigationDestination(
+            icon: const Icon(Icons.library_books_outlined),
+            label: AppLocalizations.of(context)!.homeworks,
+            tooltip: AppLocalizations.of(context)!.homeworks,
+            selectedIcon: const Icon(
+              Icons.library_books,
+            )),
+      NavigationDestination(
+          icon: const Icon(Icons.settings_outlined),
+          label: AppLocalizations.of(context)!.settings,
+          tooltip: AppLocalizations.of(context)!.settings,
+          selectedIcon: const Icon(Icons.settings)),
     ];
 
-    Widget bottomNavigationBar = BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        backgroundColor: Style.secondary,
-        items: items,
-        currentIndex: selectedIndex,
-        selectedItemColor: Style.text,
-        unselectedItemColor: Style.text,
-        iconSize: 24,
-        unselectedFontSize: 16,
-        selectedFontSize: 16,
-        onTap: (value) => setState(() => selectedIndex = value));
-    if (kIsWeb && showBanner) {
-      bottomNavigationBar = Column(mainAxisSize: MainAxisSize.min, children: [
+    Widget bottomNavigationBar =
+        Column(mainAxisSize: MainAxisSize.min, children: [
+      if (showBannerMessage)
         GestureDetector(
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10),
-                color: Style.primary,
+                color: Theme.of(context).colorScheme.error,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppLocalizations.of(context)!.banner,
-                          style: TextStyle(color: Style.text)),
+                      Text(
+                        AppLocalizations.of(context)!.banner_message,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onError),
+                      ),
+                      IconButton(
+                          onPressed: () =>
+                              setState(() => showBannerMessage = false),
+                          icon: Icon(Icons.close,
+                              color: Theme.of(context).colorScheme.onError))
+                    ])),
+            onTap: () => launchUrl(
+                Uri.parse(
+                    "https://github.com/Klbgr/EzStudies-Flutter?tab=readme-ov-file#deprecated"),
+                mode: LaunchMode.externalApplication)),
+      if (kIsWeb && showBanner)
+        GestureDetector(
+            child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                color: Theme.of(context).colorScheme.primary,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.banner,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary),
+                      ),
                       IconButton(
                           onPressed: () => setState(() => showBanner = false),
-                          icon: Icon(Icons.close, color: Style.text))
+                          icon: Icon(
+                            Icons.close,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ))
                     ])),
             onTap: () => launchUrl(Uri.parse("${Secret.server_url}install"),
                 mode: LaunchMode.externalApplication)),
-        bottomNavigationBar
-      ]);
-    }
+      NavigationBar(
+          destinations: items,
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected),
+    ]);
 
     return Scaffold(
         body: PageTransitionSwitcher(
@@ -220,7 +232,7 @@ class _MainState extends State<Main> {
             return FadeThroughTransition(
               animation: animation,
               secondaryAnimation: secondaryAnimation,
-              fillColor: Style.background,
+              // fillColor: Style.background,
               child: child,
             );
           },
@@ -233,32 +245,5 @@ class _MainState extends State<Main> {
   void initState() {
     super.initState();
     Update.checkUpdate(context);
-  }
-
-  Widget getIcon(int index) {
-    const List<IconData> icons = <IconData>[
-      Icons.view_agenda_outlined,
-      Icons.search_outlined,
-      if (!kIsWeb) Icons.library_books_outlined,
-      Icons.settings_outlined
-    ];
-
-    const List<IconData> iconsSelected = <IconData>[
-      Icons.view_agenda,
-      Icons.search,
-      if (!kIsWeb) Icons.library_books,
-      Icons.settings
-    ];
-
-    return Container(
-        decoration: BoxDecoration(
-            color:
-                (index == selectedIndex) ? Style.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(24)),
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 5, top: 5),
-        margin: const EdgeInsets.only(bottom: 5),
-        child: Icon(
-            (index == selectedIndex) ? iconsSelected[index] : icons[index],
-            color: Style.text));
   }
 }

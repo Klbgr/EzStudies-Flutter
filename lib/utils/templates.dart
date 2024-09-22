@@ -15,6 +15,7 @@ class Template extends StatelessWidget {
       this.back = false,
       this.compact = false,
       super.key});
+
   final String title;
   final Widget child;
   final Widget? menu;
@@ -26,19 +27,15 @@ class Template extends StatelessWidget {
     IconButton? iconButton;
     if (back) {
       iconButton = IconButton(
-        icon: Icon(
+        icon: const Icon(
           Icons.arrow_back,
-          color: Style.text,
         ),
         onPressed: () => Navigator.pop(context),
       );
     }
     return Scaffold(
-        backgroundColor: Style.background,
         appBar: AppBar(
-          title: compact
-              ? Text(title, style: TextStyle(color: Style.text))
-              : Container(),
+          title: compact ? Text(title) : Container(),
           systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
               statusBarIconBrightness:
@@ -58,7 +55,7 @@ class Template extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 20, bottom: 20),
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 28, color: Style.text),
+                  style: TextStyle(fontSize: 28),
                 ),
               ),
             Expanded(
@@ -71,16 +68,16 @@ class Template extends StatelessWidget {
 
 class MenuTemplate extends StatelessWidget {
   const MenuTemplate({required this.items, this.onSelected, super.key});
+
   final List<PopupMenuItem<String>> items;
   final Function(String)? onSelected;
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      color: Style.background,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16))),
-      icon: Icon(Icons.more_vert_rounded, color: Style.text),
+      icon: Icon(Icons.more_vert_rounded),
       itemBuilder: (BuildContext context) {
         return items;
       },
@@ -102,6 +99,7 @@ class OpenContainerTemplate extends StatelessWidget {
       this.radius = BorderRadius.zero,
       this.elevation = 0,
       super.key});
+
   final Widget child1;
   final Widget child2;
   final Function? onClosed;
@@ -113,8 +111,9 @@ class OpenContainerTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     return OpenContainer(
       closedShape: RoundedRectangleBorder(borderRadius: radius),
-      closedColor: (color == null) ? Style.background : color!,
-      openColor: Style.background,
+      closedColor:
+          (color == null) ? Theme.of(context).colorScheme.surface : color!,
+      openColor: Theme.of(context).colorScheme.surface,
       closedElevation: elevation,
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, action) => child1,
@@ -131,6 +130,7 @@ class OpenContainerTemplate extends StatelessWidget {
 class AlertDialogTemplate extends StatelessWidget {
   const AlertDialogTemplate(
       {required this.title, required this.content, this.actions, super.key});
+
   final String title;
   final String content;
   final List<Widget>? actions;
@@ -158,8 +158,9 @@ class TextFormFieldTemplate extends StatefulWidget {
       this.dateTime,
       this.hidden = false,
       this.multiline = false,
-        this.autofillHints,
+      this.autofillHints,
       super.key});
+
   final String label;
   final IconData icon;
   final String? initialValue;
@@ -190,11 +191,8 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
       obscureText: widget.hidden,
       enabled: widget.enabled,
       readOnly: widget.date || widget.time,
-      cursorColor: Style.primary,
-      style: TextStyle(color: Style.text),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Style.secondary,
         focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
             borderSide: BorderSide(color: Colors.transparent)),
@@ -205,9 +203,8 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
             borderRadius: BorderRadius.all(Radius.circular(16)),
             borderSide: BorderSide(color: Colors.transparent)),
         hintText: widget.label.toLowerCase(),
-        hintStyle: TextStyle(color: Style.hint),
-        label: Text(widget.label, style: TextStyle(color: Style.hint)),
-        icon: Icon(widget.icon, color: Style.text),
+        label: Text(widget.label),
+        icon: Icon(widget.icon),
       ),
       controller: TextEditingController(
           text: !(widget.date || widget.time)
@@ -266,6 +263,7 @@ class WelcomeFABTemplate extends StatelessWidget {
       this.begin = false,
       required this.onPressed,
       super.key});
+
   final bool next;
   final bool previous;
   final bool begin;
@@ -289,10 +287,9 @@ class WelcomeFABTemplate extends StatelessWidget {
       left: (next || begin) ? null : 20,
       child: FloatingActionButton.extended(
           heroTag: (begin) ? "add" : null,
-          backgroundColor: Style.primary,
           onPressed: () => onPressed(),
-          label: Text(label, style: TextStyle(color: Style.text)),
-          icon: Icon(icon, color: Style.text)),
+          label: Text(label),
+          icon: Icon(icon)),
     );
   }
 }
@@ -300,6 +297,7 @@ class WelcomeFABTemplate extends StatelessWidget {
 class WelcomePageTemplate extends StatelessWidget {
   const WelcomePageTemplate(
       {required this.content, required this.illustration, super.key});
+
   final Widget content;
   final UnDrawIllustration illustration;
 
@@ -317,7 +315,7 @@ class WelcomePageTemplate extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 20),
                 height: height,
                 child: UnDraw(
-                  color: Style.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   illustration: illustration,
                   height: height,
                 )),

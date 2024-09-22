@@ -9,7 +9,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../utils/notifications.dart';
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 import '../utils/timestamp_utils.dart';
 import 'homeworks_cell_data.dart';
 
@@ -39,8 +38,9 @@ class _HomeworksState extends State<Homeworks> {
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.ok,
-                                style: TextStyle(color: Style.primary)))
+                            child: Text(
+                              AppLocalizations.of(context)!.ok,
+                            ))
                       ])));
     }
 
@@ -50,8 +50,9 @@ class _HomeworksState extends State<Homeworks> {
         items: <PopupMenuItem<String>>[
           PopupMenuItem<String>(
               value: "help",
-              child: Text(AppLocalizations.of(context)!.help,
-                  style: TextStyle(color: Style.text)))
+              child: Text(
+                AppLocalizations.of(context)!.help,
+              ))
         ],
         onSelected: (value) {
           switch (value) {
@@ -64,8 +65,9 @@ class _HomeworksState extends State<Homeworks> {
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: Text(AppLocalizations.of(context)!.ok,
-                                    style: TextStyle(color: Style.primary)))
+                                child: Text(
+                                  AppLocalizations.of(context)!.ok,
+                                ))
                           ]));
               break;
           }
@@ -82,15 +84,25 @@ class _HomeworksState extends State<Homeworks> {
                   remove(list[index]);
                 },
                 background: Container(
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                     child: Container(
-                        margin: const EdgeInsets.only(left: 20, right: 20),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(Icons.delete, color: Style.text),
-                              Icon(Icons.delete, color: Style.text)
-                            ]))),
+                      margin: const EdgeInsets.only(left: 20, right: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.delete,
+                        color: Theme.of(context).colorScheme.onError,
+                      ),
+                    )),
+                secondaryBackground: Container(
+                    color: Theme.of(context).colorScheme.error,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 20, right: 20),
+                      alignment: Alignment.centerRight,
+                      child: Icon(
+                        Icons.delete,
+                        color: Theme.of(context).colorScheme.onError,
+                      ),
+                    )),
                 child: _HomeworksCell(list[index],
                     onClosed: () => load(),
                     onChanged: () => scheduleNotifications()),
@@ -103,28 +115,29 @@ class _HomeworksState extends State<Homeworks> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             if (list.isNotEmpty)
               FloatingActionButton(
-                  onPressed: () => scrollToToday(),
-                  tooltip: AppLocalizations.of(context)!.scroll_to_today,
-                  backgroundColor: Style.primary,
-                  child: Icon(Icons.today, color: Style.text)),
+                onPressed: () => scrollToToday(),
+                tooltip: AppLocalizations.of(context)!.scroll_to_today,
+                heroTag: "today",
+                child: const Icon(Icons.today),
+              ),
             Container(
-                margin: const EdgeInsets.only(top: 10),
-                child: OpenContainerTemplate(
-                    child1: FloatingActionButton(
-                        tooltip: AppLocalizations.of(context)!.add,
-                        elevation: 0,
-                        onPressed: null,
-                        backgroundColor: Colors.transparent,
-                        child: Icon(Icons.add, color: Style.text)),
-                    child2: const HomeworksDetails(add: true),
-                    onClosed: () => load(),
-                    radius: const BorderRadius.all(Radius.circular(32)),
-                    elevation: 6,
-                    color: Style.primary)),
+              margin: const EdgeInsets.only(top: 20),
+              child: FloatingActionButton(
+                tooltip: AppLocalizations.of(context)!.add,
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeworksDetails(
+                              add: true,
+                            ))).then((_) => load()),
+                heroTag: "add",
+                child: const Icon(Icons.add),
+              ),
+            )
           ])),
       if (loading)
         Container(
-            color: Style.background.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
             alignment: Alignment.center,
             child: const CircularProgressIndicator())
     ]);
@@ -205,6 +218,7 @@ class _HomeworksState extends State<Homeworks> {
 class _HomeworksCell extends StatefulWidget {
   const _HomeworksCell(this.data,
       {required this.onClosed, required this.onChanged});
+
   final HomeworksCellData data;
   final Function onClosed;
   final Function onChanged;
@@ -232,14 +246,15 @@ class _HomeworksCellState extends State<_HomeworksCell> {
         child: Column(children: [
           Container(
               alignment: Alignment.centerLeft,
-              child: Text(widget.data.description,
-                  style: TextStyle(color: Style.text))),
+              child: Text(
+                widget.data.description,
+              )),
           Container(
               alignment: Alignment.centerLeft,
               child: Text(
-                  DateFormat("EEEE, d MMMM y - HH:mm", getLocale()).format(
-                      DateTime.fromMillisecondsSinceEpoch(widget.data.date)),
-                  style: TextStyle(color: Style.text)))
+                DateFormat("EEEE, d MMMM y - HH:mm", getLocale()).format(
+                    DateTime.fromMillisecondsSinceEpoch(widget.data.date)),
+              ))
         ]));
 
     return Container(
@@ -249,7 +264,7 @@ class _HomeworksCellState extends State<_HomeworksCell> {
             Container(
                 margin: const EdgeInsets.only(right: 20),
                 child: Checkbox(
-                  checkColor: Style.background,
+                  // checkColor: Style.background,
                   value: (newData.done == 1) ? true : false,
                   onChanged: (value) {
                     setState(() =>

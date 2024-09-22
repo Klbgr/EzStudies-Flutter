@@ -16,7 +16,6 @@ import 'package:stacked/stacked.dart';
 import '../config/env.dart';
 import '../utils/notifications.dart';
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 import '../utils/templates.dart';
 import '../utils/timestamp_utils.dart';
 import 'agenda_cell.dart';
@@ -31,6 +30,7 @@ class Agenda extends StatefulWidget {
       this.onClosed,
       this.agendaViewModel,
       super.key});
+
   final bool agenda;
   final bool trash;
   final bool search;
@@ -56,33 +56,39 @@ class _AgendaState extends State<Agenda> {
           if (widget.agenda || widget.search)
             PopupMenuItem<String>(
                 value: "week_view",
-                child: Text(AppLocalizations.of(context)!.week_view,
-                    style: TextStyle(color: Style.text))),
+                child: Text(
+                  AppLocalizations.of(context)!.week_view,
+                )),
           if (widget.agenda && !kIsWeb)
             PopupMenuItem<String>(
                 value: "trash",
-                child: Text(AppLocalizations.of(context)!.trash,
-                    style: TextStyle(color: Style.text))),
+                child: Text(
+                  AppLocalizations.of(context)!.trash,
+                )),
           if (widget.agenda && !kIsWeb)
             PopupMenuItem<String>(
                 value: "reset",
-                child: Text(AppLocalizations.of(context)!.reset,
-                    style: TextStyle(color: Style.text))),
+                child: Text(
+                  AppLocalizations.of(context)!.reset,
+                )),
           if (widget.agenda)
             PopupMenuItem<String>(
                 value: "help_agenda",
-                child: Text(AppLocalizations.of(context)!.help,
-                    style: TextStyle(color: Style.text))),
+                child: Text(
+                  AppLocalizations.of(context)!.help,
+                )),
           if (widget.trash)
             PopupMenuItem(
                 value: "help_trash",
-                child: Text(AppLocalizations.of(context)!.help,
-                    style: TextStyle(color: Style.text))),
+                child: Text(
+                  AppLocalizations.of(context)!.help,
+                )),
           if (widget.search)
             PopupMenuItem<String>(
                 value: "help_search",
-                child: Text(AppLocalizations.of(context)!.help,
-                    style: TextStyle(color: Style.text)))
+                child: Text(
+                  AppLocalizations.of(context)!.help,
+                ))
         ],
         onSelected: (value) {
           switch (value) {
@@ -95,8 +101,9 @@ class _AgendaState extends State<Agenda> {
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary))),
+                          child: Text(
+                            AppLocalizations.of(context)!.ok,
+                          )),
                     ]),
               );
               break;
@@ -122,15 +129,17 @@ class _AgendaState extends State<Agenda> {
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.cancel,
-                              style: TextStyle(color: Style.primary))),
+                          child: Text(
+                            AppLocalizations.of(context)!.cancel,
+                          )),
                       TextButton(
                           onPressed: () {
                             reset();
                             Navigator.pop(context);
                           },
-                          child: Text(AppLocalizations.of(context)!.reset,
-                              style: TextStyle(color: Style.primary)))
+                          child: Text(
+                            AppLocalizations.of(context)!.reset,
+                          ))
                     ]),
               );
               break;
@@ -143,8 +152,9 @@ class _AgendaState extends State<Agenda> {
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: Text(AppLocalizations.of(context)!.ok,
-                                    style: TextStyle(color: Style.primary)))
+                                child: Text(
+                                  AppLocalizations.of(context)!.ok,
+                                ))
                           ]));
               break;
             case "help_search":
@@ -156,8 +166,9 @@ class _AgendaState extends State<Agenda> {
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text(AppLocalizations.of(context)!.ok,
-                              style: TextStyle(color: Style.primary))),
+                          child: Text(
+                            AppLocalizations.of(context)!.ok,
+                          )),
                     ]),
               );
               break;
@@ -215,10 +226,10 @@ class _AgendaState extends State<Agenda> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Icon(
-                                        widget.agenda
-                                            ? Icons.delete
-                                            : Icons.restore_from_trash,
-                                        color: Style.text)
+                                      widget.agenda
+                                          ? Icons.delete
+                                          : Icons.restore_from_trash,
+                                    )
                                   ]))),
                       secondaryBackground: Container(
                           color: widget.agenda ? Colors.red : Colors.green,
@@ -228,10 +239,10 @@ class _AgendaState extends State<Agenda> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Icon(
-                                        widget.agenda
-                                            ? Icons.delete
-                                            : Icons.restore_from_trash,
-                                        color: Style.text)
+                                      widget.agenda
+                                          ? Icons.delete
+                                          : Icons.restore_from_trash,
+                                    )
                                   ]))),
                       child: cell,
                     );
@@ -243,38 +254,37 @@ class _AgendaState extends State<Agenda> {
           ? content
           : RefreshIndicator(
               onRefresh: () => refresh(),
-              backgroundColor: Style.background,
+              // backgroundColor: Style.background,
               child: content),
       Positioned(
           bottom: 20,
           right: 20,
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            if (list.isNotEmpty)
+            if (list.isNotEmpty && !widget.trash)
               FloatingActionButton(
                   tooltip: AppLocalizations.of(context)!.scroll_to_today,
                   onPressed: () => scrollToToday(),
-                  backgroundColor: Style.primary,
-                  child: Icon(Icons.today, color: Style.text)),
+                  heroTag: "today",
+                  child: const Icon(Icons.today)),
             if (!kIsWeb && widget.agenda)
               Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: OpenContainerTemplate(
-                      child1: FloatingActionButton(
-                          tooltip: AppLocalizations.of(context)!.add,
-                          heroTag: "add",
-                          elevation: 0,
-                          onPressed: null,
-                          backgroundColor: Colors.transparent,
-                          child: Icon(Icons.add, color: Style.text)),
-                      child2: const AgendaDetails(add: true),
-                      onClosed: () => load(),
-                      radius: const BorderRadius.all(Radius.circular(32)),
-                      elevation: 6,
-                      color: Style.primary))
+                margin: const EdgeInsets.only(top: 20),
+                child: FloatingActionButton(
+                  tooltip: AppLocalizations.of(context)!.add,
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AgendaDetails(
+                                add: true,
+                              ))).then((_) => load()),
+                  heroTag: "add",
+                  child: const Icon(Icons.add),
+                ),
+              )
           ])),
       if (loading)
         Container(
-            color: Style.background.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
             alignment: Alignment.center,
             child: const CircularProgressIndicator())
     ]);
@@ -291,8 +301,9 @@ class _AgendaState extends State<Agenda> {
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.ok,
-                                style: TextStyle(color: Style.primary)))
+                            child: Text(
+                              AppLocalizations.of(context)!.ok,
+                            ))
                       ])));
     } else if (widget.trash &&
         !(Preferences.sharedPreferences.getBool(Preferences.helpTrash) ??
@@ -306,8 +317,9 @@ class _AgendaState extends State<Agenda> {
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.ok,
-                                style: TextStyle(color: Style.primary)))
+                            child: Text(
+                              AppLocalizations.of(context)!.ok,
+                            ))
                       ])));
     } else if (widget.search &&
         !(Preferences.sharedPreferences.getBool(Preferences.helpSearchAgenda) ??
@@ -322,8 +334,9 @@ class _AgendaState extends State<Agenda> {
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text(AppLocalizations.of(context)!.ok,
-                                style: TextStyle(color: Style.primary)))
+                            child: Text(
+                              AppLocalizations.of(context)!.ok,
+                            ))
                       ])));
     }
 

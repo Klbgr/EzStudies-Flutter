@@ -6,6 +6,14 @@ Ease your studies
 
 [English version below](#ezstudies-english)
 
+## Deprecated
+
+This project is deprecated and won't be updated anymore. Since graduating from CY Cergy Paris Université and starting a full-time job, I no longer have the time to maintain this project. And even if I had, I will soon lose access to the university's API, which will make the development impossible on my side.
+
+If you wish to maintain it, feel free to fork it or to contact me at [qiuantoine@gmail.com](mailto:qiuantoine@gmail.com) to contribute directly to this repo.
+
+However, the application is still working and can be used as is (Android and Web), until potential breaking changes on the university's side.
+
 ## Introduction
 
 Ce projet une évolution de [EzStudies](https://github.com/Klbgr/EzStudies) et a pour but de simplifier le quotidien des étudiants de CY Cergy Paris Université.
@@ -15,7 +23,7 @@ Comparé à la version précédente, cette version comporte de nombreuses diffé
 ## Fonctionnalités
 
 - Consultation de son emploi du temps via l'API de l'ENT de l'université, avec stockage hors ligne
-- Consultation de l'emploi du temps des autres étudiants de l'université
+- ~~Consultation de l'emploi du temps des autres étudiants de l'université~~ N'est plus possible à cause d'un changement du côté de l'API de l'ENT
 - Connexion à l'application avec ses identifiants de l'ENT de l'université
 - Communications sécurisées avec une API personnalisée pour réduire l'utilisation du processeur de l'appareil
 - Stockage sécurisé des identifiants de l'ENT pour communiquer avec l'API
@@ -108,7 +116,7 @@ Compared to the previous version, this one has many differences. The main differ
 ## Features
 
 - View your own agenda using the API of the ENT of the university, with offline storage
-- View the agenda of other students of the university
+- ~~View the agenda of other students of the university~~ No longer possible due to a change on the side of the API of the ENT
 - Log into the app with the credentials from the ENT of the university
 - Secured communications with a customised API  to reduce the processor usage of the device
 - Secured storage of credentials from the ENT of the university used to communicate with the custom API
@@ -149,7 +157,7 @@ You can however compile the application yourself for your iPhone if you have a r
 
 The source code of the custom API, used to make this app work, is located on the `EzStudies-Flutter/web/api` folder.
 
-The API is included in this procjet ease the deployment of the Web app.
+The API is included in this project ease the deployment of the Web app.
 
 ## Compilation
 
@@ -173,15 +181,15 @@ where `SERVER_URL` is the URL of the custom API and `CIPHER_KEY` a 32 characters
 xxx  
 ```
 ### Then  :
-- Generated texts of the app
+- Generate texts of the app
 ```
 flutter gen-l10n
 ```
-Note : you have to use this command each time you edit the files `app_en.arb` or `app_fr.arb`.
-- Generated environment variables
+Note : you have to use this command each time you change the `app_en.arb` or `app_fr.arb` files.
+- Generate environment variables
 ```
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
-Note : you have to use this command each time you edit the `.env` file.
+Note : you have to use this command each time you change the `.env` file.
 
 Finally, the app can be compiled and executed as usual.

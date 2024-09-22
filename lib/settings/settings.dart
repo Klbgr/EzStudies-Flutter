@@ -18,6 +18,7 @@ import '../utils/templates.dart';
 
 class Settings extends StatefulWidget {
   const Settings({required this.reloadTheme, super.key});
+
   final Function reloadTheme;
 
   @override
@@ -48,12 +49,19 @@ class _SettingsState extends State<Settings> {
       applicationType: ApplicationType.material,
       platform: DevicePlatform.android,
       lightTheme: SettingsThemeData(
-          settingsListBackground: Colors.transparent,
-          titleTextColor: Style.primary,
-          leadingIconsColor: Style.text,
-          tileDescriptionTextColor: Style.text,
-          settingsTileTextColor: Style.text,
-          tileHighlightColor: Style.ripple),
+        settingsListBackground: Theme.of(context).colorScheme.surface,
+        titleTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+        leadingIconsColor: Theme.of(context).textTheme.bodyMedium!.color,
+        tileDescriptionTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+        settingsTileTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+      ),
+      darkTheme: SettingsThemeData(
+        settingsListBackground: Theme.of(context).colorScheme.surface,
+        titleTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+        leadingIconsColor: Theme.of(context).textTheme.bodyMedium!.color,
+        tileDescriptionTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+        settingsTileTextColor: Theme.of(context).textTheme.bodyMedium!.color,
+      ),
       sections: [
         SettingsSection(
           title: Text(AppLocalizations.of(context)!.general, style: font),
@@ -184,7 +192,7 @@ class _SettingsState extends State<Settings> {
                     } else if (count == 4) {
                       date = null;
                       count = 0;
-                      launchUrl(Uri.parse("https://youtu.be/a3Z7zEc7AXQ"),
+                      launchUrl(Uri.parse("https://youtu.be/f8mL0_4GeV0"),
                           mode: LaunchMode.externalApplication);
                     } else {
                       count++;

@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../utils/style.dart';
 import '../utils/templates.dart';
 import 'agenda_cell_data.dart';
 
@@ -16,6 +15,7 @@ class AgendaDetails extends StatefulWidget {
       this.onClosed,
       this.onOpened,
       super.key});
+
   final bool add;
   final AgendaCellData? data;
   final bool editable;
@@ -212,7 +212,7 @@ class _AgendaDetailsState extends State<AgendaDetails> {
                     margin: const EdgeInsets.only(right: 20),
                     child: FloatingActionButton.extended(
                         backgroundColor: Colors.red,
-                        icon: Icon(Icons.refresh, color: Style.text),
+                        icon: const Icon(Icons.refresh),
                         onPressed: () {
                           AgendaCellData backup;
                           DatabaseHelper database = DatabaseHelper();
@@ -235,14 +235,16 @@ class _AgendaDetailsState extends State<AgendaDetails> {
                             });
                           });
                         },
-                        label: Text(AppLocalizations.of(context)!.reset,
-                            style: TextStyle(color: Style.text))),
+                        label: Text(
+                          AppLocalizations.of(context)!.reset,
+                        )),
                   ),
                 if (!kIsWeb && (widget.editable || widget.add))
                   FloatingActionButton.extended(
                       backgroundColor: Colors.green,
-                      icon: Icon(widget.add ? Icons.add : Icons.save,
-                          color: Style.text),
+                      icon: Icon(
+                        widget.add ? Icons.add : Icons.save,
+                      ),
                       onPressed: () {
                         DateTime start =
                             DateTime.fromMillisecondsSinceEpoch(newData.start);
@@ -359,10 +361,10 @@ class _AgendaDetailsState extends State<AgendaDetails> {
                         }
                       },
                       label: Text(
-                          widget.add
-                              ? AppLocalizations.of(context)!.add
-                              : AppLocalizations.of(context)!.save,
-                          style: TextStyle(color: Style.text)))
+                        widget.add
+                            ? AppLocalizations.of(context)!.add
+                            : AppLocalizations.of(context)!.save,
+                      ))
               ],
             ),
           )

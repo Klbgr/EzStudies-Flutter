@@ -4,12 +4,11 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:ezstudies/utils/preferences.dart';
-import 'package:ezstudies/utils/style.dart';
 import 'package:ezstudies/utils/templates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:http/http.dart' as http;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -100,10 +99,8 @@ class Update {
                                                       CrossAxisAlignment.end,
                                                   children: [
                                                     LinearProgressIndicator(
-                                                        value: downloadProgress,
-                                                        color: Style.primary,
-                                                        backgroundColor:
-                                                            Style.secondary),
+                                                      value: downloadProgress,
+                                                    ),
                                                     Container(
                                                         margin: const EdgeInsets
                                                             .only(top: 10),

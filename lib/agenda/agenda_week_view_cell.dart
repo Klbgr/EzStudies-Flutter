@@ -3,12 +3,12 @@ import 'package:ezstudies/agenda/agenda_details.dart';
 import 'package:ezstudies/utils/templates.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/style.dart';
 import '../utils/timestamp_utils.dart';
 
 class AgendaWeekViewCell extends StatefulWidget {
   const AgendaWeekViewCell(
       {required this.data, this.onClosed, this.onOpened, super.key});
+
   final AgendaCellData data;
   final Function? onClosed;
   final Function? onOpened;
@@ -35,14 +35,12 @@ class _AgendaWeekViewCellState extends State<AgendaWeekViewCell> {
                   Container(
                       alignment: Alignment.centerLeft,
                       child: Text("$start - $end",
-                          style: TextStyle(
-                              color: Style.text,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10))),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 10))),
                   Container(
                       alignment: Alignment.centerLeft,
                       child: Text(widget.data.description,
-                          style: TextStyle(color: Style.text, fontSize: 10),
+                          style: const TextStyle(fontSize: 10),
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis))
                 ])),
