@@ -32,14 +32,15 @@ class _ColorDialogState extends State<ColorDialog> {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.accent_color),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
-        ColorPicker(
-          hexInputBar: true,
-          labelTypes: const [],
-          pickerColor: Color(color).withAlpha(255),
-          onColorChanged: (Color newColor) =>
-              color = newColor.withAlpha(255).value,
-          enableAlpha: false,
-        ),
+        if (!useSystemAccent)
+          ColorPicker(
+            hexInputBar: true,
+            labelTypes: const [],
+            pickerColor: Color(color).withAlpha(255),
+            onColorChanged: (Color newColor) =>
+                color = newColor.withAlpha(255).value,
+            enableAlpha: false,
+          ),
         CheckboxListTile(
           controlAffinity: ListTileControlAffinity.leading,
           enabled: kIsWeb || Platform.isAndroid,
