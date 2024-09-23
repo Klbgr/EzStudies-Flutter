@@ -201,14 +201,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.5"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   dart_style:
     dependency: transitive
     description:
@@ -597,14 +589,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.16+1"
-  material_color_generator:
-    dependency: "direct main"
-    description:
-      name: material_color_generator
-      sha256: fa0ffc12d7cf6f13c41e35ac7f4265a49ec2f201b41b268fd8061da3bcc41131
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   material_color_utilities:
     dependency: transitive
     description:

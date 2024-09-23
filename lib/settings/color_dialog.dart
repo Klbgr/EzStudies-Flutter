@@ -52,7 +52,7 @@ class _ColorDialogState extends State<ColorDialog> {
               child: Icon(Icons.check_rounded,
                   size: 64,
                   color: (i == selectedIndex && !useSystemAccent)
-                      ? null
+                      ? Theme.of(context).colorScheme.surface
                       : Colors.transparent),
               onTap: () => setState(() {
                     selectedIndex = i;

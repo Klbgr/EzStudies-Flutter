@@ -84,23 +84,23 @@ class _HomeworksState extends State<Homeworks> {
                   remove(list[index]);
                 },
                 background: Container(
-                    color: Theme.of(context).colorScheme.error,
+                    color: Colors.redAccent,
                     child: Container(
                       margin: const EdgeInsets.only(left: 20, right: 20),
                       alignment: Alignment.centerLeft,
                       child: Icon(
                         Icons.delete,
-                        color: Theme.of(context).colorScheme.onError,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     )),
                 secondaryBackground: Container(
-                    color: Theme.of(context).colorScheme.error,
+                    color: Colors.redAccent,
                     child: Container(
                       margin: const EdgeInsets.only(left: 20, right: 20),
                       alignment: Alignment.centerRight,
                       child: Icon(
                         Icons.delete,
-                        color: Theme.of(context).colorScheme.onError,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     )),
                 child: _HomeworksCell(list[index],

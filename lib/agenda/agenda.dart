@@ -219,7 +219,9 @@ class _AgendaState extends State<Agenda> {
                         remove(data);
                       },
                       background: Container(
-                          color: widget.agenda ? Colors.red : Colors.green,
+                          color: widget.agenda
+                              ? Colors.redAccent
+                              : Colors.greenAccent,
                           child: Container(
                               margin: const EdgeInsets.only(left: 20),
                               child: Row(
@@ -229,20 +231,26 @@ class _AgendaState extends State<Agenda> {
                                       widget.agenda
                                           ? Icons.delete
                                           : Icons.restore_from_trash,
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
                                     )
                                   ]))),
                       secondaryBackground: Container(
-                          color: widget.agenda ? Colors.red : Colors.green,
+                          color: widget.agenda
+                              ? Colors.redAccent
+                              : Colors.greenAccent,
                           child: Container(
                               margin: const EdgeInsets.only(right: 20),
                               child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Icon(
-                                      widget.agenda
-                                          ? Icons.delete
-                                          : Icons.restore_from_trash,
-                                    )
+                                        widget.agenda
+                                            ? Icons.delete
+                                            : Icons.restore_from_trash,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface)
                                   ]))),
                       child: cell,
                     );
