@@ -219,9 +219,7 @@ class _AgendaState extends State<Agenda> {
                         remove(data);
                       },
                       background: Container(
-                          color: widget.agenda
-                              ? Colors.redAccent
-                              : Colors.greenAccent,
+                          color: widget.agenda ? Colors.red : Colors.green,
                           child: Container(
                               margin: const EdgeInsets.only(left: 20),
                               child: Row(
@@ -236,9 +234,7 @@ class _AgendaState extends State<Agenda> {
                                     )
                                   ]))),
                       secondaryBackground: Container(
-                          color: widget.agenda
-                              ? Colors.redAccent
-                              : Colors.greenAccent,
+                          color: widget.agenda ? Colors.red : Colors.green,
                           child: Container(
                               margin: const EdgeInsets.only(right: 20),
                               child: Row(
@@ -395,8 +391,8 @@ class _AgendaState extends State<Agenda> {
       if (itemScrollController.isAttached) {
         itemScrollController.scrollTo(
             index: index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.ease);
       }
     }
   }

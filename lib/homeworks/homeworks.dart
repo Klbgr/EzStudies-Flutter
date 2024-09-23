@@ -84,7 +84,7 @@ class _HomeworksState extends State<Homeworks> {
                   remove(list[index]);
                 },
                 background: Container(
-                    color: Colors.redAccent,
+                    color: Colors.red,
                     child: Container(
                       margin: const EdgeInsets.only(left: 20, right: 20),
                       alignment: Alignment.centerLeft,
@@ -94,7 +94,7 @@ class _HomeworksState extends State<Homeworks> {
                       ),
                     )),
                 secondaryBackground: Container(
-                    color: Colors.redAccent,
+                    color: Colors.red,
                     child: Container(
                       margin: const EdgeInsets.only(left: 20, right: 20),
                       alignment: Alignment.centerRight,
@@ -193,8 +193,8 @@ class _HomeworksState extends State<Homeworks> {
       if (itemScrollController.isAttached) {
         itemScrollController.scrollTo(
             index: index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.ease);
       }
     }
   }
