@@ -27,8 +27,9 @@ class Style {
   }
 
   static Color _getColor(double ratio) {
-    Color color = Colors.primaries[
-        Preferences.sharedPreferences.getInt(Preferences.accent) ?? 5];
+    Color color = Color(
+        Preferences.sharedPreferences.getInt(Preferences.accent) ??
+            Colors.primaries[5].value);
     if ((Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
             true) &&
         (kIsWeb || Platform.isAndroid)) {

@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:universal_io/io.dart';
 
 import '../utils/preferences.dart';
-import '../utils/style.dart';
 
 class ColorDialog extends StatefulWidget {
   const ColorDialog({required this.onClosed, super.key});
@@ -17,68 +17,40 @@ class ColorDialog extends StatefulWidget {
 
 class _ColorDialogState extends State<ColorDialog> {
   final int itemsPerLine = 4;
-  int selectedIndex =
-      Preferences.sharedPreferences.getInt(Preferences.accent) ?? 5;
+  int color = Preferences.sharedPreferences.getInt(Preferences.accent) ??
+      Colors.primaries[5].value;
   bool useSystemAccent =
       Preferences.sharedPreferences.getBool(Preferences.useSystemAccent) ??
           true;
 
   @override
   Widget build(BuildContext context) {
-    Column column = Column(
-        mainAxisSize: MainAxisSize.min, children: List.empty(growable: true));
-    Row row = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.empty(growable: true));
-    for (int i = 0; i < Colors.primaries.length; i++) {
-      if (i != 0 && i % itemsPerLine == 0) {
-        column.children.add(row);
-        row = Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.empty(growable: true));
-      } else if (i == Colors.primaries.length - 1) {
-        column.children.add(row);
-      }
-      row.children.add(Stack(
-        children: [
-          Icon(
-            Icons.circle,
-            color: (Style.theme == 0)
-                ? Colors.primaries[i].shade600
-                : Colors.primaries[i].shade700,
-            size: 64,
-          ),
-          GestureDetector(
-              child: Icon(Icons.check_rounded,
-                  size: 64,
-                  color: (i == selectedIndex && !useSystemAccent)
-                      ? Theme.of(context).colorScheme.surface
-                      : Colors.transparent),
-              onTap: () => setState(() {
-                    selectedIndex = i;
-                    useSystemAccent = false;
-                  }))
-        ],
-      ));
-    }
-
-    if (kIsWeb || Platform.isAndroid) {
-      column.children.add(CheckboxListTile(
-        controlAffinity: ListTileControlAffinity.leading,
-        value: useSystemAccent,
-        onChanged: (value) =>
-            setState(() => useSystemAccent = !useSystemAccent),
-        title: Text(
-          AppLocalizations.of(context)!.use_system_accent_color,
-        ),
-      ));
-    } else {
+    if (!kIsWeb && !Platform.isAndroid) {
       useSystemAccent = false;
     }
 
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.accent_color),
-      content: column,
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        ColorPicker(
+          hexInputBar: true,
+          labelTypes: const [],
+          pickerColor: Color(color).withAlpha(255),
+          onColorChanged: (Color newColor) =>
+              color = newColor.withAlpha(255).value,
+          enableAlpha: false,
+        ),
+        CheckboxListTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          enabled: kIsWeb || Platform.isAndroid,
+          value: useSystemAccent,
+          onChanged: (value) =>
+              setState(() => useSystemAccent = !useSystemAccent),
+          title: Text(
+            AppLocalizations.of(context)!.use_system_accent_color,
+          ),
+        )
+      ]),
       scrollable: true,
       actions: <Widget>[
         TextButton(
@@ -86,7 +58,7 @@ class _ColorDialogState extends State<ColorDialog> {
               AppLocalizations.of(context)!.ok,
             ),
             onPressed: () => Preferences.sharedPreferences
-                .setInt(Preferences.accent, selectedIndex)
+                .setInt(Preferences.accent, color)
                 .then((value) => Preferences.sharedPreferences
                         .setBool(Preferences.useSystemAccent, useSystemAccent)
                         .then((value) {
