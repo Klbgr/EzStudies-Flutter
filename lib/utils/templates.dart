@@ -160,6 +160,7 @@ class TextFormFieldTemplate extends StatefulWidget {
       this.hidden = false,
       this.multiline = false,
       this.autofillHints,
+      this.onFieldSubmitted,
       super.key});
 
   final String label;
@@ -174,6 +175,7 @@ class TextFormFieldTemplate extends StatefulWidget {
   final bool hidden;
   final bool multiline;
   final List<String>? autofillHints;
+  final Function()? onFieldSubmitted;
 
   @override
   State<TextFormFieldTemplate> createState() => _TextFormFieldTemplateState();
@@ -185,6 +187,14 @@ class _TextFormFieldTemplateState extends State<TextFormFieldTemplate> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textInputAction: widget.onFieldSubmitted == null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      onFieldSubmitted: (_) {
+        if (widget.onFieldSubmitted != null) {
+          widget.onFieldSubmitted!();
+        }
+      },
       autofillHints: widget.autofillHints,
       minLines: 1,
       maxLines: widget.multiline ? null : 1,

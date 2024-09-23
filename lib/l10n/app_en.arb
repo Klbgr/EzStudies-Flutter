@@ -60,7 +60,7 @@
   "error_credentials": "Incorrect name or password",
   "error_internet": "Please check your internet connection or retry later",
   "welcome_welcome": "Welcome to EzStudies 👋\nAn Open Source application made to ease your student life 😎\nWith to EzStudies, you will be able to manage your agenda, your homeworks and more 🔥",
-  "welcome_features": "Features:\n - View you agenda and the agenda of other students of the university 📅\n - Add, delete ou edit your agenda ✏\n - Receive reminders before each course 🔔\n - Add your homeworks 📖\n - Receive reminders for your homeworks 🔔\n - And more 🔥",
+  "welcome_features": "Features:\n - View your agenda 📅\n - Add, delete ou edit your agenda ✏\n - Receive reminders before each course 🔔\n - Add your homeworks 📖\n - Receive reminders for your homeworks 🔔\n - And more 🔥",
   "welcome_login": "To begin, log in using your credentials of the ENT 👇\nDon't worry, your credentials will be encrypted and won't go anywhere 🔒",
   "homeworks": "Homeworks",
   "error_conflict": "This element conflicts with another one already in the agenda",

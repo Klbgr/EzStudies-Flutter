@@ -69,11 +69,12 @@ class _WelcomeState extends State<Welcome> {
               Container(
                   margin: const EdgeInsets.only(bottom: 10, top: 20),
                   child: TextFormFieldTemplate(
-                      initialValue: name,
-                      label: AppLocalizations.of(context)!.name,
-                      icon: Icons.person,
-                      onChanged: (value) => name = value,
-                      autofillHints: const [AutofillHints.username])),
+                    initialValue: name,
+                    label: AppLocalizations.of(context)!.name,
+                    icon: Icons.person,
+                    onChanged: (value) => name = value,
+                    autofillHints: const [AutofillHints.username],
+                  )),
               TextFormFieldTemplate(
                 initialValue: password,
                 label: AppLocalizations.of(context)!.password,
@@ -81,6 +82,7 @@ class _WelcomeState extends State<Welcome> {
                 onChanged: (value) => password = value,
                 hidden: true,
                 autofillHints: const [AutofillHints.password],
+                onFieldSubmitted: () => start(),
               )
             ]),
             illustration: UnDrawIllustration.login),
